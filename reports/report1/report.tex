@@ -1,0 +1,92 @@
+% $Id
+
+%% Dokumentenklasse (Koma Script) -----------------------------------------
+\documentclass[%
+   %draft,     % Entwurfsstadium
+   final,      % fertiges Dokument
+	 % --- Paper Settings ---
+   paper=a4,% [Todo: add alternatives]
+   paper=portrait, % landscape
+   pagesize=auto, % driver
+   %twocolumn,
+   % --- Base Font Size ---
+   fontsize=10pt,%
+	 % --- Koma Script Version ---
+   version=last, %
+ ]{scrartcl} % Classes: scrartcl, scrreprt, scrbook
+
+
+% Encoding der Dateien (sonst funktionieren Umlaute nicht)
+% Fuer Linux -> utf8
+% Fuer Windows, alte Linux Distributionen -> latin1
+
+% Empfohlen latin1, da einige Pakete mit utf8 Zeichen nicht
+% funktionieren, z.B: listings, soul.
+
+%\usepackage[latin1]{inputenc}
+%\usepackage[ansinew]{inputenc}
+\usepackage[utf8]{inputenc}
+%\usepackage{ucs}
+%\usepackage[utf8x]{inputenc}
+
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\addto\captionsenglish{
+  \renewcommand{\contentsname}{Table of Contents}
+}
+
+\renewcommand{\rmdefault}{phv} % Arial
+\renewcommand{\sfdefault}{phv} % Arial
+
+\usepackage{appendix}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{caption}
+%\usepackage{mathtools}
+\usepackage{amsmath}
+
+\usepackage{subcaption}
+%prefer subcaption instead of subfigure
+%\usepackage{subfigure}
+
+\usepackage{float}
+
+%\usepackage{hyperref}
+
+\sffamily
+
+%% Titel -----------------------------------------
+\title{Topic Detection and Tracking System}
+\subtitle{Research Project Master Artificial Intelligence Group 5}
+\author{Daniel Brüggemann\\Yannik Hermey\\Carsten Orth\\Darius Schneider\\Stefan Selzer}
+
+%% Dokument -----------------------------------------
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\newpage
+
+\tableofcontents
+\newpage
+
+
+\input{./tex/introduction.tex}
+\input{./tex/stateOfTheArt.tex}
+\input{./tex/data.tex}
+\input{./tex/plan.tex}
+
+% Bibliography:
+%\clearpage
+\addcontentsline{toc}{section}{Bibliography}
+
+\bibliographystyle{apalike}
+\bibliography{./tex/report}
+
+%\input{./tex/contribution.tex}
+
+\end{document}
