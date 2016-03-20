@@ -93,6 +93,8 @@ class Stemmer
     * and getResultLength (which is generally more efficient.)
     */
    public String toString() { return new String(b,0,i_end); }
+   
+   public String getOriginal(){ return new String(b,0,i);}
 
    /**
     * Returns the length of the word resulting from the stemming process.
