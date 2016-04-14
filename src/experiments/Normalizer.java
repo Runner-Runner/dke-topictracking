@@ -1,22 +1,36 @@
 package experiments;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashSet;
 
 public class Normalizer {
-	public static final char WORD_DELIMITER = ' ';
 
 	public static void main(String[] args) {
 		String inpath = "ressources/testArticle.txt";
-		String outpath = "ressources/testArticle_n.txt";
 		String stopwordpath = "ressources/stopwords.txt";
-		normalize(inpath, outpath, readStopwords(stopwordpath));
+		String vocabularyPath ="ressources/vocabulary.txt";
+		String wordVectorPath ="ressources/wordVectors.txt";
+		
+		HashSet<String> stopwords = readStopwords(stopwordpath);
+		
+		// create vocabulary
+		Vocabulary vocabulary = new Vocabulary(1000);
+		// add textfile to vocabulary -> usually more than one
+		normalize(inpath, vocabulary, stopwords);
+		// write vocabulary to file
+		vocabulary.saveVocabulary(vocabularyPath);
+		
+		// count words
+		WordCounter wordCounter = new WordCounter(vocabularyPath);
+		// read each file separate
+		wordCounter.startNewDocument();
+		normalize(inpath, wordCounter, stopwords);
+		// save counted words
+		wordCounter.saveDocuments(wordVectorPath);
 	}
 
 	public static HashSet<String> readStopwords(String path) {
@@ -35,23 +49,13 @@ public class Normalizer {
 		return stopwords;
 	}
 
-	public static void normalize(String inputPath, String outputPath, HashSet<String> stopwords) {
+	public static void normalize(String inputPath, WordHandler wordHandler, HashSet<String> stopwords) {
 		char[] w = new char[501]; // word buffer
 		Stemmer s = new Stemmer();
 		FileInputStream in = null;
-		PrintWriter out = null;
 		try {
 			// input file
 			in = new FileInputStream(inputPath);
-
-			// if outputFile doesnt exists, then create it
-			File outputFile = new File(outputPath);
-			if (!outputFile.exists()) {
-				outputFile.createNewFile();
-			}
-
-			// output file
-			out = new PrintWriter(outputFile, "UTF-8");
 
 			// traverse file bytewise
 			while (true) {
@@ -76,7 +80,7 @@ public class Normalizer {
 								String original = s.getOriginal();
 								s.stem();
 								if(!stopwords.contains(original)){
-									out.write(s.toString() + WORD_DELIMITER);
+									wordHandler.addWord(s.toString());
 								}
 								
 							}
@@ -90,10 +94,7 @@ public class Normalizer {
 			}
 			in.close();
 		} catch (FileNotFoundException e) {
-		} catch (IOException e) {
-		} finally {
-			out.close();
-		}
+		} catch (IOException e) {}
 	}
 
 }
