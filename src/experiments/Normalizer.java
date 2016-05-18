@@ -10,8 +10,7 @@ import java.util.HashSet;
 public class Normalizer {
 
 	public static void main(String[] args) {
-//		String[] inpaths = {"ressources/testArticle.txt"};
-		String[] inpaths = {"ressources/art1.txt", "ressources/art2.txt"};
+		String[] inpaths = {"ressources/testArticle.txt"};
 		String stopwordpath = "ressources/stopwords.txt";
 		String vocabularyPath ="ressources/vocabulary.txt";
 		String wordVectorPath ="ressources/wordVectors.txt";
