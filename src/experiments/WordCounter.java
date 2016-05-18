@@ -15,6 +15,8 @@ public class WordCounter implements WordHandler {
 	private HashMap<String, Integer> currentDocument; // word -> count
 	private HashMap<String, Integer> vocabulary; // word -> index
 
+  private boolean tfidf = true;
+  
 	public WordCounter(String vocabularyFile) {
 		documents = new LinkedList<HashMap<String, Integer>>();
 		loadVocabulary(vocabularyFile);
@@ -49,7 +51,19 @@ public class WordCounter implements WordHandler {
 				// start with number of pairs
 				writer.print(doc.size() + " ");
 				for (Entry<String, Integer> entry : doc.entrySet()) {
-					writer.print(vocabulary.get(entry.getKey()) + ":" + entry.getValue() + " ");
+          
+          String term = entry.getKey();
+          String termValue;
+          if(tfidf)
+          {
+            termValue = String.valueOf(calculateTFIDF(term, entry.getValue()));
+          }
+          else
+          {
+            termValue = String.valueOf(entry.getValue());
+          }
+          
+          writer.print(vocabulary.get(term) + ":" + termValue + " ");
 				}
 				writer.println();
 			}
@@ -67,4 +81,20 @@ public class WordCounter implements WordHandler {
 		else
 			currentDocument.put(word, count + 1);
 	}
+  
+  public double calculateTFIDF(String term, int tf)
+  {
+    double N = documents.size();
+    double termDocumentFrequency = 0;
+    for(HashMap<String, Integer> document : documents)
+    {
+      if(document.containsKey(term))
+      {
+        termDocumentFrequency++;
+      }
+    }
+    double idf = Math.log10(N / termDocumentFrequency);
+    
+    return tf * idf;
+  }
 }

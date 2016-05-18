@@ -10,7 +10,8 @@ import java.util.HashSet;
 public class Normalizer {
 
 	public static void main(String[] args) {
-		String inpath = "ressources/testArticle.txt";
+//		String[] inpaths = {"ressources/testArticle.txt"};
+		String[] inpaths = {"ressources/art1.txt", "ressources/art2.txt"};
 		String stopwordpath = "ressources/stopwords.txt";
 		String vocabularyPath ="ressources/vocabulary.txt";
 		String wordVectorPath ="ressources/wordVectors.txt";
@@ -20,15 +21,24 @@ public class Normalizer {
 		// create vocabulary
 		Vocabulary vocabulary = new Vocabulary(1000);
 		// add textfile to vocabulary -> usually more than one
-		normalize(inpath, vocabulary, stopwords);
+//		normalize(inpath, vocabulary, stopwords);
+    for(String inpath : inpaths)
+    {
+      normalize(inpath, vocabulary, stopwords);
+    }
 		// write vocabulary to file
 		vocabulary.saveVocabulary(vocabularyPath);
 		
 		// count words
 		WordCounter wordCounter = new WordCounter(vocabularyPath);
 		// read each file separate
-		wordCounter.startNewDocument();
-		normalize(inpath, wordCounter, stopwords);
+		
+    for(String inpath : inpaths)
+    {
+      wordCounter.startNewDocument();
+      normalize(inpath, wordCounter, stopwords);
+    }
+    
 		// save counted words
 		wordCounter.saveDocuments(wordVectorPath);
 	}
