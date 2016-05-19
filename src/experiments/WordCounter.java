@@ -5,13 +5,16 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
 public class WordCounter implements WordHandler
 {
+  private List<String> documentNames;
   private List<HashMap<String, Integer>> documents;
   private HashMap<String, Integer> currentDocument; // word -> count
   private HashMap<String, Integer> vocabulary; // word -> index
@@ -20,7 +23,8 @@ public class WordCounter implements WordHandler
 
   public WordCounter(String vocabularyFile)
   {
-    documents = new LinkedList<HashMap<String, Integer>>();
+    documents = new LinkedList<>();
+    documentNames = new ArrayList<>();
     loadVocabulary(vocabularyFile);
   }
 
@@ -45,10 +49,11 @@ public class WordCounter implements WordHandler
     }
   }
 
-  public void startNewDocument()
+  public void startNewDocument(String name)
   {
     currentDocument = new HashMap<>();
     documents.add(currentDocument);
+    documentNames.add(name);
   }
 
   public void saveDocuments(String fileName)
@@ -101,8 +106,12 @@ public class WordCounter implements WordHandler
     }
   }
 
-  public double calculateTFIDF(String term, int tf)
+  public double calculateTFIDF(String term, Integer tf)
   {
+    if(tf == null)
+    {
+      return 0;
+    }
     double N = documents.size();
     double termDocumentFrequency = 0;
     for (HashMap<String, Integer> document : documents)
@@ -115,5 +124,33 @@ public class WordCounter implements WordHandler
     double idf = Math.log10(N / termDocumentFrequency);
 
     return tf * idf;
+  }
+
+  public double[][] getDocumentTermMatrix()
+  {
+    double[][] documentTermMatrix = new double[documents.size()][vocabulary.size()];
+
+    for(int i=0; i<documents.size(); i++)
+    {
+      HashMap<String, Integer> document = documents.get(i);
+      Iterator<String> vocabularyIterator = vocabulary.keySet().iterator();
+      for(int j=0; j<vocabulary.size(); j++)
+      {
+        String term = vocabularyIterator.next();
+        Integer tf = document.get(term);
+        documentTermMatrix[i][j] = calculateTFIDF(term, tf);
+      }
+    }
+    return documentTermMatrix;
+  }
+
+  public HashMap<String, Integer> getVocabulary()
+  {
+    return vocabulary;
+  }
+  
+  public List<String> getDocumentNames()
+  {
+    return documentNames;
   }
 }
