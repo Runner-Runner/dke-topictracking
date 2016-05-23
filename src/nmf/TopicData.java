@@ -56,15 +56,16 @@ public class TopicData
         topic.addTerm(term, termValue);
       }
 
-      Vector rowVector = topicDocumentMatrix.getRowVector(i);
+      Vector columnVector = topicDocumentMatrix.getColumnVector(i);
       double tfidfSum = 0;
       
       TreeMap<Double, String> documentRankings = new TreeMap<>();
-      for (int j = 0; j < rowVector.getDim(); j++)
+      //TODO Maybe just wrong dimension here?
+      for (int j = 0; j < columnVector.getDim(); j++)
       {
-        double tfidf = rowVector.get(j);
+        double tfidf = columnVector.get(j);
         tfidfSum += tfidf;
-        documentRankings.put(tfidfSum, documentNames.get(j));
+        documentRankings.put(tfidf, documentNames.get(j));
       }
       topic.setDocumentRanking(documentRankings);
       topics.put(tfidfSum, topic);

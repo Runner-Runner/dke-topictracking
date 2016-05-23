@@ -14,28 +14,43 @@ public class Normalizer
 
   public static void main(String[] args)
   {
-    Normalizer normalizer = new Normalizer();
-//    normalizer.start("ressources/art1.txt", "ressources/art2.txt");
-    normalizer.start("ressources/19960829_small");
+    String[] directoryPaths =
+    {
+      "ressources/19960829",
+//      "ressources/19960830",
+//      "ressources/19960831",
+//      "ressources/19960901",
+    };
+
+    for(String dirPath : directoryPaths)
+    {
+      Normalizer normalizer = new Normalizer();
+      normalizer.start(dirPath);
+    }
   }
 
   public void start(String... inpaths)
   {
+    if (inpaths.length == 0)
+    {
+      return;
+    }
+
     File[] files = new File[inpaths.length];
     for (int i = 0; i < files.length; i++)
     {
       files[i] = new File(inpaths[i]);
     }
-    start(files);
+    start(files, inpaths[0]);
   }
 
   public void start(String directoryPath)
   {
     File dirFile = new File(directoryPath);
-    start(dirFile.listFiles());
+    start(dirFile.listFiles(), directoryPath);
   }
 
-  public void start(File[] files)
+  public void start(File[] files, String outputFileName)
   {
     String stopwordpath = "ressources/stopwords.txt";
     String vocabularyPath = "ressources/vocabulary.txt";
@@ -64,7 +79,7 @@ public class Normalizer
       normalize(file, wordCounter, stopwords);
     }
 
-    NMFExecutor nmfExecutor = new NMFExecutor(wordCounter, 50);
+    NMFExecutor nmfExecutor = new NMFExecutor(wordCounter, 50, outputFileName);
     nmfExecutor.execute();
 
     // save counted words

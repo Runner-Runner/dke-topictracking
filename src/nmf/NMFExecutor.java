@@ -1,6 +1,12 @@
 package nmf;
 
 import experiments.WordCounter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import la.matrix.Matrix;
 import ml.clustering.Clustering;
 import ml.clustering.KMeans;
@@ -13,11 +19,13 @@ public class NMFExecutor
   private WordCounter wordCounter;
   private int topicCount;
   private TopicData topicData;
+  private String outputFileName;
 
-  public NMFExecutor(WordCounter wordCounter, int topicCount)
+  public NMFExecutor(WordCounter wordCounter, int topicCount, String outputFileName)
   {
     this.wordCounter = wordCounter;
     this.topicCount = topicCount;
+    this.outputFileName = outputFileName;
   }
 
   public void execute()
@@ -54,17 +62,47 @@ public class NMFExecutor
     nmf.feedData(documentTermMatrix);
     // NMF.initialize(null); 
     nmf.clustering(indicatorMatrix);
-    
+
     Matrix topicTerm = nmf.getCenters();
     Matrix topicDocument = nmf.getIndicatorMatrix();
-    
-    topicData = new TopicData(topicTerm, topicDocument, 
+
+    topicData = new TopicData(topicTerm, topicDocument,
             wordCounter.getVocabulary().keySet(), wordCounter.getDocumentNames());
-    
+
     topicData.getTopics();
-    
+
     System.out.println(topicData);
-    
+
+    File outputFile = new File(outputFileName);
+
+    String suffix = "_";
+    int nr = 2;
+    String path = outputFile.getPath();
+    int lastIndexOf = path.lastIndexOf(".");
+    String pathWithoutType = path.substring(0, 
+            lastIndexOf == -1 ? path.length() : lastIndexOf);
+    String fileType = ".txt";
+
+    while (outputFile.exists())
+    {
+      outputFile = new File(pathWithoutType + suffix + nr + fileType);
+      nr++;
+    }
+
+    try
+    {
+      PrintWriter writer = new PrintWriter(
+              new FileWriter(outputFile.getPath(), true));
+
+      writer.println(topicData);
+
+      writer.close();
+    }
+    catch (IOException ex)
+    {
+      Logger.getLogger(NMFExecutor.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
     // If null, KMeans will be used for initialization 
 //    System.out.println("Basis Matrix:");
 //    printMatrix(full(topicTerm));
