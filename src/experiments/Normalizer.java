@@ -6,17 +6,24 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import nmf.NMFExecutor;
 
 public class Normalizer
 {
+  private static HashMap<String, String> stemmingOriginalMapping;
 
+  static
+  {
+    stemmingOriginalMapping = new HashMap<>();
+  }
+  
   public static void main(String[] args)
   {
     String[] directoryPaths =
     {
-      "ressources/19960829",
+      "ressources/19960829_small",
 //      "ressources/19960830",
 //      "ressources/19960831",
 //      "ressources/19960901",
@@ -108,7 +115,7 @@ public class Normalizer
     return stopwords;
   }
 
-  public static void normalize(File inputFile, WordHandler wordHandler, HashSet<String> stopwords)
+  public void normalize(File inputFile, WordHandler wordHandler, HashSet<String> stopwords)
   {
     char[] w = new char[501]; // word buffer
     Stemmer s = new Stemmer();
@@ -152,6 +159,7 @@ public class Normalizer
                 if (!stopwords.contains(original))
                 {
                   wordHandler.addWord(s.toString());
+                  stemmingOriginalMapping.put(s.toString(), original);
                 }
 
               }
@@ -174,5 +182,14 @@ public class Normalizer
     {
     }
   }
-
+  
+  public static String getOriginal(String stemmedTerm)
+  {
+    String original = stemmingOriginalMapping.get(stemmedTerm);
+    if(original == null)
+    {
+      original = stemmedTerm;
+    }
+    return original;
+  }
 }

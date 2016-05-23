@@ -1,5 +1,6 @@
 package nmf;
 
+import experiments.Normalizer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -99,7 +100,8 @@ public class TopicData
           break;
         }
         String term = termEntry.getValue();
-        termsText += " " + term + " (" + tfidf + ")";
+        String original = Normalizer.getOriginal(term);
+        termsText += " " + original + " (" + tfidf + ")";
       }
       
       termsText += "\nMost Relevant Documents: ";
