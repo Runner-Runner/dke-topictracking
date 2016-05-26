@@ -29,36 +29,21 @@ public class Normalizer
   {
 //    testWithTopicFiles();
     
-//    String[] directoryPaths =
-//    {
-//      "ressources/month",
-////      "ressources/19960829",
-////      "ressources/19960830",
-////      "ressources/19960831",
-////      "ressources/19960901",
-//    };
-//
-//    for (String dirPath : directoryPaths)
-//    {
-//      Normalizer normalizer = new Normalizer();
-//      normalizer.start(dirPath);
-//    }
-	    String stopwordpath = "ressources/stopwords.txt";
-	    String vocabularyPath = "ressources/vocabulary.txt";
-	    String wordVectorPath = "ressources/wordVectors.txt";
+    String[] directoryPaths =
+    {
+      "ressources/month",
+//      "ressources/19960829",
+//      "ressources/19960830",
+//      "ressources/19960831",
+//      "ressources/19960901",
+    };
 
-	    HashSet<String> stopwords = readStopwords(stopwordpath);
-
-	    // create vocabulary
-	    Vocabulary vocabulary = new Vocabulary(1000);
-	    // add textfile to vocabulary -> usually more than one
-//			normalize(inpath, vocabulary, stopwords);
-	    File dir = new File("ressources/corpus/19960829");
-	    Normalizer n = new Normalizer();
-	    for (File file : dir.listFiles())
-	    {
-	      n.normalize(file, vocabulary, stopwords);
-	    }
+    for (String dirPath : directoryPaths)
+    {
+      Normalizer normalizer = new Normalizer();
+      normalizer.start(dirPath);
+    }
+	   
   }
 
   public static void testWithTopicFiles()
@@ -175,6 +160,11 @@ public class Normalizer
 
   public void normalize(File inputFile, WordHandler wordHandler, HashSet<String> stopwords)
   {
+	  if(inputFile.isDirectory()){
+		  for(File subfile:inputFile.listFiles())
+			  normalize(subfile,wordHandler,stopwords);
+		  return;
+	  }
     char[] w = new char[501]; // word buffer
     Stemmer s = new Stemmer();
     FileInputStream in = null;
@@ -213,8 +203,8 @@ public class Normalizer
                 }
                 // check if its a stopword
                 String original = s.getOriginal();
-                String americanized = Americanizer.americanize(original).toLowerCase();
                 s.stem();
+                String americanized = Americanizer.americanize(original).toLowerCase();
                 if(!original.equals(americanized)){
                 	System.out.println("changed "+original+" to "+americanized);
                 	for(char signleChar:americanized.toCharArray())
