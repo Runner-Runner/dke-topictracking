@@ -1,5 +1,6 @@
 package nmf;
 
+import experiments.Utilities;
 import experiments.WordCounter;
 import java.io.File;
 import java.io.FileWriter;
@@ -69,25 +70,9 @@ public class NMFExecutor
     topicData = new TopicData(topicTerm, topicDocument,
             wordCounter.getVocabulary().keySet(), wordCounter.getDocumentNames());
 
-    topicData.getTopics();
-
     System.out.println(topicData);
-
-    File outputFile = new File(outputFileName);
-
-    String suffix = "_";
-    int nr = 2;
-    String path = outputFile.getPath();
-    int lastIndexOf = path.lastIndexOf(".");
-    String pathWithoutType = path.substring(0, 
-            lastIndexOf == -1 ? path.length() : lastIndexOf);
-    String fileType = ".txt";
-
-    while (outputFile.exists())
-    {
-      outputFile = new File(pathWithoutType + suffix + nr + fileType);
-      nr++;
-    }
+    
+    File outputFile = Utilities.getNextUnusedFile(new File(outputFileName));
 
     try
     {
@@ -102,7 +87,9 @@ public class NMFExecutor
     {
       Logger.getLogger(NMFExecutor.class.getName()).log(Level.SEVERE, null, ex);
     }
-
+    
+    File topicDataFile = topicData.writeToFile();
+    
     // If null, KMeans will be used for initialization 
 //    System.out.println("Basis Matrix:");
 //    printMatrix(full(topicTerm));

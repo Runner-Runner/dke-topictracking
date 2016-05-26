@@ -12,13 +12,16 @@ import nmf.NMFExecutor;
 
 public class Normalizer
 {
+  //TODO Try own simple time model? Topics for each day, check top ranked (tfidf) words
+  //for similarities
+  //Maybe even calculate daywise AND weekwise/monthwise, and compare?
   private static HashMap<String, String> stemmingOriginalMapping;
 
   static
   {
     stemmingOriginalMapping = new HashMap<>();
   }
-  
+
   public static void main(String[] args)
   {
     String[] directoryPaths =
@@ -29,7 +32,7 @@ public class Normalizer
 //      "ressources/19960901",
     };
 
-    for(String dirPath : directoryPaths)
+    for (String dirPath : directoryPaths)
     {
       Normalizer normalizer = new Normalizer();
       normalizer.start(dirPath);
@@ -158,8 +161,12 @@ public class Normalizer
                 s.stem();
                 if (!stopwords.contains(original))
                 {
-                  wordHandler.addWord(s.toString());
-                  stemmingOriginalMapping.put(s.toString(), original);
+                  String stemmString = s.toString();
+                  wordHandler.addWord(stemmString);
+                  if (!stemmString.equals(original))
+                  {
+                    stemmingOriginalMapping.put(stemmString, original);
+                  }
                 }
 
               }
@@ -182,14 +189,19 @@ public class Normalizer
     {
     }
   }
-  
+
   public static String getOriginal(String stemmedTerm)
   {
     String original = stemmingOriginalMapping.get(stemmedTerm);
-    if(original == null)
+    if (original == null)
     {
       original = stemmedTerm;
     }
     return original;
+  }
+
+  public static HashMap<String, String> getStemmingOriginalMapping()
+  {
+    return stemmingOriginalMapping;
   }
 }
