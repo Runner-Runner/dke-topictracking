@@ -1,6 +1,7 @@
 package experiments;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,7 +11,7 @@ import java.util.HashSet;
 public class Normalizer {
 
 	public static void main(String[] args) {
-		String inpath = "ressources/testArticle.txt";
+		String inpath = "ressources/corpus";
 		String stopwordpath = "ressources/stopwords.txt";
 		String vocabularyPath ="ressources/vocabulary.txt";
 		String wordVectorPath ="ressources/wordVectors.txt";
@@ -19,18 +20,29 @@ public class Normalizer {
 		
 		// create vocabulary
 		Vocabulary vocabulary = new Vocabulary(1000);
+		MySpellChecker msc = new MySpellChecker();
 		// add textfile to vocabulary -> usually more than one
-		normalize(inpath, vocabulary, stopwords);
+		extractVocabulary(new File(inpath), vocabulary, stopwords,msc);
 		// write vocabulary to file
 		vocabulary.saveVocabulary(vocabularyPath);
 		
 		// count words
-		WordCounter wordCounter = new WordCounter(vocabularyPath);
+		//WordCounter wordCounter = new WordCounter(vocabularyPath);
 		// read each file separate
-		wordCounter.startNewDocument();
-		normalize(inpath, wordCounter, stopwords);
+		//wordCounter.startNewDocument();
+		//normalize(inpath, wordCounter, stopwords);
 		// save counted words
-		wordCounter.saveDocuments(wordVectorPath);
+		//wordCounter.saveDocuments(wordVectorPath);
+	}
+	private static void extractVocabulary(File file, Vocabulary voc, HashSet<String>stopwords,MySpellChecker msc){
+		if(file.isDirectory()){
+			for(File f: file.listFiles()){
+				extractVocabulary(f,voc	, stopwords,msc);
+			}
+		}
+		else if(file.getName().endsWith(".text")){
+			normalize(file.getAbsolutePath(), voc, stopwords,msc);
+		}
 	}
 
 	public static HashSet<String> readStopwords(String path) {
@@ -45,11 +57,12 @@ public class Normalizer {
 			}
 			br.close();
 		} catch (Exception e) {
+			System.out.println("failure reading stopwords");
 		}
 		return stopwords;
 	}
 
-	public static void normalize(String inputPath, WordHandler wordHandler, HashSet<String> stopwords) {
+	public static void normalize(String inputPath, WordHandler wordHandler, HashSet<String> stopwords, MySpellChecker msc) {
 		char[] w = new char[501]; // word buffer
 		Stemmer s = new Stemmer();
 		FileInputStream in = null;
@@ -64,7 +77,7 @@ public class Normalizer {
 					int j = 0;
 					// traverse current word
 					while (true) {
-						ch = Character.toLowerCase((char) ch);
+						//ch = Character.toLowerCase((char) ch);
 						w[j] = (char) ch;
 						if (j < 500)
 							j++;
@@ -78,7 +91,10 @@ public class Normalizer {
 									s.add(w[c]);
 								// check if its a stopword
 								String original = s.getOriginal();
+								if(!original.toUpperCase().equals(original))
+									msc.spellCheck(original);
 								s.stem();
+								
 								if(!stopwords.contains(original)){
 									wordHandler.addWord(s.toString());
 								}
