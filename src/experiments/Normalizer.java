@@ -6,15 +6,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import nmf.NMFExecutor;
+import nmf.TopicData;
+import wordnet.TopicMatcher;
 
 public class Normalizer
 {
-  //TODO Try own simple time model? Topics for each day, check top ranked (tfidf) words
-  //for similarities
-  //Maybe even calculate daywise AND weekwise/monthwise, and compare?
   private static HashMap<String, String> stemmingOriginalMapping;
 
   static
@@ -24,9 +26,12 @@ public class Normalizer
 
   public static void main(String[] args)
   {
+//    testWithTopicFiles();
+    
     String[] directoryPaths =
     {
-      "ressources/19960829_small",
+      "ressources/month",
+//      "ressources/19960829",
 //      "ressources/19960830",
 //      "ressources/19960831",
 //      "ressources/19960901",
@@ -39,8 +44,24 @@ public class Normalizer
     }
   }
 
+  public static void testWithTopicFiles()
+  {
+    File file1 = new File("ressources/topicdata.txt");
+    File file2 = new File("ressources/topicdata_2.txt");
+    
+    TopicData topicData1 = TopicData.loadFromFile(file1);
+    TopicData topicData2 = TopicData.loadFromFile(file2);
+    
+    TopicMatcher topicMatcher = new TopicMatcher();
+    topicMatcher.compareTopicData(topicData1, topicData2);
+    
+    int a = 3;
+    
+  }
+  
   public void start(String... inpaths)
   {
+    
     if (inpaths.length == 0)
     {
       return;
@@ -51,16 +72,33 @@ public class Normalizer
     {
       files[i] = new File(inpaths[i]);
     }
-    start(files, inpaths[0]);
+    start(Arrays.asList(files), inpaths[0]);
   }
 
   public void start(String directoryPath)
   {
     File dirFile = new File(directoryPath);
-    start(dirFile.listFiles(), directoryPath);
+    File[] listFiles = dirFile.listFiles();
+    List<File> upperFileList = new ArrayList<>();
+    upperFileList.addAll(Arrays.asList(listFiles));
+    
+    List<File> textFiles = new ArrayList<>();
+    for(File file : upperFileList)
+    {
+      if(file.isDirectory())
+      {
+        textFiles.addAll(Arrays.asList(file.listFiles()));
+      }
+      else
+      {
+        textFiles.add(file);
+      }
+    }
+    
+    start(textFiles, directoryPath);
   }
 
-  public void start(File[] files, String outputFileName)
+  public void start(List<File> files, String outputFileName)
   {
     String stopwordpath = "ressources/stopwords.txt";
     String vocabularyPath = "ressources/vocabulary.txt";

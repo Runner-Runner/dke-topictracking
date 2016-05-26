@@ -52,9 +52,11 @@ public class TopicData
     loadTopics();
   }
 
-  public Collection<Topic> getTopics()
+  public List<Topic> getTopics()
   {
-    return topics.values();
+    List<Topic> topicList = new ArrayList<>();
+    topicList.addAll(topics.values());
+    return topicList;
   }
 
   private void loadTopics()
@@ -301,43 +303,7 @@ public class TopicData
       Map.Entry<Double, Topic> topicEntry = topicIterator.next();
       Double cumulatedTfidf = topicEntry.getKey();
       Topic topic = topicEntry.getValue();
-      Iterator<Map.Entry<Double, String>> termIterator
-              = topic.getTerms().descendingMap().entrySet().iterator();
-
-      String termsText = "";
-      int termIndex = 0;
-      while (termIterator.hasNext() && termIndex < 10)
-      {
-        termIndex++;
-        Map.Entry<Double, String> termEntry = termIterator.next();
-        Double tfidf = termEntry.getKey();
-        if (tfidf <= 0.00001)
-        {
-          break;
-        }
-        String term = termEntry.getValue();
-        String original = Normalizer.getOriginal(term);
-        termsText += " " + original + " (" + tfidf + ")";
-      }
-
-      termsText += "\nMost Relevant Documents: ";
-      Iterator<Map.Entry<Double, String>> docIterator
-              = topic.getDocumentRankings().descendingMap().entrySet().iterator();
-      int docIndex = 0;
-      while (docIterator.hasNext() && docIndex < 3)
-      {
-        docIndex++;
-        Map.Entry<Double, String> docEntry = docIterator.next();
-        Double tfidf = docEntry.getKey();
-        if (tfidf <= 0.00001)
-        {
-          break;
-        }
-        String doc = docEntry.getValue();
-        termsText += " " + doc + " (" + tfidf + ")";
-      }
-
-      text += "\nTopic #" + index + " (" + cumulatedTfidf + "):" + termsText;
+      text += "\nTopic #" + index + " (" + cumulatedTfidf + "):" + topic;
     }
     return text;
   }
