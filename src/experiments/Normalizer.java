@@ -6,39 +6,79 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import nmf.NMFExecutor;
+import nmf.TopicData;
+import wordnet.TopicMatcher;
 
 public class Normalizer
 {
   private static HashMap<String, String> stemmingOriginalMapping;
-
-
   static
   {
     stemmingOriginalMapping = new HashMap<>();
   }
-  
-  public static void main(String[] args)
-  {
-    String[] directoryPaths =
-    {
-      "ressources/19960829_small",
-//      "ressources/19960830",
-//      "ressources/19960831",
-//      "ressources/19960901",
-    };
-
-    for(String dirPath : directoryPaths)
-    {
-      Normalizer normalizer = new Normalizer();
-      normalizer.start(dirPath);
-    }
+  public Normalizer() {
   }
 
+  public static void main(String[] args)
+  {
+//    testWithTopicFiles();
+    
+//    String[] directoryPaths =
+//    {
+//      "ressources/month",
+////      "ressources/19960829",
+////      "ressources/19960830",
+////      "ressources/19960831",
+////      "ressources/19960901",
+//    };
+//
+//    for (String dirPath : directoryPaths)
+//    {
+//      Normalizer normalizer = new Normalizer();
+//      normalizer.start(dirPath);
+//    }
+	    String stopwordpath = "ressources/stopwords.txt";
+	    String vocabularyPath = "ressources/vocabulary.txt";
+	    String wordVectorPath = "ressources/wordVectors.txt";
+
+	    HashSet<String> stopwords = readStopwords(stopwordpath);
+
+	    // create vocabulary
+	    Vocabulary vocabulary = new Vocabulary(1000);
+	    // add textfile to vocabulary -> usually more than one
+//			normalize(inpath, vocabulary, stopwords);
+	    File dir = new File("ressources/corpus/19960829");
+	    Normalizer n = new Normalizer();
+	    for (File file : dir.listFiles())
+	    {
+	      n.normalize(file, vocabulary, stopwords);
+	    }
+  }
+
+  public static void testWithTopicFiles()
+  {
+    File file1 = new File("ressources/topicdata.txt");
+    File file2 = new File("ressources/topicdata_2.txt");
+    
+    TopicData topicData1 = TopicData.loadFromFile(file1);
+    TopicData topicData2 = TopicData.loadFromFile(file2);
+    
+    TopicMatcher topicMatcher = new TopicMatcher();
+    topicMatcher.compareTopicData(topicData1, topicData2);
+    
+    int a = 3;
+    
+  }
+  
   public void start(String... inpaths)
   {
+    
     if (inpaths.length == 0)
     {
       return;
@@ -49,16 +89,33 @@ public class Normalizer
     {
       files[i] = new File(inpaths[i]);
     }
-    start(files, inpaths[0]);
+    start(Arrays.asList(files), inpaths[0]);
   }
 
   public void start(String directoryPath)
   {
     File dirFile = new File(directoryPath);
-    start(dirFile.listFiles(), directoryPath);
+    File[] listFiles = dirFile.listFiles();
+    List<File> upperFileList = new ArrayList<>();
+    upperFileList.addAll(Arrays.asList(listFiles));
+    
+    List<File> textFiles = new ArrayList<>();
+    for(File file : upperFileList)
+    {
+      if(file.isDirectory())
+      {
+        textFiles.addAll(Arrays.asList(file.listFiles()));
+      }
+      else
+      {
+        textFiles.add(file);
+      }
+    }
+    
+    start(textFiles, directoryPath);
   }
 
-  public void start(File[] files, String outputFileName)
+  public void start(List<File> files, String outputFileName)
   {
     String stopwordpath = "ressources/stopwords.txt";
     String vocabularyPath = "ressources/vocabulary.txt";
@@ -156,11 +213,23 @@ public class Normalizer
                 }
                 // check if its a stopword
                 String original = s.getOriginal();
+                String americanized = Americanizer.americanize(original).toLowerCase();
                 s.stem();
+                if(!original.equals(americanized)){
+                	System.out.println("changed "+original+" to "+americanized);
+                	for(char signleChar:americanized.toCharArray())
+                		s.add(signleChar);
+                	s.stem();
+                	original = americanized;
+                }
                 if (!stopwords.contains(original))
                 {
-                  wordHandler.addWord(s.toString());
-                  stemmingOriginalMapping.put(s.toString(), original);
+                  String stemmString = s.toString();
+                  wordHandler.addWord(stemmString);
+                  if (!stemmString.equals(original))
+                  {
+                    stemmingOriginalMapping.put(stemmString, original);
+                  }
                 }
 
               }
@@ -183,14 +252,19 @@ public class Normalizer
     {
     }
   }
-  
+
   public static String getOriginal(String stemmedTerm)
   {
     String original = stemmingOriginalMapping.get(stemmedTerm);
-    if(original == null)
+    if (original == null)
     {
       original = stemmedTerm;
     }
     return original;
+  }
+
+  public static HashMap<String, String> getStemmingOriginalMapping()
+  {
+    return stemmingOriginalMapping;
   }
 }

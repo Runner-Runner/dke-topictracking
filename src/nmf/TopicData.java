@@ -1,26 +1,45 @@
 package nmf;
 
 import experiments.Normalizer;
+import experiments.Utilities;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import la.matrix.Matrix;
+import la.matrix.SparseMatrix;
 import la.vector.Vector;
 
 public class TopicData
 {
-  //TODO Link most relevant documents?
-
   private Matrix topicTermMatrix;
   private Matrix topicDocumentMatrix;
   private Set<String> vocabulary;
 
   private TreeMap<Double, Topic> topics;
-  private final List<String> documentNames;
+  private List<String> documentNames;
+
+  private static final String TOPIC_DOCUMENT = "topicdocument:";
+  private static final String TOPIC_TERM = "topicterm:";
+  private static final String VOCABULARY = "vocabulary:";
+  private static final String DOCUMENTNAMES = "documentnames:";
+  private static final String STEMMING_ORIGINAL_MAPPING = "stemmingOriginalMapping:";
+
+  private static final String OUTPUT_FILE_NAME = "ressources/topicdata.txt";
 
   public TopicData(Matrix topicTermMatrix, Matrix topicDocumentMatrix,
           Set<String> vocabulary, List<String> documentNames)
@@ -29,13 +48,15 @@ public class TopicData
     this.topicDocumentMatrix = topicDocumentMatrix;
     this.vocabulary = vocabulary;
     this.documentNames = documentNames;
-    
+
     loadTopics();
   }
 
-  public Collection<Topic> getTopics()
+  public List<Topic> getTopics()
   {
-    return topics.values();
+    List<Topic> topicList = new ArrayList<>();
+    topicList.addAll(topics.values());
+    return topicList;
   }
 
   private void loadTopics()
@@ -59,9 +80,9 @@ public class TopicData
 
       Vector columnVector = topicDocumentMatrix.getColumnVector(i);
       double tfidfSum = 0;
-      
+
       TreeMap<Double, String> documentRankings = new TreeMap<>();
-      //TODO Maybe just wrong dimension here?
+
       for (int j = 0; j < columnVector.getDim(); j++)
       {
         double tfidf = columnVector.get(j);
@@ -73,55 +94,216 @@ public class TopicData
     }
   }
 
+  public File writeToFile()
+  {
+    File outputFile = Utilities.getNextUnusedFile(new File(OUTPUT_FILE_NAME));
+    try (PrintWriter writer = new PrintWriter(outputFile))
+    {
+      writer.println(TOPIC_TERM);
+      for (int i = 0; i < topicTermMatrix.getColumnDimension(); i++)
+      {
+        for (int j = 0; j < topicTermMatrix.getRowDimension(); j++)
+        {
+          writer.print(topicTermMatrix.getEntry(j, i) + ";");
+        }
+        writer.println();
+      }
+
+      writer.println();
+      writer.println(TOPIC_DOCUMENT);
+      for (int i = 0; i < topicDocumentMatrix.getColumnDimension(); i++)
+      {
+        for (int j = 0; j < topicDocumentMatrix.getRowDimension(); j++)
+        {
+          writer.print(topicDocumentMatrix.getEntry(j, i) + ";");
+        }
+        writer.println();
+      }
+
+      writer.println();
+      writer.println(VOCABULARY);
+      writer.println(vocabulary);
+
+      writer.println();
+      writer.println(DOCUMENTNAMES);
+      writer.println(documentNames);
+
+      writer.println();
+      writer.println(STEMMING_ORIGINAL_MAPPING);
+      writer.println(Normalizer.getStemmingOriginalMapping());
+    }
+    catch (FileNotFoundException ex)
+    {
+      Logger.getLogger(TopicData.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    return outputFile;
+  }
+
+  public static TopicData loadFromFile(File file)
+  {
+    try
+    {
+      BufferedReader reader = new BufferedReader(new FileReader(file));
+      String line;
+
+      List<Double> topicTermList = new ArrayList<>();
+      int width = 0;
+      int height = 0;
+      while ((line = reader.readLine()) != null)
+      {
+        if (line.contains(TOPIC_TERM))
+        {
+          continue;
+        }
+        else if (line.contains(TOPIC_DOCUMENT))
+        {
+          break;
+        }
+        if (line.trim().isEmpty())
+        {
+          continue;
+        }
+
+        height++;
+
+        String[] texts = line.split(";");
+        width = texts.length;
+        for (String text : texts)
+        {
+          double value = Double.parseDouble(text);
+          topicTermList.add(value);
+        }
+      }
+
+      Matrix topicTermMatrix = new SparseMatrix(width, height);
+      int listIndex = -1;
+      for (int i = 0; i < width; i++)
+      {
+        for (int j = 0; j < height; j++)
+        {
+          listIndex++;
+          topicTermMatrix.setEntry(i, j, topicTermList.get(listIndex));
+        }
+      }
+
+      List<Double> topicDocumentList = new ArrayList<>();
+      width = height = 0;
+      while ((line = reader.readLine()) != null)
+      {
+        if (line.contains(VOCABULARY))
+        {
+          break;
+        }
+        if (line.trim().isEmpty())
+        {
+          continue;
+        }
+
+        height++;
+
+        String[] texts = line.split(";");
+        width = texts.length;
+        for (String text : texts)
+        {
+          double value = Double.parseDouble(text);
+          topicDocumentList.add(value);
+        }
+      }
+
+      Matrix topicDocumentMatrix = new SparseMatrix(width, height);
+      listIndex = -1;
+      for (int i = 0; i < width; i++)
+      {
+        for (int j = 0; j < height; j++)
+        {
+          listIndex++;
+          topicDocumentMatrix.setEntry(i, j, topicTermList.get(listIndex));
+        }
+      }
+
+      Set<String> vocabulary = new HashSet<>();
+      while ((line = reader.readLine()) != null)
+      {
+        if (line.contains(DOCUMENTNAMES))
+        {
+          break;
+        }
+        if (line.trim().isEmpty())
+        {
+          continue;
+        }
+
+        line = line.replace("[", "");
+        line = line.replace("]", "");
+        String[] texts = line.split("\\s*\\,\\s*");
+        vocabulary.addAll(Arrays.asList(texts));
+      }
+
+      List<String> documentNames = new ArrayList<>();
+      while ((line = reader.readLine()) != null)
+      {
+        if (line.contains(STEMMING_ORIGINAL_MAPPING))
+        {
+          break;
+        }
+        if (line.trim().isEmpty())
+        {
+          continue;
+        }
+
+        line = line.replace("[", "");
+        line = line.replace("]", "");
+        String[] texts = line.split("\\s*\\,\\s*");
+        documentNames.addAll(Arrays.asList(texts));
+      }
+
+      HashMap<String, String> stemmingOriginalMapping = new HashMap<String, String>();
+      while ((line = reader.readLine()) != null)
+      {
+        if (line.trim().isEmpty())
+        {
+          continue;
+        }
+
+        line = line.replace("{", "");
+        line = line.replace("}", "");
+        String[] texts = line.split("\\s\\,\\s");
+        for (String text : texts)
+        {
+          String[] split = text.split("=");
+          if (text.length() == 2)
+          {
+            stemmingOriginalMapping.put(split[0], split[1]);
+          }
+        }
+      }
+
+      TopicData topicData = new TopicData(topicTermMatrix, topicDocumentMatrix, 
+              vocabulary, documentNames);
+      Normalizer.getStemmingOriginalMapping().putAll(stemmingOriginalMapping);
+      
+      return topicData;
+    }
+    catch (IOException ex)
+    {
+      Logger.getLogger(TopicData.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    return null;
+  }
+
   @Override
   public String toString()
   {
     Iterator<Map.Entry<Double, Topic>> topicIterator = topics.descendingMap().entrySet().iterator();
     int index = 0;
     String text = "";
-    while(topicIterator.hasNext())
+    while (topicIterator.hasNext())
     {
       index++;
       Map.Entry<Double, Topic> topicEntry = topicIterator.next();
       Double cumulatedTfidf = topicEntry.getKey();
       Topic topic = topicEntry.getValue();
-      Iterator<Map.Entry<Double, String>> termIterator = 
-              topic.getTerms().descendingMap().entrySet().iterator();
-      
-      String termsText = "";
-      int termIndex = 0;
-      while(termIterator.hasNext() && termIndex < 10)
-      {
-        termIndex++;
-        Map.Entry<Double, String> termEntry = termIterator.next();
-        Double tfidf = termEntry.getKey();
-        if(tfidf <= 0.00001)
-        {
-          break;
-        }
-        String term = termEntry.getValue();
-        String original = Normalizer.getOriginal(term);
-        termsText += " " + original + " (" + tfidf + ")";
-      }
-      
-      termsText += "\nMost Relevant Documents: ";
-      Iterator<Map.Entry<Double, String>> docIterator = 
-              topic.getDocumentRankings().descendingMap().entrySet().iterator();
-      int docIndex = 0;
-      while(docIterator.hasNext() && docIndex < 3)
-      {
-        docIndex++;
-        Map.Entry<Double, String> docEntry = docIterator.next();
-        Double tfidf = docEntry.getKey();
-        if(tfidf <= 0.00001)
-        {
-          break;
-        }
-        String doc = docEntry.getValue();
-        termsText += " " + doc + " (" + tfidf + ")";
-      }
-      
-      text += "\nTopic #"+index + " ("+cumulatedTfidf+"):" + termsText;
+      text += "\nTopic #" + index + " (" + cumulatedTfidf + "):" + topic;
     }
     return text;
   }
