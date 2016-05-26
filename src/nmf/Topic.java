@@ -1,5 +1,9 @@
 package nmf;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 public class Topic
@@ -20,6 +24,22 @@ public class Topic
   public TreeMap<Double, String> getTerms()
   {
     return terms;
+  }
+
+  public List<String> getBestTerms(int termCount)
+  {
+    List<String> bestTerms = new ArrayList<>();
+    Iterator<Map.Entry<Double, String>> iterator
+            = getTerms().descendingMap().entrySet().iterator();
+    for (int i = 0; i < termCount; i++)
+    {
+      if (!iterator.hasNext())
+      {
+        break;
+      }
+      bestTerms.add(iterator.next().getValue());
+    }
+    return bestTerms;
   }
 
   void setDocumentRanking(TreeMap<Double, String> documentRankings)
