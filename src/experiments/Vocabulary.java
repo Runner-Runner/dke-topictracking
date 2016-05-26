@@ -14,6 +14,7 @@ public class Vocabulary implements WordHandler{
 	
 	@Override
 	public void addWord(String word) {
+		System.out.println(word);
 		vocabulary.add(word);
 	}
 	
