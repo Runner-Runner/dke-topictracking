@@ -1,6 +1,5 @@
 package nmf;
 
-
 import la.matrix.Matrix;
 import ml.clustering.Clustering;
 import ml.clustering.KMeans;
@@ -10,18 +9,11 @@ import ml.options.NMFOptions;
 
 public class NMFExecutor
 {
-  private int topicCount;
-  public int getTopicCount() {
-	return topicCount;
-}
-
-private Matrix topicTerm;
+  private Matrix topicTerm;
   private Matrix topicDocument;
-
 
   public void execute(double[][] documentTermMatrix, int topicCount)
   {
-
     KMeansOptions options = new KMeansOptions();
     options.nClus = topicCount;
     options.verbose = true;
@@ -57,12 +49,14 @@ private Matrix topicTerm;
     topicDocument = nmf.getIndicatorMatrix();
   }
 
-public Matrix getTopicTerm() {
-	return topicTerm;
-}
+  public Matrix getTopicTerm()
+  {
+    return topicTerm;
+  }
 
-public Matrix getTopicDocument() {
-	return topicDocument;
-}
-  
+  public Matrix getTopicDocument()
+  {
+    return topicDocument;
+  }
+
 }

@@ -1,9 +1,9 @@
 package model;
 
+import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import nmf.Topic;
 
 public class TopicWave
 {
@@ -28,15 +28,15 @@ public class TopicWave
     sequence.put(timeunit, topic);
   }
 
-  @Override
-  public String toString()
+  public String toString(HashMap<Integer, Double> tfidfTotalMap)
   {
     String text = "";
     for (Entry<Integer, Topic> entry : sequence.entrySet())
     {
-      text += "\nTimestep: " + entry.getKey() + ", Topic (" + 
-              entry.getValue().getAbsoluteRelevance() + "): "
-              + entry.getValue().toShortString();
+      double relativeRelevance = entry.getValue().getAbsoluteRelevance() / 
+              tfidfTotalMap.get(entry.getKey());
+      text += "\nTimestep: " + entry.getKey() + ", Topic (" + relativeRelevance 
+              + "%): " + entry.getValue().toShortString();
     }
     return text;
   }

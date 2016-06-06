@@ -1,7 +1,7 @@
 package model;
 
-import nmf.Topic;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class TopicRiver
@@ -9,23 +9,32 @@ public class TopicRiver
   private List<TopicWave> waves;
   private TopicMatcher topicMatcher;
   
+  private HashMap<Integer, Double> tfidfTotalMap; 
+  
   //TODO Store week date?
   
   public TopicRiver()
   {
     waves = new ArrayList<>();
     topicMatcher = new TopicMatcher();
+    tfidfTotalMap = new HashMap<>();
+  }
+
+  public Double getTfidfTotal(int timeUnit)
+  {
+    return tfidfTotalMap.get(timeUnit);
   }
   
-  public void addTopicData(int timeUnit, TopicData topicData)
+  public void addTopicData(int timeUnit, TopicTimeStepCollection topicData)
   {
-    for(Topic topic : topicData.getTopics())
+    for(Topic topic : topicData.getTopicList())
     {
       addTopic(timeUnit, topic);
     }
+    tfidfTotalMap.put(timeUnit, topicData.getAbsoluteValuesTotal());
   }
   
-  public void addTopic(int timeUnit, Topic topic)
+  private void addTopic(int timeUnit, Topic topic)
   {
     TopicWave bestWave = null;
     double bestValue = -1;
@@ -59,7 +68,7 @@ public class TopicRiver
     for(TopicWave wave : waves)
     {
       count++;
-      text += "\nTopicWave #" + count + ": " + wave.toString() + 
+      text += "\nTopicWave #" + count + ": " + wave.toString(tfidfTotalMap) + 
               "\n--------------------------";
     }
     return text;

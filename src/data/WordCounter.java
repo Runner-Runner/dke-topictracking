@@ -37,41 +37,6 @@ public class WordCounter implements WordHandler
   {
     return this.vocabulary;
   }
-  // public void saveDocuments(String fileName)
-  // {
-  // PrintWriter writer;
-  // try
-  // {
-  // writer = new PrintWriter(fileName, "UTF-8");
-  // for (HashMap<String, Integer> doc : documents)
-  // {
-  // // start with number of pairs
-  // writer.print(doc.size() + " ");
-  // for (Entry<String, Integer> entry : doc.entrySet())
-  // {
-  //
-  // String term = entry.getKey();
-  // String termValue;
-  // if (tfidf)
-  // {
-  // termValue = String.valueOf(calculateTFIDF(term, entry.getValue()));
-  // }
-  // else
-  // {
-  // termValue = String.valueOf(entry.getValue());
-  // }
-  //
-  // writer.print(vocabulary.get(term) + ":" + termValue + " ");
-  // }
-  // writer.println();
-  // }
-  // writer.close();
-  // }
-  // catch (FileNotFoundException | UnsupportedEncodingException e)
-  // {
-  // e.printStackTrace();
-  // }
-  // }
 
   @Override
   public void addWord(String word)

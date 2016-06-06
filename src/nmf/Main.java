@@ -1,6 +1,7 @@
 package nmf;
 
-import model.TopicData;
+import model.Topic;
+import model.TopicTimeStepCollection;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,12 +13,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import normalization.Normalizer;
-import model.TopicMatcher;
 import model.TopicRiver;
 
 public class Main
 {
-
+  //TODO 2 mains for extracting and river
+  
   private static final String stopwordpath = "ressources/stopwords.txt";
   private static final String vocabularyPath = "ressources/vocabulary.xml";
 
@@ -29,23 +30,14 @@ public class Main
 
   public static void testLoad()
   {
-    List<TreeMap<Double, Topic>> topicList = new ArrayList<>();
-
     File directory = new File("/media/Storage/Meine Daten/Schutzbereich/MoS/Research Project 2/savedata/result 4 weeks/weeks");
     File[] files = directory.listFiles();
     TopicRiver topicRiver = new TopicRiver();
     for (int i=0; i<files.length; i++)
     {
-      TreeMap<Double, Topic> topics = TopicData.loadTopics(files[i].getAbsolutePath());
-      Iterator<Map.Entry<Double, Topic>> iterator = topics.descendingMap().entrySet().iterator();
-      while (iterator.hasNext())
-      {
-        Map.Entry<Double, Topic> entry = iterator.next();
-        Topic topic = entry.getValue();
-        topicRiver.addTopic(i+1, topic);
-      }
+      TopicTimeStepCollection topicData = TopicTimeStepCollection.loadTopicData(files[i].getAbsolutePath());
+      topicRiver.addTopicData(i+1, topicData);
     }
-
     System.out.println(topicRiver);
   }
 
@@ -117,7 +109,7 @@ public class Main
 
     // create TopicData
     System.out.print("extract Topics ");
-    TopicData topicData = new TopicData(nmfExecutor.getTopicTerm(), nmfExecutor.getTopicDocument(),
+    TopicTimeStepCollection topicData = new TopicTimeStepCollection(nmfExecutor.getTopicTerm(), nmfExecutor.getTopicDocument(),
             wordCounter.getVocabulary().getVocabulary(), wordCounter.getDocumentNames());
     System.out.println(" - done");
     // save topics

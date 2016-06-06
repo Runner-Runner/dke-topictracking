@@ -17,7 +17,6 @@ import net.didion.jwnl.data.relationship.Relationship;
 import net.didion.jwnl.data.relationship.RelationshipFinder;
 import net.didion.jwnl.data.relationship.RelationshipList;
 import net.didion.jwnl.dictionary.Dictionary;
-import nmf.Topic;
 
 public class TopicMatcher
 {
