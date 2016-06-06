@@ -1,13 +1,6 @@
 package nmf;
 
-import experiments.Utilities;
-import experiments.WordCounter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import la.matrix.Matrix;
 import ml.clustering.Clustering;
 import ml.clustering.KMeans;
@@ -17,21 +10,17 @@ import ml.options.NMFOptions;
 
 public class NMFExecutor
 {
-  private WordCounter wordCounter;
   private int topicCount;
-  private TopicData topicData;
-  private String outputFileName;
+  public int getTopicCount() {
+	return topicCount;
+}
 
-  public NMFExecutor(WordCounter wordCounter, int topicCount, String outputFileName)
-  {
-    this.wordCounter = wordCounter;
-    this.topicCount = topicCount;
-    this.outputFileName = outputFileName;
-  }
+private Matrix topicTerm;
+  private Matrix topicDocument;
 
-  public void execute()
+
+  public void execute(double[][] documentTermMatrix, int topicCount)
   {
-    double[][] documentTermMatrix = this.wordCounter.getDocumentTermMatrix();
 
     KMeansOptions options = new KMeansOptions();
     options.nClus = topicCount;
@@ -64,36 +53,16 @@ public class NMFExecutor
     // NMF.initialize(null); 
     nmf.clustering(indicatorMatrix);
 
-    Matrix topicTerm = nmf.getCenters();
-    Matrix topicDocument = nmf.getIndicatorMatrix();
-
-    topicData = new TopicData(topicTerm, topicDocument,
-            wordCounter.getVocabulary().keySet(), wordCounter.getDocumentNames());
-
-    System.out.println(topicData);
-    
-    File outputFile = Utilities.getNextUnusedFile(new File(outputFileName));
-
-    try
-    {
-      PrintWriter writer = new PrintWriter(
-              new FileWriter(outputFile.getPath(), true));
-
-      writer.println(topicData);
-
-      writer.close();
-    }
-    catch (IOException ex)
-    {
-      Logger.getLogger(NMFExecutor.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    
-    File topicDataFile = topicData.writeToFile();
-    
-    // If null, KMeans will be used for initialization 
-//    System.out.println("Basis Matrix:");
-//    printMatrix(full(topicTerm));
-//    System.out.println("Indicator Matrix:");
-//    printMatrix(full(topicDocument));
+    topicTerm = nmf.getCenters();
+    topicDocument = nmf.getIndicatorMatrix();
   }
+
+public Matrix getTopicTerm() {
+	return topicTerm;
+}
+
+public Matrix getTopicDocument() {
+	return topicDocument;
+}
+  
 }
