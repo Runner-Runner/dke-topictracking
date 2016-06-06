@@ -11,6 +11,7 @@ import java.util.HashSet;
 
 import data.WordHandler;
 
+//TODO remove August, Juli etc.
 
 public class Normalizer {
 	private static HashMap<String, String> stemmingOriginalMapping = new HashMap<>();

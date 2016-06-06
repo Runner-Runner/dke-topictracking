@@ -11,16 +11,26 @@ import normalization.Normalizer;
 
 public class Topic implements Serializable
 {
-
   private static final long serialVersionUID = 6420397376392250856L;
   private TreeMap<Double, String> terms;
   private TreeMap<Double, String> documentRankings;
+  private double absoluteRelevance;
 
   public Topic()
   {
     terms = new TreeMap<>();
   }
 
+  public double getAbsoluteRelevance()
+  {
+    return absoluteRelevance;
+  }
+
+  public void setAbsoluteRelevance(double absoluteRelevance)
+  {
+    this.absoluteRelevance = absoluteRelevance;
+  }
+  
   public void setTerms(TreeMap<Double, String> terms)
   {
     this.terms = terms;
@@ -56,11 +66,6 @@ public class Topic implements Serializable
     return bestTerms;
   }
 
-  void setDocumentRanking(TreeMap<Double, String> documentRankings)
-  {
-    this.documentRankings = documentRankings;
-  }
-
   public TreeMap<Double, String> getDocumentRankings()
   {
     return documentRankings;
@@ -84,6 +89,22 @@ public class Topic implements Serializable
       String term = termEntry.getValue();
       String original = Normalizer.getOriginal(term);
       termsText += " " + original;
+    }
+
+    termsText += "\t\t\t\t";
+    Iterator<Map.Entry<Double, String>> docIterator = getDocumentRankings().descendingMap().entrySet().iterator();
+    int docIndex = 0;
+    while (docIterator.hasNext() && docIndex < 5)
+    {
+      docIndex++;
+      Map.Entry<Double, String> docEntry = docIterator.next();
+      Double tfidf = docEntry.getKey();
+      if (tfidf <= 0.00001)
+      {
+        break;
+      }
+      String doc = docEntry.getValue();
+      termsText += " " + doc;
     }
 
     return termsText;

@@ -1,5 +1,6 @@
-package nmf;
+package model;
 
+import nmf.Topic;
 import experiments.Utilities;
 
 import java.beans.XMLDecoder;
@@ -30,6 +31,8 @@ import la.matrix.Matrix;
 import la.matrix.SparseMatrix;
 import la.vector.Vector;
 import normalization.Normalizer;
+
+//TODO Merge within same timestep
 
 public class TopicData {
 	private Matrix topicTermMatrix;
@@ -63,7 +66,7 @@ public class TopicData {
 		return topicList;
 	}
 
-	public void saveTopics(String filename) {
+	public static void saveTopics(String filename, TreeMap<Double, Topic> topics) {
 		XMLEncoder encoder = null;
 		try {
 			encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(filename)));
@@ -111,8 +114,9 @@ public class TopicData {
 				tfidfSum += tfidf;
 				documentRankings.put(tfidf, documentNames.get(j));
 			}
-			topic.setDocumentRanking(documentRankings);
-			topics.put(tfidfSum, topic);
+			topic.setDocumentRankings(documentRankings);
+			topic.setAbsoluteRelevance(tfidfSum);
+      topics.put(tfidfSum, topic);
 		}
 	}
 

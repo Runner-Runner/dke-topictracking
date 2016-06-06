@@ -1,4 +1,4 @@
-package wordnet;
+package model;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,12 +19,13 @@ import net.didion.jwnl.data.relationship.RelationshipList;
 import net.didion.jwnl.dictionary.Dictionary;
 import nmf.Topic;
 
-
 public class TopicMatcher
 {
   private Dictionary dictionary;
-  private ArrayList<TopicSeries> sequences;
+  private ArrayList<TopicWave> sequences;
 
+  public static final int TOPIC_THRESHOLD = 10;
+  
   public TopicMatcher()
   {
     sequences = new ArrayList<>();
@@ -69,11 +70,6 @@ public class TopicMatcher
     System.out.println(tm.compareTopics(three, two));
   }
 
-  public void add(Topic topic, int timeunit)
-  {
-
-  }
-
   public void compareTopicData(
           TreeMap<Double, Topic> topics1, TreeMap<Double, Topic> topics2)
   {
@@ -109,7 +105,6 @@ public class TopicMatcher
   public double compareTopics(Topic one, Topic two)
   {
     int termAmount = 20;
-    int matchThreshold = 5;
     double d = 0;
     List<String> bestTerms1 = one.getBestTerms(termAmount);
     List<String> bestTerms2 = two.getBestTerms(termAmount);
