@@ -3,7 +3,10 @@ package wordnet;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
@@ -15,7 +18,6 @@ import net.didion.jwnl.data.relationship.RelationshipFinder;
 import net.didion.jwnl.data.relationship.RelationshipList;
 import net.didion.jwnl.dictionary.Dictionary;
 import nmf.Topic;
-import nmf.TopicData;
 
 
 public class TopicMatcher
@@ -73,17 +75,22 @@ public class TopicMatcher
   }
 
   public void compareTopicData(
-          TopicData topicData1, TopicData topicData2)
+          TreeMap<Double, Topic> topics1, TreeMap<Double, Topic> topics2)
   {
-    List<Topic> topics1 = topicData1.getTopics();
-    List<Topic> topics2 = topicData2.getTopics();
-
-    for (Topic topic1 : topics1)
+    Iterator<Map.Entry<Double, Topic>> iterator1 = topics1.descendingMap().entrySet().iterator();
+    
+    while (iterator1.hasNext())
     {
+      Topic topic1 = iterator1.next().getValue();
+      
       double bestValue = 0;
       Topic bestCompareTopic = null;
-      for (Topic topic2 : topics2)
+      
+      Iterator<Map.Entry<Double, Topic>> iterator2 = topics2.descendingMap().entrySet().iterator();
+      while (iterator2.hasNext())
       {
+        Topic topic2 = iterator2.next().getValue();
+        
         double compareValue = compareTopics(topic1, topic2);
 
         if (bestValue < compareValue)
@@ -94,6 +101,7 @@ public class TopicMatcher
       }
       System.out.println("Topic 1: " + topic1);
       System.out.println("Best Match ("+bestValue+"): " + bestCompareTopic);
+      System.out.println("------------------------");
     }
 
   }

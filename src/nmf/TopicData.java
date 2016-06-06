@@ -75,7 +75,7 @@ public class TopicData {
 	}
 
 	@SuppressWarnings("unchecked")
-	public TreeMap<Double, Topic> loadTopics(String filename) {
+	public static TreeMap<Double, Topic> loadTopics(String filename) {
 		XMLDecoder decoder = null;
 		try {
 			decoder = new XMLDecoder(new BufferedInputStream(new FileInputStream(filename)));

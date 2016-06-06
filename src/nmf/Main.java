@@ -1,19 +1,17 @@
 package nmf;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import data.Vocabulary;
 import data.WordCounter;
-import experiments.Utilities;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 import normalization.Normalizer;
+import wordnet.TopicMatcher;
 
 public class Main {
 
@@ -21,9 +19,23 @@ public class Main {
 	private static final String vocabularyPath = "ressources/vocabulary.xml";
 
 	public static void main(String[] args) {
-		runNMF("ressources/weekFour", "weekFour_topics.xml");
+    testLoad();
+//		runNMF("ressources/weekFour", "weekFour_topics.xml");
 	}
 
+  public static void testLoad()
+  {
+    TreeMap<Double, Topic> topics = TopicData.loadTopics("/media/Storage/Meine Daten/Schutzbereich/MoS/Research Project 2/savedata/result 4 weeks/weekOne_topics.xml");
+    TreeMap<Double, Topic> topics2 = TopicData.loadTopics("/media/Storage/Meine Daten/Schutzbereich/MoS/Research Project 2/savedata/result 4 weeks/weekTwo_topics.xml");
+    Iterator<Map.Entry<Double, Topic>> iterator = topics.descendingMap().entrySet().iterator();
+    while(iterator.hasNext())
+    {
+//      System.out.println(iterator.next().getValue().toShortString());
+    }
+    TopicMatcher topicMatcher = new TopicMatcher();
+    topicMatcher.compareTopicData(topics, topics2);
+  }
+  
 	public static void runNMF(String directory, String outputFileName) {
 		File dir = new File(directory);
 		ArrayList<File> files = new ArrayList<>();
