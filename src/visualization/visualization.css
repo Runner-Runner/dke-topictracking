@@ -1,0 +1,27 @@
+#chart_container {
+	position: relative;
+	font-family: Arial, Helvetica, sans-serif;
+}
+#chart {
+	display: inline-block;
+	margin-left: 40px;
+}
+.rickshaw_graph .y_ticks {
+	left: 0;
+}
+#y_axis {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 40px;
+}
+#x_axis {
+	position: absolute;
+	top: 512px;
+	left: 40px;
+}
+#legend {
+	display: inline-block;
+	vertical-align: top;
+	margin: 0 0 0 10px;
+}
