@@ -1,5 +1,6 @@
 package model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,18 @@ public class TopicRiver
       waves.add(newWave);
     }
   }
-
+  public static TopicRiver loadTopicRiver(String directoryName)
+  {
+    File directory = new File(directoryName);
+    File[] files = directory.listFiles();
+    TopicRiver topicRiver = new TopicRiver();
+    for (int i=0; i<files.length; i++)
+    {
+      TopicTimeStepCollection topicData = TopicTimeStepCollection.loadTopicData(files[i].getAbsolutePath());
+      topicRiver.addTopicData(i+1, topicData);
+    }
+    return topicRiver;
+  }
   @Override
   public String toString()
   {
