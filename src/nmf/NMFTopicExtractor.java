@@ -1,6 +1,6 @@
 package nmf;
 
-import model.Topic;
+
 import model.TopicTimeStepCollection;
 import java.io.File;
 import java.util.ArrayList;
@@ -9,37 +9,19 @@ import java.util.List;
 
 import data.Vocabulary;
 import data.WordCounter;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
 import normalization.Normalizer;
-import model.TopicRiver;
 
-public class Main
+public class NMFTopicExtractor
 {
-  //TODO 2 mains for extracting and river
   
   private static final String stopwordpath = "ressources/stopwords.txt";
   private static final String vocabularyPath = "ressources/vocabulary.xml";
 
   public static void main(String[] args)
   {
-    testLoad();
-//		runNMF("ressources/weekFour", "weekFour_topics.xml");
+		runNMF("ressources/weekFour", "weekFour_topics.xml");
   }
 
-  public static void testLoad()
-  {
-    File directory = new File("/media/Storage/Meine Daten/Schutzbereich/MoS/Research Project 2/savedata/result 4 weeks/weeks");
-    File[] files = directory.listFiles();
-    TopicRiver topicRiver = new TopicRiver();
-    for (int i=0; i<files.length; i++)
-    {
-      TopicTimeStepCollection topicData = TopicTimeStepCollection.loadTopicData(files[i].getAbsolutePath());
-      topicRiver.addTopicData(i+1, topicData);
-    }
-    System.out.println(topicRiver);
-  }
 
   public static void runNMF(String directory, String outputFileName)
   {
@@ -114,27 +96,8 @@ public class Main
     System.out.println(" - done");
     // save topics
     System.out.print("save extracted topics ");
-//    topicData.saveTopics(outputFileName);
+    TopicTimeStepCollection.saveTopicData(outputFileName, topicData);
     System.out.println(" - done");
-    //System.out.println(topicData);
 
-//		File outputFile = Utilities.getNextUnusedFile(new File(outputFileName));
-//
-//		try {
-//			PrintWriter writer = new PrintWriter(new FileWriter(outputFile.getPath(), true));
-//
-//			writer.println(topicData);
-//
-//			writer.close();
-//		} catch (IOException ex) {
-//			Logger.getLogger(NMFExecutor.class.getName()).log(Level.SEVERE, null, ex);
-//		}
-//
-//		File topicDataFile = topicData.writeToFile();
-    // If null, KMeans will be used for initialization
-    // System.out.println("Basis Matrix:");
-    // printMatrix(full(topicTerm));
-    // System.out.println("Indicator Matrix:");
-    // printMatrix(full(topicDocument));
   }
 }
