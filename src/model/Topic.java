@@ -2,6 +2,7 @@ package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class Topic implements Serializable
   {
     this.absoluteRelevance = absoluteRelevance;
   }
-  
+
   public void setTerms(TreeMap<Double, String> terms)
   {
     this.terms = terms;
@@ -51,9 +52,9 @@ public class Topic implements Serializable
     return terms;
   }
 
-  public List<String> getBestTerms(int termCount)
+  public HashMap<String, Double> getBestTerms(int termCount)
   {
-    List<String> bestTerms = new ArrayList<>();
+    HashMap<String, Double> bestTerms = new HashMap<>();
     Iterator<Map.Entry<Double, String>> iterator = getTerms().descendingMap().entrySet().iterator();
     for (int i = 0; i < termCount; i++)
     {
@@ -61,7 +62,8 @@ public class Topic implements Serializable
       {
         break;
       }
-      bestTerms.add(iterator.next().getValue());
+      Map.Entry<Double, String> entry = iterator.next();
+      bestTerms.put(entry.getValue(), entry.getKey());
     }
     return bestTerms;
   }
@@ -148,5 +150,10 @@ public class Topic implements Serializable
     }
 
     return termsText;
+  }
+
+  public double getRelativeRelevance(Double tfidfTotal)
+  {
+    return getAbsoluteRelevance()/tfidfTotal;
   }
 }

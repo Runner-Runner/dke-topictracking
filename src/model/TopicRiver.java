@@ -85,4 +85,9 @@ public class TopicRiver
     }
     return text;
   }
+  
+  public List<TopicWave> getWaves()
+  {
+    return waves;
+  }
 }

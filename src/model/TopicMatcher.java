@@ -3,8 +3,8 @@ package model;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -105,32 +105,18 @@ public class TopicMatcher
   {
     int termAmount = 20;
     double d = 0;
-    List<String> bestTerms1 = one.getBestTerms(termAmount);
-    List<String> bestTerms2 = two.getBestTerms(termAmount);
+    HashMap<String, Double> bestTerms1 = one.getBestTerms(termAmount);
+    HashMap<String, Double> bestTerms2 = two.getBestTerms(termAmount);
 
     int matches = 0;
-    for (String term : bestTerms1)
+    for (String term : bestTerms1.keySet())
     {
-      if (bestTerms2.contains(term))
+      if (bestTerms2.keySet().contains(term))
       {
         matches++;
       }
     }
     return matches;
-
-//		double d = 0;
-//		for(Entry<Double,String> entryOne : one.getTerms().entrySet()){
-//			double best = Double.MAX_VALUE;
-//			for(Entry<Double,String> entryTwo : two.getTerms().entrySet()){
-//				double add = compareWords(entryOne.getValue(), entryTwo.getValue());
-//				//System.out.println(entryOne.getValue()+" "+entryTwo.getValue()+" "+add);
-//				if(add<best)
-//					best = add;
-//				
-//			}
-//			d+=best;///(entryOne.getKey()*entryTwo.getKey());
-//		}
-//		return d;
   }
 
   public int compareWords(String one, String two) throws JWNLException

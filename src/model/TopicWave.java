@@ -7,31 +7,36 @@ import java.util.TreeMap;
 
 public class TopicWave
 {
-  private TreeMap<Integer, Topic> sequence;
+  private TreeMap<Integer, Topic> topicSequence;
 
   public TopicWave(int timeunit, Topic topic)
   {
-    sequence = new TreeMap<>();
+    topicSequence = new TreeMap<>();
     addTopic(timeunit, topic);
   }
 
   public Topic getLastTopic()
   {
-    return sequence.lastEntry().getValue();
+    return topicSequence.lastEntry().getValue();
+  }
+
+  public TreeMap<Integer, Topic> getTopicSequence()
+  {
+    return topicSequence;
   }
 
   public void addTopic(int timeunit, Topic topic)
   {
-    Topic previousTopic = sequence.get(timeunit);
+    Topic previousTopic = topicSequence.get(timeunit);
     //TODO Merge if previousTopic != null
 
-    sequence.put(timeunit, topic);
+    topicSequence.put(timeunit, topic);
   }
 
   public String toString(HashMap<Integer, Double> tfidfTotalMap)
   {
     String text = "";
-    for (Entry<Integer, Topic> entry : sequence.entrySet())
+    for (Entry<Integer, Topic> entry : topicSequence.entrySet())
     {
       double relativeRelevance = entry.getValue().getAbsoluteRelevance() / 
               tfidfTotalMap.get(entry.getKey());
