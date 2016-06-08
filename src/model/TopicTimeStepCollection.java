@@ -1,35 +1,23 @@
 package model;
 
-import experiments.Utilities;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import la.matrix.Matrix;
-import la.matrix.SparseMatrix;
 import la.vector.Vector;
-import normalization.Normalizer;
 
 //TODO Merge within same timestep
 public class TopicTimeStepCollection
@@ -40,8 +28,17 @@ public class TopicTimeStepCollection
 
   private TreeMap<Double, Topic> topics;
   private List<String> documentNames;
+  private Date timestamp;
 
-  private double absoluteValuesTotal;
+  public Date getTimestamp() {
+	return timestamp;
+}
+
+public void setTimestamp(Date timestamp) {
+	this.timestamp = timestamp;
+}
+
+private double absoluteValuesTotal;
 
   private static final String TOPIC_DOCUMENT = "topicdocument:";
   private static final String TOPIC_TERM = "topicterm:";
@@ -59,12 +56,13 @@ public class TopicTimeStepCollection
   }
 
   public TopicTimeStepCollection(Matrix topicTermMatrix, Matrix topicDocumentMatrix, Set<String> vocabulary,
-          List<String> documentNames)
+          List<String> documentNames, Date timestamp)
   {
     this.topicTermMatrix = topicTermMatrix;
     this.topicDocumentMatrix = topicDocumentMatrix;
     this.vocabulary = vocabulary;
     this.documentNames = documentNames;
+    this.timestamp = timestamp;
 
     extractTopicsFromMatrices();
   }

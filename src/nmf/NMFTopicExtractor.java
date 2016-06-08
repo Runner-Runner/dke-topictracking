@@ -3,9 +3,15 @@ package nmf;
 
 import model.TopicTimeStepCollection;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 
 import data.Vocabulary;
 import data.WordCounter;
@@ -19,7 +25,7 @@ public class NMFTopicExtractor
 
   public static void main(String[] args)
   {
-		runNMF("ressources/weekFour", "weekFour_topics.xml");
+		runNMF("ressources/corpus", "weekFour_topics.xml");
   }
 
 
@@ -27,18 +33,25 @@ public class NMFTopicExtractor
   {
     File dir = new File(directory);
     ArrayList<File> files = new ArrayList<>();
-    listFiles(dir, files);
-    runNMF(files, outputFileName);
+    ArrayList<Date> dates = new ArrayList<>();
+    DateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+    listFiles(dir, files, dates, format);
+    runNMF(files, dates, outputFileName);
   }
 
   // traverse directory recursive and add files to filelist
-  private static void listFiles(File file, List<File> files)
+  private static void listFiles(File file, List<File> files, List<Date> dates, DateFormat format)
   {
+	try {
+		Date date = format.parse(file.getName());
+		dates.add(date);
+	} catch (ParseException e) {
+	}
     if (file.isDirectory())
     {
       for (File f : file.listFiles())
       {
-        listFiles(f, files);
+        listFiles(f, files, dates, format);
       }
     }
     else
@@ -47,7 +60,7 @@ public class NMFTopicExtractor
     }
   }
 
-  public static void runNMF(List<File> files, String outputFileName)
+  public static void runNMF(List<File> files, List<Date> dates, String outputFileName)
   {
     // read stopwords for normalizer
     System.out.print("read stopwords ");
@@ -89,10 +102,17 @@ public class NMFTopicExtractor
     nmfExecutor.execute(wordCounter.getDocumentTermMatrix(), 50);
     System.out.println("run NMF - done");
 
+    // determine first date
+    System.out.print("determine timestamp ");
+    Date timestamp = null;
+    if(dates.size()>0){
+    	Collections.sort(dates);
+    	timestamp = dates.get(0);
+    }
     // create TopicData
     System.out.print("extract Topics ");
     TopicTimeStepCollection topicData = new TopicTimeStepCollection(nmfExecutor.getTopicTerm(), nmfExecutor.getTopicDocument(),
-            wordCounter.getVocabulary().getVocabulary(), wordCounter.getDocumentNames());
+            wordCounter.getVocabulary().getVocabulary(), wordCounter.getDocumentNames(),timestamp);
     System.out.println(" - done");
     // save topics
     System.out.print("save extracted topics ");
