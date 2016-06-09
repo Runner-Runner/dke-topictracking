@@ -69,6 +69,7 @@ public class NMFTopicExtractor
       List<Date> dates = intervalDates.get(i);
       runNMF(files, dates, outputFileName);
       System.out.println("Interval #" + i + " done.");
+      System.gc();
     }
   }
 
