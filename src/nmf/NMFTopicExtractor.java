@@ -57,11 +57,18 @@ public class NMFTopicExtractor
     listFiles(dir, intervalFiles, intervalDates, format,
             startFolder, interval, intervalCount);
 
+    Date startDate = intervalDates.get(0).get(0);
+    List<Date> lastDates = intervalDates.get(intervalDates.size() - 1);
+    Date endDate = lastDates.get(lastDates.size() - 1);
+    System.out.println(
+            "Starting NMF intervals: From " + startDate + " until " + endDate);
     for (int i = 0; i < intervalFiles.size(); i++)
     {
+      System.out.println("Interval #" + i + " (" + interval + " days):");
       List<File> files = intervalFiles.get(i);
       List<Date> dates = intervalDates.get(i);
       runNMF(files, dates, outputFileName);
+      System.out.println("Interval #" + i + " done.");
     }
   }
 
@@ -104,7 +111,7 @@ public class NMFTopicExtractor
 
         if (foundStartFolder == false)
         {
-          System.out.println("Start folder not found.");
+          System.out.println("ERROR: Start folder not found.");
           return;
         }
         timeSpanDirectories = new File[startFolderFollowingDirs.size()];
@@ -115,10 +122,10 @@ public class NMFTopicExtractor
       {
         interval = timeSpanDirectories.length;
       }
-      
+
       int maxIterations;
-      
-      if(intervalCount == 0)
+
+      if (intervalCount == 0)
       {
         maxIterations = timeSpanDirectories.length;
       }
@@ -167,7 +174,7 @@ public class NMFTopicExtractor
   public static void runNMF(List<File> files, List<Date> dates, String outputFileName)
   {
     // read stopwords for normalizer
-    System.out.print("read stopwords ");
+    System.out.print("Read stopwords ");
     HashSet<String> stopwords = Normalizer.readStopwords(STOPWORD_PATH);
     System.out.println("- done");
 
@@ -175,7 +182,7 @@ public class NMFTopicExtractor
     Vocabulary vocabulary = new Vocabulary(10000);
 
     // fill vocabulary
-    System.out.print("generate vocabulary ");
+    System.out.print("Generate vocabulary ");
     for (File file : files)
     {
       vocabulary.nextFile(file.getName());
@@ -186,14 +193,14 @@ public class NMFTopicExtractor
     System.out.println("Vocabulary Size: " + vocabulary.size());
 
     // save vocabulary in xml
-    System.out.print("save vocabulary ");
+    System.out.print("Save vocabulary ");
     vocabulary.saveVocabulary(VOCABULARY_PATH);
     System.out.println("- done");
 
     // count words (tfidf)
     WordCounter wordCounter = new WordCounter(vocabulary);
     // read each file separate
-    System.out.print("count document words ");
+    System.out.print("Count document words ");
     for (File file : files)
     {
       wordCounter.nextFile(file.getName());
@@ -203,12 +210,12 @@ public class NMFTopicExtractor
 
     // run NMF
     NMFExecutor nmfExecutor = new NMFExecutor();
-    System.out.println("run NMF ");
+    System.out.println("Run NMF:");
     nmfExecutor.execute(wordCounter.getDocumentTermMatrix());
-    System.out.println("run NMF - done");
+    System.out.println("Run NMF - done");
 
     // determine first date
-    System.out.print("determine timestamp ");
+    System.out.println("Determine timestamp");
     Date timestamp = null;
     if (dates.size() > 0)
     {
@@ -216,15 +223,14 @@ public class NMFTopicExtractor
       timestamp = dates.get(0);
     }
     // create TopicData
-    System.out.print("extract Topics ");
+    System.out.print("Extract Topics ");
     TopicTimeStepCollection topicData = new TopicTimeStepCollection(nmfExecutor.getTopicTerm(), nmfExecutor.getTopicDocument(),
             wordCounter.getVocabulary().getVocabulary(), wordCounter.getDocumentNames(), timestamp);
     System.out.println(" - done");
     // save topics
-    System.out.print("save extracted topics ");
+    System.out.print("Save extracted topics ");
     outputFileName += " " + timestamp + ".xml";
     TopicTimeStepCollection.saveTopicData(outputFileName, topicData);
     System.out.println(" - done");
-
   }
 }
