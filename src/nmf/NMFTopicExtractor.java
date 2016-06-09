@@ -77,8 +77,9 @@ public class NMFTopicExtractor
       vocabulary.nextFile(file.getName());
       Normalizer.normalize(file, vocabulary, stopwords);
     }
-    vocabulary.removeLowOccurrances(2, 2);
-    System.out.println("- done");
+    vocabulary.removeLowOccurrances(5, 5);
+    System.out.print("- done");
+    System.out.println("Vocabulary Size: " + vocabulary.size());
 
     // save vocabulary in xml
     System.out.print("save vocabulary ");
@@ -99,7 +100,7 @@ public class NMFTopicExtractor
     // run NMF
     NMFExecutor nmfExecutor = new NMFExecutor();
     System.out.println("run NMF ");
-    nmfExecutor.execute(wordCounter.getDocumentTermMatrix(), 50);
+    nmfExecutor.execute(wordCounter.getDocumentTermMatrix());
     System.out.println("run NMF - done");
 
     // determine first date
