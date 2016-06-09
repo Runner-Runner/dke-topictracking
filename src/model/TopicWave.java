@@ -37,13 +37,17 @@ public class TopicWave
   public TreeMap<Double, String> getAverageTFIDF(){
 	  HashMap<String,Double> terms = new HashMap<>();
 	  for(Topic topic:topicSequence.values()){
+		  double tfidfSum = 0;
+		  for(double d:topic.getTerms().keySet()){
+			  tfidfSum+=d;
+		  }
 		  for(Entry<Double,String> entry: topic.getTerms().entrySet()){
 			  Double tfidf = terms.get(entry.getValue());
 			  if(tfidf == null){
-				  terms.put(entry.getValue(), entry.getKey());
+				  terms.put(entry.getValue(), (entry.getKey()/tfidfSum)*topic.getRelativeRelevance());
 			  }
 			  else{
-				  terms.put(entry.getValue(), tfidf+entry.getKey());
+				  terms.put(entry.getValue(), tfidf+entry.getKey()/tfidfSum);
 			  }
 		  }
 	  }

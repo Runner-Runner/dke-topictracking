@@ -15,21 +15,20 @@ public class Topic implements Serializable
   private static final long serialVersionUID = 6420397376392250856L;
   private TreeMap<Double, String> terms;
   private TreeMap<Double, String> documentRankings;
+  private double relativeRelevance;
   private double absoluteRelevance;
 
-  public Topic()
+  public double getAbsoluteRelevance() {
+	return absoluteRelevance;
+}
+
+public void setAbsoluteRelevance(double absoluteRelevance) {
+	this.absoluteRelevance = absoluteRelevance;
+}
+
+public Topic()
   {
     terms = new TreeMap<>();
-  }
-
-  public double getAbsoluteRelevance()
-  {
-    return absoluteRelevance;
-  }
-
-  public void setAbsoluteRelevance(double absoluteRelevance)
-  {
-    this.absoluteRelevance = absoluteRelevance;
   }
 
   public void setTerms(TreeMap<Double, String> terms)
@@ -152,8 +151,13 @@ public class Topic implements Serializable
     return termsText;
   }
 
-  public double getRelativeRelevance(Double tfidfTotal)
-  {
-    return getAbsoluteRelevance()/tfidfTotal;
-  }
+public double getRelativeRelevance() {
+	return relativeRelevance;
+}
+
+public void setRelativeRelevance(double relativeRelevance) {
+	this.relativeRelevance = relativeRelevance;
+}
+
+  
 }

@@ -148,6 +148,10 @@ private double absoluteValuesTotal;
       absoluteValuesTotal += tfidfSum;
       topics.put(tfidfSum, topic);
     }
+    //set relative values
+    for(Topic topic:topics.values()){
+    	topic.setRelativeRelevance(topic.getAbsoluteRelevance()/absoluteValuesTotal);
+    }
   }
 
   public double getAbsoluteValuesTotal()
