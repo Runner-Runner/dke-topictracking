@@ -19,7 +19,7 @@ public class NMFExecutor
     KMeansOptions options = new KMeansOptions();
     options.nClus = TOPIC_COUNT;
     options.verbose = true;
-    options.maxIter = 50;
+    options.maxIter = 20;
     KMeans kmeans = new KMeans(options);
     kmeans.feedData(documentTermMatrix);
     kmeans.initialize(null);
@@ -30,7 +30,6 @@ public class NMFExecutor
     nmfOptions.maxIter = 50;
     nmfOptions.verbose = true;
     nmfOptions.calc_OV = false;
-//    nmfOptions.epsilon = 1e-5;
     nmfOptions.epsilon = 1e-4;
     Clustering nmf = new NMF(nmfOptions);
 //    L1NMFOptions l1nmfOptions = new L1NMFOptions();

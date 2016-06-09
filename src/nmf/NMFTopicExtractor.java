@@ -24,8 +24,8 @@ public class NMFTopicExtractor
 
   public static void main(String[] args)
   {
-    runMultipleNMF("/media/Storage/Meine Daten/Schutzbereich/MoS/Research Project 2/savedata/08-29 - 09-04",
-            "year", "19960904", 2, 10);
+    runMultipleNMF("/media/Storage/Meine Daten/Schutzbereich/MoS/Research Project 2/savedata/96 - 97",
+            "year", null, 7, 1);
   }
 
   public static void runNMF(String directory, String outputFileName)
@@ -44,7 +44,8 @@ public class NMFTopicExtractor
    * for "take all directories".
    * @param interval How many time spans (e.g. days) make an interval? (e.g. 7
    * for a week). Set 0 if all files should be executed as one interval.
-   * @param intervalCount How many intervals shall be executed? (e.g. 4 weeks)
+   * @param intervalCount How many intervals shall be executed? (e.g. 4 weeks).
+   * Set 0 if all files should be executed interval-wise.
    */
   public static void runMultipleNMF(String startDirectory, String outputFileName,
           String startFolder, int interval, int intervalCount)
@@ -114,8 +115,17 @@ public class NMFTopicExtractor
       {
         interval = timeSpanDirectories.length;
       }
-
-      int maxIterations = Math.min(intervalCount * interval, timeSpanDirectories.length);
+      
+      int maxIterations;
+      
+      if(intervalCount == 0)
+      {
+        maxIterations = timeSpanDirectories.length;
+      }
+      else
+      {
+        maxIterations = Math.min(intervalCount * interval, timeSpanDirectories.length);
+      }
 
       List<File> files = new ArrayList<>();
       List<Date> dates = new ArrayList<>();
