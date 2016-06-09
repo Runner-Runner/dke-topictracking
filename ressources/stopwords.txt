@@ -810,11 +810,15 @@ yours
 
 Monday
 
+monday
+
 Mon
 
 mon
 
 Tuesday
+
+tuesday
 
 Tue
 
@@ -822,11 +826,15 @@ tue
 
 Wednesday
 
+wednesday
+
 Wed
 
 wed
 
 Thursday
+
+thursday
 
 Thu
 
@@ -834,11 +842,15 @@ thu
 
 Friday
 
+friday
+
 Fri
 
 fri
 
 Saturday
+
+saturday
 
 Sat
 
@@ -846,11 +858,15 @@ sat
 
 Sunday
 
+sunday
+
 Sun
 
 sun
 
 January
+
+january
 
 Jan 
 
@@ -858,17 +874,23 @@ jan
 
 February
 
+february
+
 Feb
 
 feb
 
 March
 
+march
+
 Mar
 
 mar
 
 April
+
+april
 
 Apr
 
@@ -880,11 +902,15 @@ may
 
 June
 
+june
+
 Jun
 
 jun
 
 July
+
+july
 
 Jul
 
@@ -892,11 +918,15 @@ jul
 
 August
 
+august
+
 Aug
 
 aug
 
 September
+
+september
 
 Sep
 
@@ -904,17 +934,23 @@ sep
 
 October
 
+october
+
 Oct
 
 oct
 
 November
 
+november
+
 Nov
 
 nov
 
 December
+
+december
 
 Dec
 
