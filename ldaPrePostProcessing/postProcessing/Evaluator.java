@@ -9,14 +9,18 @@ import java.util.Map.Entry;
 
 public class Evaluator {
 
-	CorpusTopicDataObject data;
+	ReutersMetaData dataReuters;
 	
-	public Evaluator(CorpusTopicDataObject data)
+	TopicDistributions dataLDA;
+	
+	public Evaluator(ReutersMetaData reutersData,
+			TopicDistributions ldaData)
 	{
-		this.data = data;
+		this.dataReuters = reutersData;
+		
+		this.dataLDA = ldaData;
 		
 		System.out.println("[Evaluator] initialization done.");
-		
 	}
 	
 	public void evaluteTopics()
@@ -25,7 +29,7 @@ public class Evaluator {
 		HashMap<Integer, String> mAnnotatedTopicsIndexToTopic = new HashMap<Integer, String>();
 
 		int index = 0;
-		for(Entry<String, ArrayList<Integer>> entry: data.getAnnotatedTopicsDocumentsPerTopic().entrySet())
+		for(Entry<String, ArrayList<Integer>> entry: dataReuters.getDocumentsPerTopics().entrySet())
 		{
 			String topic = entry.getKey();
 			mAnnotatedTopicsTopicToIndex.put(topic, index);
@@ -33,8 +37,8 @@ public class Evaluator {
 			++index;
 		}
 		
-		int sizeLDATopics = data.getLDADocumentsPerTopic().size();
-		int sizeOrigTopcis = data.getAnnotatedTopicsDocumentsPerTopic().size();
+		int sizeLDATopics = dataLDA.getDocumentsPerTopics().size();
+		int sizeOrigTopcis = dataReuters.getDocumentsPerTopics().size();
 		
 		int[][] confusionMatrix = new int[sizeLDATopics][sizeOrigTopcis];
 		
@@ -55,14 +59,14 @@ public class Evaluator {
 //			}
 //		}
 		
-		for(Entry<Integer, HashMap<Integer, Double>> entry1 : data.getLDADocumentsPerTopic().entrySet())
+		for(Entry<Integer, HashMap<Integer, Double>> entry1 : dataLDA.getDocumentsPerTopics().entrySet())
 		{
 			int topicLDA = entry1.getKey();
 			HashMap<Integer, Double> docsLDA = entry1.getValue();
 			
 			for (Entry<Integer, Double> doc : docsLDA.entrySet())
 			{
-				ArrayList<String> topicsOrig = data.getAnnotatedTopicsPerDocument().get(doc.getKey());
+				ArrayList<String> topicsOrig = dataReuters.getTopicsForDocument(doc.getKey());
 				for (String topicOrig : topicsOrig)
 				{
 					int indexTopicOrig = mAnnotatedTopicsTopicToIndex.get(topicOrig);

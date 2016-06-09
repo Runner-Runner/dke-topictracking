@@ -2,8 +2,10 @@ package app;
 
 
 import container.Vocabulary;
-import postProcessing.CorpusTopicDataObject;
+import postProcessing.ReutersMetaData;
+import postProcessing.TopicDistributions;
 import postProcessing.DTMEvaluator;
+import postProcessing.WordDistributions;
 import postProcessing.Evaluator;
 import postProcessing.VisDataGenerator;
 import preProcessing.CorpusProcessor;
@@ -103,11 +105,11 @@ public class Application {
 			break;
 			case evaluateTopics:
 			{
-				CorpusTopicDataObject data = new CorpusTopicDataObject(
-						config.resultDir + "/" + config.metaDataFilename,
-						config.resultDir + "/" + config.topicsPerDocFilename);
+				ReutersMetaData reutersData = new ReutersMetaData(config.resultDir + "/" + config.metaDataFilename);
 				
-				Evaluator eva = new Evaluator(data);
+				TopicDistributions ldaData = new TopicDistributions(config.resultDir + "/" + config.topicsPerDocFilename);
+				
+				Evaluator eva = new Evaluator(reutersData, ldaData);
 				
 				eva.evaluteTopics();
 		
@@ -116,11 +118,11 @@ public class Application {
 			break;
 			case generateVisData:
 			{
-				CorpusTopicDataObject data = new CorpusTopicDataObject(
-						config.resultDir + "/" + config.metaDataFilename,
-						config.resultDir + "/" + config.topicsPerDocFilename);
+				ReutersMetaData reutersData = new ReutersMetaData(config.resultDir + "/" + config.metaDataFilename);
 				
-				VisDataGenerator gen = new VisDataGenerator(data, config.corpusPath);
+				TopicDistributions ldaData = new TopicDistributions(config.resultDir + "/" + config.topicsPerDocFilename);
+
+				VisDataGenerator gen = new VisDataGenerator(reutersData, ldaData, config.corpusPath);
 		
 				gen.writeTopicsWithDocWeightJson(config.resultDir + "/" + config.topicTopWordsFilename,
 						config.resultDir + "/" + config.topicClustersFilename,
@@ -131,27 +133,28 @@ public class Application {
 			break;
 			case generateStats:
 			{
-				CorpusTopicDataObject data = new CorpusTopicDataObject(
-						config.resultDir + "/" + config.metaDataFilename,
-						config.resultDir + "/" + config.topicsPerDocFilename);
+				WordDistributions dtmWDs = new WordDistributions(config.dtmNumTimesteps,
+						config.resultDir + "/" + config.dtmTopicWordDistributions);
 				
-				data.writeTopicsWithDocWeight(config.resultDir + "/" + config.docsPerTopicFilename);
-				
+
 				System.out.println("generateStats finished.");
 
 			}
 			break;
 			case evaluateDTMTopics:
 			{
-				CorpusTopicDataObject data = new CorpusTopicDataObject(
-						config.resultDir + "/" + config.metaDataFilename,
-						config.resultDir + "/" + config.topicsPerDocFilename);
+				ReutersMetaData reutersData = new ReutersMetaData(config.resultDir + "/" + config.metaDataFilename);
 				
-				DTMEvaluator eva = new DTMEvaluator(data);
+				TopicDistributions ldaData = new TopicDistributions(config.resultDir + "/" + config.topicsPerDocFilename);
+
+				DTMEvaluator eva = new DTMEvaluator(reutersData, ldaData);
+				
+//				eva.writeTopicsWithDocWeight(config.resultDir + "/" + config.docsPerTopicFilename);
+
 				eva.writeTopicsWithDocsPerTime(config.dtmNumTimesteps,
 						true,
 						config.resultDir + "/" + config.docsPerTopicFilename);
-				
+			
 				System.out.println("DTM topic evaluation finished.");
 			}
 			break;

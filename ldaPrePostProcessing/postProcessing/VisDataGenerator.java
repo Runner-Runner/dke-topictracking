@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 
 import preProcessing.ReutersXMLHandler;
 import tools.IOUtils;
+import tools.Utils;
 
 public class VisDataGenerator {
 
@@ -36,18 +37,23 @@ public class VisDataGenerator {
 //	HashMap<Integer, HashMap<Integer, Double> > mLDADocumentsPerTopic;
 //	HashMap<String, ArrayList<Integer> > liOrigTopicsToDocs;
 
-	CorpusTopicDataObject data;
+	ReutersMetaData dataReuters;
+	
+	TopicDistributions dataLDA;
 
 	LinkedHashMap<Integer, Integer> topicsByNumberOfDocs;
 
 	private Integer indexCounter = 0;
 
-	public VisDataGenerator(CorpusTopicDataObject data,
+	public VisDataGenerator(ReutersMetaData dataReuters,
+			TopicDistributions dataLDA,
 			final String corpusDir)
 	{
 		this.corpusDir = corpusDir;
 		
-		this.data = data;
+		this.dataReuters = dataReuters;
+		
+		this.dataLDA = dataLDA;
 		
 		topicsByNumberOfDocs = new LinkedHashMap<Integer, Integer>();
 		
@@ -84,7 +90,7 @@ public class VisDataGenerator {
 			return;
 		}
 		
-		HashMap<Integer, String>  topicsToClustersSorted = sortByValue(topicsToClusters);
+		HashMap<Integer, String>  topicsToClustersSorted = Utils.sortByValue(topicsToClusters);
 		
 		final HashMap<String, ArrayList<Integer> > clustersToTopics = new HashMap<String, ArrayList<Integer> >();
 		
@@ -161,12 +167,12 @@ public class VisDataGenerator {
 			Integer numDocsOverall = 0;
 			for (Integer topic : topics) 
 			{
-				Integer numDocs = data.getLDADocumentsPerTopic().get(topic).size();
+				Integer numDocs = dataLDA.getDocumentsAndWeightsForTopic(topic).size();
 				numDocsOverall += numDocs;
 				topicsByCluster.put(topic, numDocs);
 			}
 			
-			topicsByCluster = sortByValue(topicsByCluster);
+			topicsByCluster = Utils.sortByValue(topicsByCluster);
 
 			String clusterContent = "";
 			
@@ -208,8 +214,8 @@ public class VisDataGenerator {
 
 				clusterContent += "\t\t\"weight\": " + numDocs + ",\n";// comma here because groups are following now
 				
-				HashMap<Integer, Double> docs = data.getLDADocumentsPerTopic().get(topic);
-				docs = sortByValue(docs);
+				HashMap<Integer, Double> docs = dataLDA.getDocumentsAndWeightsForTopic(topic);
+				docs = Utils.sortByValue(docs);
 
 				clusterContent += "\t\t\"groups\": [\n";
 
@@ -220,7 +226,7 @@ public class VisDataGenerator {
 					Entry<Integer, Double> entry = entries.next();
 					int id = entry.getKey();
 					int weight = (int) Math.round(entry.getValue());
-					String docName = data.getIndexToDoc().get(id);
+					String docName = dataReuters.getDocName(id);
 
 					String docContent = getDocumentText(docName + ".xml");
 					
@@ -259,7 +265,7 @@ public class VisDataGenerator {
 			// Do not mess the order if there was only one topic
 			if( mTopCLusterWords.size() > 1)
 			{
-				mTopCLusterWords = sortByValue(mTopCLusterWords);
+				mTopCLusterWords = Utils.sortByValue(mTopCLusterWords);
 			}
 			
 			Object[] aTopCLusterWords = mTopCLusterWords.keySet().toArray();
@@ -386,13 +392,13 @@ public class VisDataGenerator {
 //		});
 		
 		Integer numDocsOverall = 0;
-		for (Entry<Integer, HashMap<Integer, Double>> entry : data.getLDADocumentsPerTopic().entrySet()) 
+		for (Entry<Integer, HashMap<Integer, Double>> entry : dataLDA.getDocumentsPerTopics().entrySet()) 
 		{
 			numDocsOverall += entry.getValue().size();
 			topicsByNumberOfDocs.put(entry.getKey(), entry.getValue().size());
 		}
 		
-		topicsByNumberOfDocs = sortByValue(topicsByNumberOfDocs);
+		topicsByNumberOfDocs = Utils.sortByValue(topicsByNumberOfDocs);
 		
 		PrintWriter writer;
 		try 
@@ -419,18 +425,6 @@ public class VisDataGenerator {
 			e.printStackTrace();
 		}
 		
-	}
-	
-	private static <K, V extends Comparable<? super V>> LinkedHashMap<K, V> 
-    sortByValue( Map<K, V> map )
-	{
-		LinkedHashMap<K, V> result = new LinkedHashMap<>();
-	    Stream<Map.Entry<K, V>> st = map.entrySet().stream();
-	
-	    st.sorted( Map.Entry.comparingByValue(Comparator.reverseOrder()) )
-	        .forEachOrdered( e -> result.put(e.getKey(), e.getValue()) );
-	
-	    return result;
 	}
 	
 	public String getDocumentText(final String fileName)

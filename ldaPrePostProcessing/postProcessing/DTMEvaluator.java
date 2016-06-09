@@ -2,18 +2,28 @@ package postProcessing;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import tools.IOUtils;
+import tools.Utils;
 
 public class DTMEvaluator 
 {
-	CorpusTopicDataObject data;
+	ReutersMetaData dataReuters;
+	
+	TopicDistributions dataLDA;
 
-	public DTMEvaluator(CorpusTopicDataObject data) 
+	public DTMEvaluator(ReutersMetaData dataReuters,
+			TopicDistributions dataLDA) 
 	{
-		this.data = data;
+		this.dataReuters = dataReuters;
+		
+		this.dataLDA = dataLDA;
 		
 		System.out.println("[DTMEvaluator] initialization done.");
 	}
@@ -24,11 +34,10 @@ public class DTMEvaluator
 	{
 		String content = "";
 		
-		for (Integer index = 0; index < data.getLDADocumentsPerTopic().size(); index++)
+		for (Integer index = 0; index < dataLDA.getDocumentsPerTopics().size(); index++)
 		{
 			//ArrayList<Integer> docs = liLDATopicsToDocs.get(index);
-			HashMap<Integer, Double> docs = data.getLDADocumentsPerTopic().get(index);
-			
+			HashMap<Integer, Double> docs = dataLDA.getDocumentsAndWeightsForTopic(index);
 			if (!scoreInsteadOfDocNumbers)
 			{
 				content += docs.size();
@@ -39,7 +48,7 @@ public class DTMEvaluator
 			for (Entry<Integer, Double> entry : docs.entrySet()) 
 			{
 				int doc = entry.getKey();
-				int date = data.getDocIndexToDate().get(doc);
+				int date = dataReuters.getDocDate(doc);
 				
 				if (!mDocsPerDate.containsKey(date))
 				{
@@ -101,6 +110,36 @@ public class DTMEvaluator
 		}
 		
 		System.out.println("[DTMEvaluator::writeTopicsWithDocsPerTime] Saving topics with number of docs to " + filename);
+		IOUtils.saveContentToFile(content, filename);
+	}
+	
+	public void writeTopicsWithDocWeight(final String filename)
+	{
+		String content = "";
+		
+		for (Integer index = 0; index < dataLDA.getDocumentsPerTopics().size(); index++)
+		{
+			//ArrayList<Integer> docs = liLDATopicsToDocs.get(index);
+			HashMap<Integer, Double> docs = dataLDA.getDocumentsAndWeightsForTopic(index);
+			docs = Utils.sortByValue(docs);
+			
+			content += docs.size();
+			
+//			for (Entry<Integer, Double> entry : docs.entrySet()) 
+//			{
+//				String docName = getIndexToDoc().get(entry.getKey());
+//				content += " " + docName + ":" + entry.getValue();
+//			}
+			
+//			docs.forEach((id, weight) -> 
+//			{
+//				String docName = getIndexToDoc().get(id);
+//				content += " " + docName + ":" + weight;
+//			});
+			content += "\n";
+		}
+		
+		System.out.println("[DTMEvaluator::writeTopicsWithDocWeight] Saving topics with number of docs to " + filename);
 		IOUtils.saveContentToFile(content, filename);
 	}
 }
