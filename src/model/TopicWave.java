@@ -8,6 +8,7 @@ import java.util.TreeMap;
 public class TopicWave
 {
   private TreeMap<Integer, Topic> topicSequence;
+  
 
   public TopicWave(int timeunit, Topic topic)
   {
@@ -32,6 +33,26 @@ public class TopicWave
 
     topicSequence.put(timeunit, topic);
   }
+  
+  public TreeMap<Double, String> getAverageTFIDF(){
+	  HashMap<String,Double> terms = new HashMap<>();
+	  for(Topic topic:topicSequence.values()){
+		  for(Entry<Double,String> entry: topic.getTerms().entrySet()){
+			  Double tfidf = terms.get(entry.getValue());
+			  if(tfidf == null){
+				  terms.put(entry.getValue(), entry.getKey());
+			  }
+			  else{
+				  terms.put(entry.getValue(), tfidf+entry.getKey());
+			  }
+		  }
+	  }
+	  TreeMap<Double, String> ret = new TreeMap<>();
+	  for(Entry<String,Double> entry:terms.entrySet()){
+		  ret.put(entry.getValue()/topicSequence.size(),entry.getKey());
+	  }
+	  return ret;
+  }
 
   public String toString(HashMap<Integer, Double> tfidfTotalMap)
   {
@@ -45,4 +66,5 @@ public class TopicWave
     }
     return text;
   }
+  
 }
