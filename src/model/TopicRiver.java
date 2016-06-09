@@ -26,7 +26,7 @@ public class TopicRiver
     return tfidfTotalMap.get(timeUnit);
   }
   
-  public void addTopicData(int timeUnit, TopicTimeStepCollection topicData)
+  public void addTopicTimeStepCollection(int timeUnit, TopicTimeStepCollection topicData)
   {
     for(Topic topic : topicData.getTopicList())
     {
@@ -67,8 +67,9 @@ public class TopicRiver
     TopicRiver topicRiver = new TopicRiver();
     for (int i=0; i<files.length; i++)
     {
-      TopicTimeStepCollection topicData = TopicTimeStepCollection.loadTopicData(files[i].getAbsolutePath());
-      topicRiver.addTopicData(i+1, topicData);
+      TopicTimeStepCollection topicTimeStepCollection = TopicTimeStepCollection.
+              loadTopicData(files[i].getAbsolutePath());
+      topicRiver.addTopicTimeStepCollection(i+1, topicTimeStepCollection);
     }
     return topicRiver;
   }
