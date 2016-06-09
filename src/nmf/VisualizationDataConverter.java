@@ -71,20 +71,8 @@ public class VisualizationDataConverter
         yValues.add(relativeRelevance);
       }
       yValueMap.put(wave, yValues);
-//
-      int termCount = 0;
-      List<String> bestTerms = new ArrayList<>();
-      for (Entry<Double, String> terms : wave.getAverageTFIDF().descendingMap().entrySet())
-      {
-        bestTerms.add(terms.getValue());
-        termCount++;
-        if (termCount == 5)
-        {
-          break;
-        }
-      }
-      String name = String.join(", ", bestTerms);
-      nameMap.put(wave, name);
+
+      nameMap.put(wave, wave.getName());
     }
 
     String jsonText = "var data = [";

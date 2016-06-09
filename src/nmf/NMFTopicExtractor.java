@@ -231,7 +231,7 @@ public class NMFTopicExtractor
     // save topics
     System.out.print("Save extracted topics ");
     outputFileName += " " + timestamp + ".xml";
-    TopicTimeStepCollection.saveTopicData(outputFileName, topicData);
+    TopicTimeStepCollection.save(outputFileName, topicData);
     System.out.println(" - done");
   }
 }

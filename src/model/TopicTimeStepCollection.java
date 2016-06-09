@@ -84,7 +84,7 @@ private double absoluteValuesTotal;
     this.topics = topics;
   }
 
-  public static void saveTopicData(String filename, TopicTimeStepCollection topicData)
+  public static void save(String filename, TopicTimeStepCollection topicData)
   {
     XMLEncoder encoder = null;
     try
@@ -99,7 +99,7 @@ private double absoluteValuesTotal;
     encoder.close();
   }
   
-  public static TopicTimeStepCollection loadTopicData(String filename)
+  public static TopicTimeStepCollection load(String filename)
   {
     XMLDecoder decoder = null;
     try

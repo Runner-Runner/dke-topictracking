@@ -9,11 +9,10 @@ public class TopicRiver
 {
   private List<TopicWave> waves;
   private TopicMatcher topicMatcher;
-  
-  private HashMap<Integer, Double> tfidfTotalMap; 
-  
+
+  private HashMap<Integer, Double> tfidfTotalMap;
+
   //TODO Store week date?
-  
   public TopicRiver()
   {
     waves = new ArrayList<>();
@@ -25,32 +24,32 @@ public class TopicRiver
   {
     return tfidfTotalMap.get(timeUnit);
   }
-  
+
   public void addTopicTimeStepCollection(int timeUnit, TopicTimeStepCollection topicData)
   {
-    for(Topic topic : topicData.getTopicList())
+    for (Topic topic : topicData.getTopicList())
     {
       addTopic(timeUnit, topic);
     }
     tfidfTotalMap.put(timeUnit, topicData.getAbsoluteValuesTotal());
   }
-  
+
   private void addTopic(int timeUnit, Topic topic)
   {
     TopicWave bestWave = null;
     double bestValue = -1;
     //TODO handle multiple best values (same nr of matches)
     //TODO How to merge, how to split?
-    for(TopicWave wave : waves)
+    for (TopicWave wave : waves)
     {
       double matchScore = topicMatcher.compareTopics(topic, wave.getLastTopic());
-      if(matchScore > bestValue)
+      if (matchScore > bestValue)
       {
         bestValue = matchScore;
         bestWave = wave;
       }
     }
-    if(bestWave != null && bestValue >= TopicMatcher.TOPIC_THRESHOLD)
+    if (bestWave != null && bestValue >= TopicMatcher.TOPIC_THRESHOLD)
     {
       bestWave.addTopic(timeUnit, topic);
     }
@@ -60,33 +59,34 @@ public class TopicRiver
       waves.add(newWave);
     }
   }
+
   public static TopicRiver loadTopicRiver(String directoryName)
   {
     File directory = new File(directoryName);
     File[] files = directory.listFiles();
     TopicRiver topicRiver = new TopicRiver();
-    for (int i=0; i<files.length; i++)
+    for (int i = 0; i < files.length; i++)
     {
-      TopicTimeStepCollection topicTimeStepCollection = TopicTimeStepCollection.
-              loadTopicData(files[i].getAbsolutePath());
-      topicRiver.addTopicTimeStepCollection(i+1, topicTimeStepCollection);
+      TopicTimeStepCollection topicTimeStepCollection = TopicTimeStepCollection.load(files[i].getAbsolutePath());
+      topicRiver.addTopicTimeStepCollection(i + 1, topicTimeStepCollection);
     }
     return topicRiver;
   }
+
   @Override
   public String toString()
   {
     String text = "";
     int count = 0;
-    for(TopicWave wave : waves)
+    for (TopicWave wave : waves)
     {
       count++;
-      text += "\nTopicWave #" + count + ": " + wave.toString(tfidfTotalMap) + 
-              "\n--------------------------";
+      text += "\nTopicWave #" + count + ": " + wave.toString(tfidfTotalMap)
+              + "\n--------------------------";
     }
     return text;
   }
-  
+
   public List<TopicWave> getWaves()
   {
     return waves;

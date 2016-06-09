@@ -26,6 +26,7 @@ public class WordCounter implements WordHandler
     this.vocabulary = vocabulary;
   }
 
+  @Override
   public void nextFile(String name)
   {
     currentDocument = new HashMap<>();
