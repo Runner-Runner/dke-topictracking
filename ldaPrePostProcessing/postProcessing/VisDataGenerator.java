@@ -214,16 +214,16 @@ public class VisDataGenerator {
 
 				clusterContent += "\t\t\"weight\": " + numDocs + ",\n";// comma here because groups are following now
 				
-				HashMap<Integer, Double> docs = dataLDA.getDocumentsAndWeightsForTopic(topic);
+				HashMap<Integer, Float> docs = dataLDA.getDocumentsAndWeightsForTopic(topic);
 				docs = Utils.sortByValue(docs);
 
 				clusterContent += "\t\t\"groups\": [\n";
 
 				int topDocs = 10;
-				Iterator<Map.Entry<Integer, Double>> entries = docs.entrySet().iterator();
+				Iterator<Map.Entry<Integer, Float>> entries = docs.entrySet().iterator();
 				while (topDocs > 0 && entries.hasNext())
 				{
-					Entry<Integer, Double> entry = entries.next();
+					Entry<Integer, Float> entry = entries.next();
 					int id = entry.getKey();
 					int weight = (int) Math.round(entry.getValue());
 					String docName = dataReuters.getDocName(id);
@@ -392,7 +392,7 @@ public class VisDataGenerator {
 //		});
 		
 		Integer numDocsOverall = 0;
-		for (Entry<Integer, HashMap<Integer, Double>> entry : dataLDA.getDocumentsPerTopics().entrySet()) 
+		for (Entry<Integer, HashMap<Integer, Float>> entry : dataLDA.getDocumentsPerTopics().entrySet()) 
 		{
 			numDocsOverall += entry.getValue().size();
 			topicsByNumberOfDocs.put(entry.getKey(), entry.getValue().size());

@@ -2,6 +2,7 @@ package app;
 
 
 import container.Vocabulary;
+import edu.stanford.nlp.io.IOUtils;
 import postProcessing.ReutersMetaData;
 import postProcessing.TopicDistributions;
 import postProcessing.DTMEvaluator;
@@ -10,6 +11,12 @@ import postProcessing.Evaluator;
 import postProcessing.VisDataGenerator;
 import preProcessing.CorpusProcessor;
 import preProcessing.WordCounter;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+
 import app.Configuration.modes;
 
 public class Application {
@@ -41,9 +48,9 @@ public class Application {
 			{
 				config.mode = modes.evaluateDTMTopics;
 			}
-			else if (arg.equals("-generateStats"))
+			else if (arg.equals("-evaluateWordDistributions"))
 			{
-				config.mode = modes.generateStats;
+				config.mode = modes.evaluateWordDistributions;
 			}
 			else
 			{
@@ -53,6 +60,7 @@ public class Application {
 				System.out.println("-evaluate");
 				System.out.println("-generateVisData");
 				System.out.println("-evaluateDTM");
+				System.out.println("-evaluateWordDistributions");
 				System.out.println("See the config.properties for more information.");
 				return;
 			}
@@ -131,13 +139,30 @@ public class Application {
 				System.out.println("generateVisData finished.");
 			}
 			break;
-			case generateStats:
+			case evaluateWordDistributions:
 			{
 				WordDistributions dtmWDs = new WordDistributions(config.dtmNumTimesteps,
 						config.resultDir + "/" + config.dtmTopicWordDistributions);
 				
+				String filename = config.resultDir + "/" + config.IntraTopicSimilaritiesFilename;
+				
+				System.out.println("computing IntraTopicDistances.");
+				
+				//tools.IOUtils.writeDoubleMatrix(filename, dtmWDs.computeIntraTopicSimilarities());
+				tools.IOUtils.writeIntMatrix(filename, dtmWDs.computeIntraTopicDistances(10));
+				
+				filename = config.resultDir + "/" + config.InterTopicSimilaritiesFilename;
 
-				System.out.println("generateStats finished.");
+				System.out.println("computing InterTopicDistances.");
+				
+				int timeStep = 0;
+//				double[][] interTopipcSimiliarity = dtmWDs.computeInterTopicSimilarities(timeStep);
+//				tools.IOUtils.writeDoubleMatrix(filename, interTopipcSimiliarity);
+				
+				int[][] interTopipcSimiliarity = dtmWDs.computeInterTopicDistances(timeStep, 10);
+				tools.IOUtils.writeIntMatrix(filename, interTopipcSimiliarity);
+				
+				System.out.println("evaluateWordDistributions finished.");
 
 			}
 			break;
@@ -147,12 +172,11 @@ public class Application {
 				
 				TopicDistributions ldaData = new TopicDistributions(config.resultDir + "/" + config.topicsPerDocFilename);
 
-				DTMEvaluator eva = new DTMEvaluator(reutersData, ldaData);
+				DTMEvaluator eva = new DTMEvaluator(reutersData, ldaData, config.dtmNumTimesteps);
 				
 //				eva.writeTopicsWithDocWeight(config.resultDir + "/" + config.docsPerTopicFilename);
 
-				eva.writeTopicsWithDocsPerTime(config.dtmNumTimesteps,
-						true,
+				eva.writeTopicsWithDocsPerTime(true,
 						config.resultDir + "/" + config.docsPerTopicFilename);
 			
 				System.out.println("DTM topic evaluation finished.");

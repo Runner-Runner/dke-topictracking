@@ -1,7 +1,10 @@
 package tools;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -17,5 +20,26 @@ public class Utils {
 	        .forEachOrdered( e -> result.put(e.getKey(), e.getValue()) );
 	
 	    return result;
+	}
+	
+	public static double[] convertToArray(List<Float> list)
+	{
+		double[] doubleArray = list.stream()
+			    .mapToDouble(f -> f != null ? f : Float.NaN)
+			    .toArray();
+		
+		return doubleArray;
+	}
+	
+	public static LinkedHashMap<Integer, Float> convertListToMap(ArrayList<Float> list)
+	{
+		LinkedHashMap<Integer, Float> map = new LinkedHashMap<Integer, Float>();
+		
+		for (int index = 0; index < list.size(); ++index)
+		{
+			map.put(index, list.get(index));
+		}
+		
+		return map;
 	}
 }

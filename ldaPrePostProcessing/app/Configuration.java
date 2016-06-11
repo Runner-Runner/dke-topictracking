@@ -14,7 +14,7 @@ public class Configuration {
 		generateWordCount,
 		generateVisData,
 		evaluateTopics,
-		generateStats,
+		evaluateWordDistributions,
 		evaluateDTMTopics
 	}
 	
@@ -39,6 +39,9 @@ public class Configuration {
 	public String dtmTopicScorePerTimestepFilename;
 	public String dtmTopicWordDistributions;
 	public int dtmNumTimesteps;
+	
+	public String IntraTopicSimilaritiesFilename;
+	public String InterTopicSimilaritiesFilename;
 	
 	public Configuration()
 	{}
@@ -132,12 +135,17 @@ public class Configuration {
 				}
 			}
 			break;
-			case generateStats:
+			case evaluateWordDistributions:
 			{
 				String dtmNumTimestepsString = prop.getProperty("DTMNumTimesteps");
+				dtmTopicWordDistributions = prop.getProperty("DTMTopicsFilename");
+				IntraTopicSimilaritiesFilename = prop.getProperty("IntraTopicSimilaritiesFilename");
+				InterTopicSimilaritiesFilename = prop.getProperty("InterTopicSimilaritiesFilename");
 				
-				if (docsPerTopicFilename == null
-						|| dtmNumTimestepsString == null)
+				if (dtmTopicWordDistributions == null
+						|| dtmNumTimestepsString == null
+						|| IntraTopicSimilaritiesFilename == null
+						|| InterTopicSimilaritiesFilename == null)
 				{
 					System.out.println("docsPerTopicFilename or DTMNumTimesteps missing.");
 					return false;
