@@ -69,7 +69,13 @@ public class Topic implements Serializable {
 		HashMap<String, Double> bestTerms = new HashMap<>();
 		Iterator<Map.Entry<Double, String>> iterator = getNormalizedTerms().
             descendingMap().entrySet().iterator();
-		for (int i = 0; i < termCount; i++) {
+		
+    if(termCount == -1)
+    {
+      termCount = terms.size();
+    }
+    
+    for (int i = 0; i < termCount; i++) {
 			if (!iterator.hasNext()) {
 				break;
 			}

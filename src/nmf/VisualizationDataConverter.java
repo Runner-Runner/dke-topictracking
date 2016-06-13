@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,12 +27,18 @@ public class VisualizationDataConverter
 
   public static void writeJSONData(TopicRiver topicRiver)
   {
-    //TODO dynamic timesteps
-    int timeSteps = 52;
-
     List<TopicWave> waves = topicRiver.getWaves();
-    HashMap<TopicWave, List<Double>> yValueMap = new HashMap<>();
 
+    Set<Integer> uniqueTimeSteps = new HashSet<>();
+    for (TopicWave wave : waves)
+    {
+      Set<Integer> keySet = wave.getTopicSequence().keySet();
+      uniqueTimeSteps.addAll(keySet);
+    }
+    //Create as many time steps as are uniquely given by the topic waves
+    int timeSteps = uniqueTimeSteps.size();
+
+    HashMap<TopicWave, List<Double>> yValueMap = new HashMap<>();
     HashMap<TopicWave, String> nameMap = new HashMap<>();
 
     for (TopicWave wave : waves)
