@@ -1,7 +1,9 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -19,6 +21,21 @@ public class TopicWave
   public Topic getLastTopic()
   {
     return topicSequence.lastEntry().getValue();
+  }
+  
+  public Topic getLastTopic(int nthIndex)
+  {
+    Iterator<Topic> iterator = topicSequence.descendingMap().values().iterator();
+    Topic topic = null;
+    for(int i=0; i<nthIndex; i++)
+    {
+      if(!iterator.hasNext())
+      {
+        break;
+      }
+      topic = iterator.next();
+    }
+    return topic;
   }
 
   public TreeMap<Integer, Topic> getTopicSequence()

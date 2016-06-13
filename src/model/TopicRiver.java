@@ -42,16 +42,45 @@ public class TopicRiver
     //TODO How to merge, how to split?
     for (TopicWave wave : waves)
     {
-      double matchScore = topicMatcher.compareTopics(topic, wave.getLastTopic());
-      if (matchScore > bestValue)
+      Topic existingTopic = wave.getTopicSequence().get(timeUnit);
+      Topic secondLastTopic = wave.getLastTopic(2);
+      
+      double currentScore;
+      if(existingTopic != null && secondLastTopic != null)
       {
-        bestValue = matchScore;
+        currentScore = topicMatcher.compareTopics(secondLastTopic, topic);
+        double previousScore = topicMatcher.compareTopics(secondLastTopic, existingTopic);
+        
+        if(currentScore <= previousScore)
+        {
+          continue;
+        }
+      }
+      else
+      {
+        currentScore = topicMatcher.compareTopics(topic, wave.getLastTopic());
+      }
+      
+      if (currentScore > bestValue)
+      {
+        bestValue = currentScore;
         bestWave = wave;
       }
     }
-    if (bestWave != null && bestValue >= TopicMatcher.TOPIC_THRESHOLD)
+    if (bestWave != null && bestValue > TopicMatcher.TOPIC_THRESHOLD)
     {
+      System.out.println("New Topic: " + topic);
+      System.out.println("Best Matching Wave (" + bestValue + "): " + 
+              bestWave.getName());
+      System.out.println(bestWave.getLastTopic());
+      System.out.println("------------------------");
+
+      Topic existingTopic = bestWave.getTopicSequence().get(timeUnit);
       bestWave.addTopic(timeUnit, topic);
+      if(existingTopic != null)
+      {
+        addTopic(timeUnit, existingTopic);
+      }
     }
     else
     {

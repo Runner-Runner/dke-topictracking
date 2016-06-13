@@ -2,11 +2,10 @@ package model;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
@@ -21,13 +20,11 @@ import net.didion.jwnl.dictionary.Dictionary;
 public class TopicMatcher
 {
   private Dictionary dictionary;
-  private ArrayList<TopicWave> sequences;
 
-  public static final int TOPIC_THRESHOLD = 10;
+  public static final double TOPIC_THRESHOLD = 0.2;
   
   public TopicMatcher()
   {
-    sequences = new ArrayList<>();
     try
     {
       JWNL.initialize(new FileInputStream("ressources/WNProperities.xml"));
@@ -40,83 +37,61 @@ public class TopicMatcher
 
   }
 
-  public static void main(String[] args)
+  /**
+   * Calculate similarity via Cosine Similarity metric. Did not yield better 
+   * results than the weighted term metric while creating more topics.
+   * 
+   * @param topic1
+   * @param topic2
+   * @return 
+   */
+  public double compareTopicsCosine(Topic topic1, Topic topic2)
   {
-    Topic one = new Topic();
-    one.addTerm("cook", 10.0);
-    one.addTerm("menu", 9.0);
-    one.addTerm("meal", 8.0);
-    one.addTerm("food", 7.0);
-    one.addTerm("bill", 6.0);
-
-    Topic two = new Topic();
-    two.addTerm("ship", 10.0);
-    two.addTerm("car", 9.0);
-    two.addTerm("street", 8.0);
-    two.addTerm("container", 7.0);
-    two.addTerm("harbour", 6.0);
-
-    Topic three = new Topic();
-    three.addTerm("restaurant", 10.0);
-    three.addTerm("meat", 9.0);
-    three.addTerm("vegetable", 8.0);
-    three.addTerm("food", 7.0);
-    three.addTerm("spoon", 6.0);
-    TopicMatcher tm = new TopicMatcher();
+    Set<Map.Entry<Double, String>> termSet1 = topic1.getTerms().entrySet();
+    HashMap<String, Double> terms2 = topic2.getBestTerms(-1);
     
-    System.out.println(tm.compareTopics(one, two));
-    System.out.println(tm.compareTopics(one, three));
-    System.out.println(tm.compareTopics(three, two));
-  }
-
-  public void compareTopicData(
-          TreeMap<Double, Topic> topics1, TreeMap<Double, Topic> topics2)
-  {
-    Iterator<Map.Entry<Double, Topic>> iterator1 = topics1.descendingMap().entrySet().iterator();
-    
-    while (iterator1.hasNext())
+    double dotProduct = 0.0;
+    double sumTopic1 = 0.0;
+    double sumTopic2 = 0.0;
+    for(Entry<Double, String> entry1 : termSet1)
     {
-      Topic topic1 = iterator1.next().getValue();
-      
-      double bestValue = 0;
-      Topic bestCompareTopic = null;
-      
-      Iterator<Map.Entry<Double, Topic>> iterator2 = topics2.descendingMap().entrySet().iterator();
-      while (iterator2.hasNext())
+      Double tfidf1 = entry1.getKey();
+      Double tfidf2 = terms2.get(entry1.getValue());
+      if(tfidf2 == null)
       {
-        Topic topic2 = iterator2.next().getValue();
-        
-        double compareValue = compareTopics(topic1, topic2);
-
-        if (bestValue < compareValue)
-        {
-          bestValue = compareValue;
-          bestCompareTopic = topic2;
-        }
+        continue;
       }
-      System.out.println("Topic 1: " + topic1);
-      System.out.println("Best Match ("+bestValue+"): " + bestCompareTopic);
-      System.out.println("------------------------");
+      dotProduct += tfidf1 * tfidf2;
+      sumTopic1 += tfidf1 * tfidf1;
+      sumTopic2 += tfidf2 * tfidf2;
     }
-
+    double normTopic1 = Math.sqrt(sumTopic1);
+    double normTopic2 = Math.sqrt(sumTopic2);
+    
+    double cosineDiff = dotProduct / (normTopic1 * normTopic2);
+    
+    return cosineDiff;
   }
-
-  public double compareTopics(Topic one, Topic two)
+  
+  public double compareTopics(Topic topic1, Topic topic2)
   {
     int termAmount = 20;
-    double d = 0;
-    HashMap<String, Double> bestTerms1 = one.getBestTerms(termAmount);
-    HashMap<String, Double> bestTerms2 = two.getBestTerms(termAmount);
+    HashMap<String, Double> bestTerms1 = topic1.getBestTerms(termAmount);
+    HashMap<String, Double> bestTerms2 = topic2.getBestTerms(termAmount);
 
     int matches = 0;
+    double score = 0;
     for (String term : bestTerms1.keySet())
     {
       if (bestTerms2.keySet().contains(term))
       {
+        double combinedValue = bestTerms1.get(term) + bestTerms2.get(term);
+        score += combinedValue;
         matches++;
       }
     }
-    return matches;
+    score *= matches;
+    return score;
   }
 
   public int compareWords(String one, String two) throws JWNLException
