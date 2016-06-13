@@ -15,9 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import la.matrix.Matrix;
 import la.vector.Vector;
+import normalization.Normalizer;
 
 //TODO Merge within same timestep
 public class TopicTimeStepCollection
@@ -163,6 +165,16 @@ private double absoluteValuesTotal;
   {
     this.absoluteValuesTotal = absoluteValuesTotal;
   }
+  
+  public void retranslateStemming(){
+		for(Topic topic: topics.values()){
+			TreeMap<Double, String> terms = new TreeMap<>();
+			for(Entry<Double, String> entry: topic.getTerms().entrySet()){
+				terms.put(entry.getKey(), Normalizer.getOriginal(entry.getValue()));
+			}
+			topic.setTerms(terms);
+		}
+	}
 
   @Override
   public String toString()
