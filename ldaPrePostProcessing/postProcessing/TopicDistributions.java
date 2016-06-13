@@ -15,17 +15,17 @@ import tools.IOUtils;
 
 public class TopicDistributions {
 
-	private ArrayList<HashMap<Integer, Double> > liTopicsPerDocument;
+	private ArrayList<HashMap<Integer, Float> > liTopicsPerDocument;
 
-	private HashMap<Integer, HashMap<Integer, Double> > mDocumentsPerTopic;
+	private HashMap<Integer, HashMap<Integer, Float> > mDocumentsPerTopic;
 
 	private Integer indexCounter = 0;
 
 	public TopicDistributions(final String ldaTopicsFilename)
 	{
-		liTopicsPerDocument = new ArrayList<HashMap<Integer, Double> >();
+		liTopicsPerDocument = new ArrayList<HashMap<Integer, Float> >();
 		
-		mDocumentsPerTopic = new HashMap<Integer, HashMap<Integer, Double> >();
+		mDocumentsPerTopic = new HashMap<Integer, HashMap<Integer, Float> >();
 
 		loadLDATopics(ldaTopicsFilename);
 
@@ -33,17 +33,17 @@ public class TopicDistributions {
 		
 	}
 	
-	public HashMap<Integer, Double> getTopicsAndWeightsForDocument(int index)
+	public HashMap<Integer, Float> getTopicsAndWeightsForDocument(int index)
 	{
 		return liTopicsPerDocument.get(index);
 	}
 
-	public HashMap<Integer, HashMap<Integer, Double> > getDocumentsPerTopics()
+	public HashMap<Integer, HashMap<Integer, Float> > getDocumentsPerTopics()
 	{
 		return mDocumentsPerTopic;
 	}
 	
-	public HashMap<Integer, Double> getDocumentsAndWeightsForTopic(int index)
+	public HashMap<Integer, Float> getDocumentsAndWeightsForTopic(int index)
 	{
 		return mDocumentsPerTopic.get(index);
 	}
@@ -77,7 +77,7 @@ public class TopicDistributions {
 	private void readLDATopicLine(final String line)
 	{
 		String[] parts = line.split(" ");
-		HashMap<Integer, Double> topics = new HashMap<Integer, Double>();
+		HashMap<Integer, Float> topics = new HashMap<Integer, Float>();
 		
 		synchronized(indexCounter)
 		{
@@ -87,7 +87,7 @@ public class TopicDistributions {
 				if (topicAndWeight.length == 2 && topicAndWeight[0] != "" && topicAndWeight[1] != "")
 				{
 					int topic = Integer.parseInt(topicAndWeight[0]);
-					double weight = Double.parseDouble(topicAndWeight[1]);
+					float weight = Float.parseFloat(topicAndWeight[1]);
 					topics.put(topic, weight);
 //				if(liLDATopicsToDocs.containsKey(topic))
 //				{
@@ -106,7 +106,7 @@ public class TopicDistributions {
 					}
 					else
 					{
-						HashMap<Integer, Double> docs = new HashMap<Integer, Double>();
+						HashMap<Integer, Float> docs = new HashMap<Integer, Float>();
 						docs.put(indexCounter, weight);
 						mDocumentsPerTopic.put(topic, docs);
 					}

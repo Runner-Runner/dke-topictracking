@@ -59,12 +59,12 @@ public class Evaluator {
 //			}
 //		}
 		
-		for(Entry<Integer, HashMap<Integer, Double>> entry1 : dataLDA.getDocumentsPerTopics().entrySet())
+		for(Entry<Integer, HashMap<Integer, Float>> entry1 : dataLDA.getDocumentsPerTopics().entrySet())
 		{
 			int topicLDA = entry1.getKey();
-			HashMap<Integer, Double> docsLDA = entry1.getValue();
+			HashMap<Integer, Float> docsLDA = entry1.getValue();
 			
-			for (Entry<Integer, Double> doc : docsLDA.entrySet())
+			for (Entry<Integer, Float> doc : docsLDA.entrySet())
 			{
 				ArrayList<String> topicsOrig = dataReuters.getTopicsForDocument(doc.getKey());
 				for (String topicOrig : topicsOrig)

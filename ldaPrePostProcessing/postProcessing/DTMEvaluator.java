@@ -14,22 +14,26 @@ import tools.Utils;
 
 public class DTMEvaluator 
 {
-	ReutersMetaData dataReuters;
+	final ReutersMetaData dataReuters;
 	
-	TopicDistributions dataLDA;
+	final TopicDistributions dataLDA;
+	
+	final int numTimeSteps;
 
-	public DTMEvaluator(ReutersMetaData dataReuters,
-			TopicDistributions dataLDA) 
+	public DTMEvaluator(final ReutersMetaData dataReuters,
+			final TopicDistributions dataLDA,
+			final int numTimeSteps) 
 	{
 		this.dataReuters = dataReuters;
 		
 		this.dataLDA = dataLDA;
 		
+		this.numTimeSteps = numTimeSteps;
+		
 		System.out.println("[DTMEvaluator] initialization done.");
 	}
-
-	public void writeTopicsWithDocsPerTime(final int numTimeSteps, 
-			boolean scoreInsteadOfDocNumbers,
+	
+	public void writeTopicsWithDocsPerTime(boolean scoreInsteadOfDocNumbers,
 			final String filename)
 	{
 		String content = "";
@@ -37,7 +41,7 @@ public class DTMEvaluator
 		for (Integer index = 0; index < dataLDA.getDocumentsPerTopics().size(); index++)
 		{
 			//ArrayList<Integer> docs = liLDATopicsToDocs.get(index);
-			HashMap<Integer, Double> docs = dataLDA.getDocumentsAndWeightsForTopic(index);
+			HashMap<Integer, Float> docs = dataLDA.getDocumentsAndWeightsForTopic(index);
 			if (!scoreInsteadOfDocNumbers)
 			{
 				content += docs.size();
@@ -45,7 +49,7 @@ public class DTMEvaluator
 			
 			HashMap<Integer, ArrayList<Integer>> mDocsPerDate = new HashMap<Integer, ArrayList<Integer>>();
 			
-			for (Entry<Integer, Double> entry : docs.entrySet()) 
+			for (Entry<Integer, Float> entry : docs.entrySet()) 
 			{
 				int doc = entry.getKey();
 				int date = dataReuters.getDocDate(doc);
@@ -120,7 +124,7 @@ public class DTMEvaluator
 		for (Integer index = 0; index < dataLDA.getDocumentsPerTopics().size(); index++)
 		{
 			//ArrayList<Integer> docs = liLDATopicsToDocs.get(index);
-			HashMap<Integer, Double> docs = dataLDA.getDocumentsAndWeightsForTopic(index);
+			HashMap<Integer, Float> docs = dataLDA.getDocumentsAndWeightsForTopic(index);
 			docs = Utils.sortByValue(docs);
 			
 			content += docs.size();
