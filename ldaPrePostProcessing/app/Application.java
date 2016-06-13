@@ -52,6 +52,10 @@ public class Application {
 			{
 				config.mode = modes.evaluateWordDistributions;
 			}
+			else if(arg.equals("-evaluateReuters"))
+			{
+				config.mode = modes.evaluateReutersTopics;
+			}
 			else
 			{
 				System.out.println("Application parameters defining operation mode (use one at a time):");
@@ -176,9 +180,50 @@ public class Application {
 				
 //				eva.writeTopicsWithDocWeight(config.resultDir + "/" + config.docsPerTopicFilename);
 
-				eva.writeTopicsWithDocsPerTime(true,
-						config.resultDir + "/" + config.docsPerTopicFilename);
+//				eva.writeTopicsWithDocsPerTime(true,
+//						config.resultDir + "/" + config.docsPerTopicFilename);
 			
+				WordDistributions wordData = new WordDistributions(config.dtmNumTimesteps,
+						config.resultDir + "/" + config.dtmTopicWordDistributions);
+				
+				Vocabulary vocabulary = new Vocabulary(config.resultDir + "/" + config.vocabularyFilenameBase);
+				
+				String[][] topWords = wordData.getTopicsAsWordsForTimeStep(vocabulary, 5, 0);
+				//tools.IOUtils.writeTopicTopWords(config.resultDir + "/topicTopWords0.txt", topWords);
+				
+				float[][] timestepTopics = eva.computeTopicsWithDocsPerTime(true, 0.1f);
+				
+				System.out.println("num topics " + timestepTopics.length);
+				System.out.println("num timesteps " + timestepTopics[0].length);
+				
+				float[][] timestepTopics2 = eva.findNewTopics(timestepTopics, wordData, 0.01f);
+				
+				System.out.println("num topics 2 " + timestepTopics2.length);
+				System.out.println("num timesteps 2 " + timestepTopics2[0].length);
+				
+				
+				tools.IOUtils.writeTimestepTopicsAsJason(config.resultDir + "/topics_n.js", topWords, timestepTopics2);
+				
+				System.out.println("DTM topic evaluation finished.");
+			}
+			break;
+			case evaluateReutersTopics:
+			{
+				ReutersMetaData reutersData = new ReutersMetaData(config.resultDir + "/" + config.metaDataFilename);
+				
+				String[] topicNames = reutersData.getTopicNamesAsArray();
+				
+				String[][] topicNamesTimesteppd = new String[topicNames.length][1];
+				
+				for (int i = 0; i < topicNames.length; i++) 
+				{
+					topicNamesTimesteppd[i][0] = topicNames[i];
+				}
+				
+				float[][] timestepTopics = reutersData.computeAnnotatedTopicsWithDocsPerTime(config.dtmNumTimesteps);
+				
+				tools.IOUtils.writeTimestepTopicsAsJason(config.resultDir + "/topics_a.js", topicNamesTimesteppd, timestepTopics);
+				
 				System.out.println("DTM topic evaluation finished.");
 			}
 			break;

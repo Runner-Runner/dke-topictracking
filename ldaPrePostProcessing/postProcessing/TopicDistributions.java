@@ -15,8 +15,14 @@ import tools.IOUtils;
 
 public class TopicDistributions {
 
+	/**
+	 * list of all documents of map containing topic id and topic score for each document
+	 */
 	private ArrayList<HashMap<Integer, Float> > liTopicsPerDocument;
 
+	/**
+	 * map of all topics containing topic id and a map containing document id and this topic's score for each document
+	 */
 	private HashMap<Integer, HashMap<Integer, Float> > mDocumentsPerTopic;
 
 	private Integer indexCounter = 0;
@@ -28,6 +34,16 @@ public class TopicDistributions {
 		mDocumentsPerTopic = new HashMap<Integer, HashMap<Integer, Float> >();
 
 		loadLDATopics(ldaTopicsFilename);
+
+		System.out.println("[CorpusTopicDataObject] initialization done.");
+		
+	}
+	
+	public TopicDistributions()
+	{
+		liTopicsPerDocument = new ArrayList<HashMap<Integer, Float> >();
+		
+		mDocumentsPerTopic = new HashMap<Integer, HashMap<Integer, Float> >();
 
 		System.out.println("[CorpusTopicDataObject] initialization done.");
 		

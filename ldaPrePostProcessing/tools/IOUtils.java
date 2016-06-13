@@ -4,10 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Map.Entry;
-import java.util.Set;
 
 public class IOUtils {
 
@@ -101,4 +98,77 @@ public class IOUtils {
 		System.out.println("[IOUtils::writeDoubleMatrix] Saving data to " + filename);
 		IOUtils.saveContentToFile(content, filename);
 	}
+	
+	public static void writeTopicTopWords(final String filename, 
+			final String[][] wordLists)
+	{
+		String content = "";
+
+		for (int i = 0; i < wordLists.length; i++) 
+		{
+			for (int j = 0; j < wordLists[i].length; j++) 
+			{
+				content += wordLists[i][j] + " ";
+			}
+			content += "\n";
+		}
+
+		System.out.println("[IOUtils::writeTopicTopWords] Saving data to " + filename);
+		IOUtils.saveContentToFile(content, filename);
+	}
+	
+	public static void writeTimestepTopicsAsJason(final String filename,
+			final String[][] wordLists,
+			final float[][] timestepTopics)
+	{
+		ArrayList<String> topicStrings = new ArrayList<String>();
+		for (int topic = 0; topic < timestepTopics.length; ++topic)
+		{
+			ArrayList<String> strings = new ArrayList<String>();
+//			for (int word = 0; word < wordLists[topic].length; ++word)
+//			{
+//				strings.add(wordLists[topic][word]);
+//			}
+			strings.add("temp");
+			String topicName = String.join(" ", strings);
+			
+			strings.clear();
+			for (int timestep = 0; timestep < timestepTopics[topic].length; ++timestep)
+			{
+				strings.add("{\"x\":" + timestep + ",\"y\":" + timestepTopics[topic][timestep] + "}");
+			}
+			String topicValues = String.join(",", strings);;
+			
+			
+			topicStrings.add("{\"name\":\"Topic \\\"" + topicName
+					+ "\\\"\",\"data\":[" + topicValues + "]}");
+
+		}
+
+		String content = "var data = [" + String.join(",", topicStrings) + "];";
+
+		System.out.println("[IOUtils::writeTimestepTopicsAsJason] Saving data to " + filename);
+		IOUtils.saveContentToFile(content, filename);
+		
+//		List<String> waveData = new ArrayList<>();
+//	    for (TopicWave wave : waves)
+//	    {
+//	      String waveText = "{\"name\":\"Topic \\\"" + nameMap.get(wave)
+//	              + "\\\"\",\"data\":[";
+//	      List<Double> yValues = yValueMap.get(wave);
+//	      List<String> timeStepData = new ArrayList<>();
+//	      for (int i = 0; i < yValues.size(); i++)
+//	      {
+//	        String timeStepText = "{\"x\":" + i + ",\"y\":" + yValues.get(i) + "}";
+//	        timeStepData.add(timeStepText);
+//	      }
+//	      waveText += String.join(",", timeStepData);
+//	      waveText += "]}";
+//	      waveData.add(waveText);
+//	    }
+//	    jsonText += String.join(",", waveData);
+//	    jsonText += "];";
+	}
+	
+
 }

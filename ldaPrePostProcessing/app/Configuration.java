@@ -15,7 +15,8 @@ public class Configuration {
 		generateVisData,
 		evaluateTopics,
 		evaluateWordDistributions,
-		evaluateDTMTopics
+		evaluateDTMTopics,
+		evaluateReutersTopics
 	}
 	
 	public modes mode;
@@ -142,7 +143,8 @@ public class Configuration {
 				IntraTopicSimilaritiesFilename = prop.getProperty("IntraTopicSimilaritiesFilename");
 				InterTopicSimilaritiesFilename = prop.getProperty("InterTopicSimilaritiesFilename");
 				
-				if (dtmTopicWordDistributions == null
+				if (resultDir == null
+						||dtmTopicWordDistributions == null
 						|| dtmNumTimestepsString == null
 						|| IntraTopicSimilaritiesFilename == null
 						|| InterTopicSimilaritiesFilename == null)
@@ -168,7 +170,8 @@ public class Configuration {
 				dtmTopicWordDistributions = prop.getProperty("DTMTopicsFilename");
 				String dtmNumTimestepsString = prop.getProperty("DTMNumTimesteps");
 				
-				if (dtmTopicScorePerTimestepFilename == null
+				if (resultDir == null
+						||dtmTopicScorePerTimestepFilename == null
 						||dtmTopicWordDistributions == null
 						|| dtmNumTimestepsString == null)
 				{
@@ -186,6 +189,29 @@ public class Configuration {
 					return false;
 				}
 
+			}
+			break;
+			case evaluateReutersTopics:
+			{
+				String dtmNumTimestepsString = prop.getProperty("DTMNumTimesteps");
+				
+				if (resultDir == null
+						|| metaDataFilename== null
+						|| dtmNumTimestepsString == null)
+				{
+					System.out.println("resultDir or metaDataFilename or DTMNumTimesteps missing.");
+					return false;
+				}
+
+				try
+				{
+					dtmNumTimesteps = Integer.parseInt(dtmNumTimestepsString);
+				}
+				catch (NumberFormatException e)
+				{
+					System.out.println("DTMNumTimesteps is not an integer.");
+					return false;
+				}
 			}
 			break;
 			default:
