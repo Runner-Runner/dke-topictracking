@@ -23,7 +23,7 @@ public class TopicMatcher
   private Dictionary dictionary;
   private ArrayList<TopicWave> sequences;
 
-  public static final int TOPIC_THRESHOLD = 10;
+  public static final int TOPIC_THRESHOLD = 0;
   
   public TopicMatcher()
   {
@@ -40,80 +40,19 @@ public class TopicMatcher
 
   }
 
-  public static void main(String[] args)
-  {
-    Topic one = new Topic();
-    one.addTerm("cook", 10.0);
-    one.addTerm("menu", 9.0);
-    one.addTerm("meal", 8.0);
-    one.addTerm("food", 7.0);
-    one.addTerm("bill", 6.0);
-
-    Topic two = new Topic();
-    two.addTerm("ship", 10.0);
-    two.addTerm("car", 9.0);
-    two.addTerm("street", 8.0);
-    two.addTerm("container", 7.0);
-    two.addTerm("harbour", 6.0);
-
-    Topic three = new Topic();
-    three.addTerm("restaurant", 10.0);
-    three.addTerm("meat", 9.0);
-    three.addTerm("vegetable", 8.0);
-    three.addTerm("food", 7.0);
-    three.addTerm("spoon", 6.0);
-    TopicMatcher tm = new TopicMatcher();
-    
-    System.out.println(tm.compareTopics(one, two));
-    System.out.println(tm.compareTopics(one, three));
-    System.out.println(tm.compareTopics(three, two));
-  }
-
-  public void compareTopicData(
-          TreeMap<Double, Topic> topics1, TreeMap<Double, Topic> topics2)
-  {
-    Iterator<Map.Entry<Double, Topic>> iterator1 = topics1.descendingMap().entrySet().iterator();
-    
-    while (iterator1.hasNext())
-    {
-      Topic topic1 = iterator1.next().getValue();
-      
-      double bestValue = 0;
-      Topic bestCompareTopic = null;
-      
-      Iterator<Map.Entry<Double, Topic>> iterator2 = topics2.descendingMap().entrySet().iterator();
-      while (iterator2.hasNext())
-      {
-        Topic topic2 = iterator2.next().getValue();
-        
-        double compareValue = compareTopics(topic1, topic2);
-
-        if (bestValue < compareValue)
-        {
-          bestValue = compareValue;
-          bestCompareTopic = topic2;
-        }
-      }
-      System.out.println("Topic 1: " + topic1);
-      System.out.println("Best Match ("+bestValue+"): " + bestCompareTopic);
-      System.out.println("------------------------");
-    }
-
-  }
-
-  public double compareTopics(Topic one, Topic two)
+  public double compareTopics(Topic topic1, Topic topic2)
   {
     int termAmount = 20;
-    double d = 0;
-    HashMap<String, Double> bestTerms1 = one.getBestTerms(termAmount);
-    HashMap<String, Double> bestTerms2 = two.getBestTerms(termAmount);
+    HashMap<String, Double> bestTerms1 = topic1.getBestTerms(termAmount);
+    HashMap<String, Double> bestTerms2 = topic2.getBestTerms(termAmount);
 
-    int matches = 0;
+    double matches = 0;
     for (String term : bestTerms1.keySet())
     {
       if (bestTerms2.keySet().contains(term))
       {
-        matches++;
+        double combinedValue = bestTerms1.get(term) + bestTerms2.get(term);
+        matches += combinedValue;
       }
     }
     return matches;

@@ -49,9 +49,14 @@ public class TopicRiver
         bestWave = wave;
       }
     }
-    if (bestWave != null && bestValue >= TopicMatcher.TOPIC_THRESHOLD)
+    if (bestWave != null && bestValue > TopicMatcher.TOPIC_THRESHOLD)
     {
       bestWave.addTopic(timeUnit, topic);
+
+      System.out.println("New Topic: " + topic);
+      System.out.println("Best Matching Wave (" + bestValue + "): " + 
+              bestWave.getName());
+      System.out.println("------------------------");
     }
     else
     {

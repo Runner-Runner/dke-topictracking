@@ -37,7 +37,11 @@ public class Topic implements Serializable {
 	}
 	
 	public TreeMap<Double,String> getNormalizedTerms(){
-		return relativeTerms;
+		if(relativeTerms == null)
+    {
+      normalizeTerms();
+    }
+    return relativeTerms;
 	}
 
 	public void setAbsoluteRelevance(double absoluteRelevance) {
@@ -63,7 +67,8 @@ public class Topic implements Serializable {
 
 	public HashMap<String, Double> getBestTerms(int termCount) {
 		HashMap<String, Double> bestTerms = new HashMap<>();
-		Iterator<Map.Entry<Double, String>> iterator = getTerms().descendingMap().entrySet().iterator();
+		Iterator<Map.Entry<Double, String>> iterator = getNormalizedTerms().
+            descendingMap().entrySet().iterator();
 		for (int i = 0; i < termCount; i++) {
 			if (!iterator.hasNext()) {
 				break;
