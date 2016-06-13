@@ -2,11 +2,7 @@ package model;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
 
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
@@ -21,13 +17,11 @@ import net.didion.jwnl.dictionary.Dictionary;
 public class TopicMatcher
 {
   private Dictionary dictionary;
-  private ArrayList<TopicWave> sequences;
 
-  public static final int TOPIC_THRESHOLD = 0;
+  public static final double TOPIC_THRESHOLD = 0.2;
   
   public TopicMatcher()
   {
-    sequences = new ArrayList<>();
     try
     {
       JWNL.initialize(new FileInputStream("ressources/WNProperities.xml"));
@@ -46,16 +40,19 @@ public class TopicMatcher
     HashMap<String, Double> bestTerms1 = topic1.getBestTerms(termAmount);
     HashMap<String, Double> bestTerms2 = topic2.getBestTerms(termAmount);
 
-    double matches = 0;
+    int matches = 0;
+    double score = 0;
     for (String term : bestTerms1.keySet())
     {
       if (bestTerms2.keySet().contains(term))
       {
         double combinedValue = bestTerms1.get(term) + bestTerms2.get(term);
-        matches += combinedValue;
+        score += combinedValue;
+        matches++;
       }
     }
-    return matches;
+    score *= matches;
+    return score;
   }
 
   public int compareWords(String one, String two) throws JWNLException

@@ -88,7 +88,7 @@ public class Topic implements Serializable {
 
 		String termsText = "";
 		int termIndex = 0;
-		while (termIterator.hasNext() && termIndex < 15) {
+		while (termIterator.hasNext() && termIndex < 20) {
 			termIndex++;
 			Map.Entry<Double, String> termEntry = termIterator.next();
 			Double tfidf = termEntry.getKey();
@@ -119,7 +119,7 @@ public class Topic implements Serializable {
 
 	@Override
 	public String toString() {
-		Iterator<Map.Entry<Double, String>> termIterator = getTerms().descendingMap().entrySet().iterator();
+		Iterator<Map.Entry<Double, String>> termIterator = getNormalizedTerms().descendingMap().entrySet().iterator();
 
 		String termsText = "";
 		int termIndex = 0;
