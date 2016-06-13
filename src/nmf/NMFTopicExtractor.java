@@ -25,7 +25,7 @@ public class NMFTopicExtractor
   public static void main(String[] args)
   {
     runMultipleNMF("/media/Storage/Meine Daten/Schutzbereich/MoS/Research Project 2/savedata/96 - 97",
-            "year", null, 7, 1);
+            "year", "19970501", 7, 1);
   }
 
   public static void runNMF(String directory, String outputFileName)
@@ -50,6 +50,9 @@ public class NMFTopicExtractor
   public static void runMultipleNMF(String startDirectory, String outputFileName,
           String startFolder, int interval, int intervalCount)
   {
+    System.out.println("Run NMF iterations:");
+    long completeStartTime = System.currentTimeMillis();
+    
     File dir = new File(startDirectory);
     List<List<File>> intervalFiles = new ArrayList<>();
     List<List<Date>> intervalDates = new ArrayList<>();
@@ -64,13 +67,25 @@ public class NMFTopicExtractor
             "Starting NMF intervals: From " + startDate + " until " + endDate);
     for (int i = 0; i < intervalFiles.size(); i++)
     {
-      System.out.println("Interval #" + i + " (" + interval + " days):");
+      System.out.println("Interval #" + (i+1) + "/" + 
+              (intervalFiles.size()/interval+1) + " (" + interval + " days):");
+      long nmfStartTime = System.currentTimeMillis();
+      
       List<File> files = intervalFiles.get(i);
       List<Date> dates = intervalDates.get(i);
       runNMF(files, dates, outputFileName);
-      System.out.println("Interval #" + i + " done.");
+      
+      long nmfElapsedTime = System.currentTimeMillis() - nmfStartTime;
+      //In minutes
+      nmfElapsedTime = nmfElapsedTime / 1000 / 60;
+      System.out.println("Interval #" + i + " done. Duration: " + nmfElapsedTime + " mins.");
       System.gc();
     }
+    
+    long completeElapsedTime = System.currentTimeMillis() - completeStartTime;
+    //In minutes
+    completeElapsedTime = completeElapsedTime / 1000 / 60;
+    System.out.println("All NMF iterations done. Duration: " + completeElapsedTime + " mins.");
   }
 
   /**
@@ -190,8 +205,7 @@ public class NMFTopicExtractor
       Normalizer.normalize(file, vocabulary, stopwords);
     }
     vocabulary.removeLowOccurrances(5, 5);
-    System.out.print("- done");
-    System.out.println("Vocabulary Size: " + vocabulary.size());
+    System.out.println("- done, Vocabulary Size: " + vocabulary.size());
 
     // save vocabulary in xml
     System.out.print("Save vocabulary ");
