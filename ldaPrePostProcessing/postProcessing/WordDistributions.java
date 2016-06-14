@@ -63,10 +63,17 @@ public class WordDistributions {
 		System.out.println("[DTMWordDistributions] initialization done.");
 	}
 	
-	
+	/**
+	 * Get the actual top words of all topics at a timestep according to the vocabulary.
+	 * 
+	 * @param vocabulary
+	 * @param numTopWords
+	 * @param timestep
+	 * @return
+	 */
 	public String[][] getTopicsAsWordsForTimeStep(Vocabulary vocabulary, 
 			int numTopWords,
-			int timestep)
+			final int timestep)
 	{
 		LinkedList<String> vocabularyList = vocabulary.getAsList();
 		int numTopics = topicTimestepWordDistributions.size();
@@ -78,32 +85,6 @@ public class WordDistributions {
 		
 		for (int topicId = 0; topicId < numTopics; ++topicId)
 		{
-//			ArrayList<Float> topicWords = getWordDistribution(topicId, timestep);
-//			
-//			// create map with explicit id to get implicit id after sorting
-//			LinkedHashMap<Integer, Float> wordIdsAndWeigths = new LinkedHashMap<Integer, Float>();
-//			for (int wordId = 0; wordId < topicWords.size(); ++wordId)
-//			{
-//				wordIdsAndWeigths.put(wordId, topicWords.get(wordId));
-//			}
-//			
-//			wordIdsAndWeigths = Utils.sortByValue(wordIdsAndWeigths);
-//			
-//			int topWord = 0;
-//			for (Integer wordId : wordIdsAndWeigths.keySet()) 
-//			{
-//				if (topWord < numTopWords)
-//				{
-//					String word = vocabularyList.get(wordId);
-//					wordLists[topicId][topWord] = word;
-//				}
-//				else
-//				{
-//					break;
-//				}
-//				++topWord;
-//			}
-			
 			wordLists[topicId] = getWordListForTopic(vocabulary, numTopWords, timestep, topicId);
 		}
 		
@@ -111,10 +92,19 @@ public class WordDistributions {
 		
 	}
 	
+	/**
+	 * Get the actual top words of a topic at a timestep according to the vocabulary.
+	 * 
+	 * @param vocabulary
+	 * @param numTopWords	full vector if < 1 (might be too much!)
+	 * @param timestep
+	 * @param topicId
+	 * @return
+	 */
 	public String[] getWordListForTopic(Vocabulary vocabulary, 
 			int numTopWords,
-			int timestep,
-			int topicId)
+			final int timestep,
+			final int topicId)
 	{
 		String[] wordList = new String[numTopWords];
 		
@@ -122,6 +112,9 @@ public class WordDistributions {
 
 		LinkedList<String> vocabularyList = vocabulary.getAsList();
 
+		if (numTopWords < 1)
+			numTopWords = vocabularyList.size();
+		
 		// create map with explicit id to get implicit id after sorting
 		LinkedHashMap<Integer, Float> wordIdsAndWeigths = new LinkedHashMap<Integer, Float>();
 		for (int wordId = 0; wordId < topicWords.size(); ++wordId)
@@ -149,6 +142,11 @@ public class WordDistributions {
 		return wordList;
 	}
 	
+	/**
+	 * Load beta file form lda output.
+	 * 
+	 * @param filename
+	 */
 	private void loadTopicWordDistributions(final String filename)
 	{
 		if (Files.exists(Paths.get(filename))) 
@@ -209,7 +207,7 @@ public class WordDistributions {
 	}
 	
 	/**
-	 * compute cosine similarities of topic timesteps
+	 * compute cosine similarities of topic timesteps for all topics
 	 * 
 	 * @return cosine similarity matrix[numTopics][numTimeSteps -1]
 	 */
@@ -217,19 +215,33 @@ public class WordDistributions {
 	{
 		int sizeLDATopics = getTopicTimestepWordDistributions().size();
 		
-		double[][] intraTopipcSimiliarity = new double[sizeLDATopics][numTimeSteps -1];
+		double[][] intraTopipcSimiliarities = new double[sizeLDATopics][numTimeSteps -1];
 		
 		for (int topicId = 0; topicId < sizeLDATopics; ++topicId) 
 		{
-			for (int timeStep = 0; timeStep < numTimeSteps - 1; ++timeStep) 
-			{
-				double[] currentWD = Utils.convertToArray(getWordDistribution(topicId, timeStep));
-				double[] nextWD = Utils.convertToArray(getWordDistribution(topicId, timeStep + 1));
-				
-				double sim = Similarities.cosineSimilarity(currentWD, nextWD);
-				
-				intraTopipcSimiliarity[topicId][timeStep] = sim;
-			}
+			intraTopipcSimiliarities[topicId] = computeIntraTopicSimilaritiesForTopic(topicId);
+		}
+		
+		return intraTopipcSimiliarities;
+	}
+	
+	/**
+	 * compute cosine similarities of topic timesteps
+	 * 
+	 * @return cosine similarity matrix[numTimeSteps -1]
+	 */
+	public double[] computeIntraTopicSimilaritiesForTopic(final int topicId)
+	{
+		double[] intraTopipcSimiliarity = new double[numTimeSteps -1];
+		
+		for (int timeStep = 0; timeStep < numTimeSteps - 1; ++timeStep) 
+		{
+			double[] currentWD = Utils.convertToArray(getWordDistribution(topicId, timeStep));
+			double[] nextWD = Utils.convertToArray(getWordDistribution(topicId, timeStep + 1));
+
+			double sim = Similarities.cosineSimilarity(currentWD, nextWD);
+
+			intraTopipcSimiliarity[timeStep] = sim;
 		}
 		
 		return intraTopipcSimiliarity;
@@ -237,35 +249,53 @@ public class WordDistributions {
 	
 	
 	/**
-	 * compute vector distance of topic timesteps
+	 * compute vector distance of topic timesteps for all topics
 	 * 
+	 * @param numWords	number of top words to take into account(whole list if < 1)
 	 * @return distance matrix[numTopics][numTimeSteps -1]
 	 */
 	public int[][] computeIntraTopicDistances(int numWords)
 	{
 		int sizeLDATopics = getTopicTimestepWordDistributions().size();
 		
-		int[][] intraTopipcSimiliarity = new int[sizeLDATopics][numTimeSteps -1];
+		int[][] intraTopipcSimiliarities = new int[sizeLDATopics][numTimeSteps -1];
 		
 		for (int topicId = 0; topicId < sizeLDATopics; ++topicId) 
 		{
-			for (int timeStep = 0; timeStep < numTimeSteps - 1; ++timeStep) 
-			{
-				ArrayList<Float> currentWordList = getWordDistribution(topicId, timeStep);
-				ArrayList<Float> nextWordList = getWordDistribution(topicId, timeStep + 1);
-				
-				assert(currentWordList.size() == nextWordList.size());
-				
-				if (numWords < 1)
-					numWords = currentWordList.size();
-				
-				LinkedHashMap<Integer, Float> wordListA = Utils.convertListToMap(currentWordList);
-				LinkedHashMap<Integer, Float> wordListB = Utils.convertListToMap(nextWordList);
+			intraTopipcSimiliarities[topicId] = computeIntraTopicDistancesForTopic(topicId, numWords);
+		}
+		
+		return intraTopipcSimiliarities;
+	}
+	
+	/**
+	 * compute vector distance of topic timesteps
+	 * 
+	 * @param topicId
+	 * @param numWords	number of top words to take into account(whole list if < 1)
+	 * @return distance matrix[numTopics][numTimeSteps -1]
+	 */
+	public int[] computeIntraTopicDistancesForTopic(final int topicId, 
+			int numWords)
+	{
+		int[] intraTopipcSimiliarity = new int[numTimeSteps -1];
+		
+		for (int timeStep = 0; timeStep < numTimeSteps - 1; ++timeStep) 
+		{
+			ArrayList<Float> currentWordList = getWordDistribution(topicId, timeStep);
+			ArrayList<Float> nextWordList = getWordDistribution(topicId, timeStep + 1);
 
-				int distance = Similarities.indexDistance(wordListA, wordListB, numWords);
-				
-				intraTopipcSimiliarity[topicId][timeStep] = distance;
-			}
+			assert(currentWordList.size() == nextWordList.size());
+
+			if (numWords < 1)
+				numWords = currentWordList.size();
+
+			LinkedHashMap<Integer, Float> wordListA = Utils.convertListToMap(currentWordList);
+			LinkedHashMap<Integer, Float> wordListB = Utils.convertListToMap(nextWordList);
+
+			int distance = Similarities.indexDistance(wordListA, wordListB, numWords);
+
+			intraTopipcSimiliarity[timeStep] = distance;
 		}
 		
 		return intraTopipcSimiliarity;

@@ -188,15 +188,16 @@ public class Application {
 				
 				Vocabulary vocabulary = new Vocabulary(config.resultDir + "/" + config.vocabularyFilenameBase);
 				
-				String[][] topWords = wordData.getTopicsAsWordsForTimeStep(vocabulary, 5, 0);
-				//tools.IOUtils.writeTopicTopWords(config.resultDir + "/topicTopWords0.txt", topWords);
+				//String[][] topWords = wordData.getTopicsAsWordsForTimeStep(vocabulary, 5, 0);
+				String[][] topWords = eva.findNewTopicsWords(wordData, config.similarityTreshold, vocabulary, config.numTopWords);
+				tools.IOUtils.writeTopicTopWords(config.resultDir + "/topicTopWords1.txt", topWords);
 				
 				float[][] timestepTopics = eva.computeTopicsWithDocsPerTime(true, 0.1f);
 				
 				System.out.println("num topics " + timestepTopics.length);
 				System.out.println("num timesteps " + timestepTopics[0].length);
 				
-				float[][] timestepTopics2 = eva.findNewTopics(timestepTopics, wordData, 0.01f);
+				float[][] timestepTopics2 = eva.findNewTopics(timestepTopics, wordData, config.similarityTreshold);
 				
 				System.out.println("num topics 2 " + timestepTopics2.length);
 				System.out.println("num timesteps 2 " + timestepTopics2[0].length);

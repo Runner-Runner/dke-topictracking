@@ -1,16 +1,20 @@
 package postProcessing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import javax.sound.midi.Synthesizer;
 
+import container.Vocabulary;
 import tools.IOUtils;
 import tools.Utils;
 
@@ -35,9 +39,17 @@ public class DTMEvaluator
 		System.out.println("[DTMEvaluator] initialization done.");
 	}
 	
-	public float[][] findNewTopics(float[][] timestepTopics,
-			WordDistributions wds,
-			float threshold)
+	/**
+	 * Add new topics to timestepTopics according to changes in word vectors exceeding threshold
+	 * 
+	 * @param timestepTopics
+	 * @param wds
+	 * @param threshold
+	 * @return timestepTopics with additional topics
+	 */
+	public float[][] findNewTopics(final float[][] timestepTopics,
+			final WordDistributions wds,
+			final float threshold)
 	{
 		ArrayList<ArrayList<Float>> allNewTopics = new ArrayList<ArrayList<Float>>();
 		
@@ -71,31 +83,33 @@ public class DTMEvaluator
 				continue;
 			}
 			
-			// first timestep is first reference
-			double firstTimestep = topicSimilarities[i][0];
+//			// first timestep is first reference
+//			double firstTimestep = topicSimilarities[i][0];
+//			
+//			// find number of topic changes in time
+//			double sumDivs = 0.0d;
+//			ArrayList<Integer> pointsOfChange = new ArrayList<Integer>();
+//			pointsOfChange.add(0);
+//			for (int j = 1; j < topicSimilarities[i].length; ++j)
+//			{
+//				double nextTimestep = topicSimilarities[i][j];
+//				
+//				// get div from last change to current
+//				double div = Math.abs(firstTimestep - nextTimestep);
+//				
+//				// sum divs as long as no change happens as changes are computed between neighboring timesteps.
+//				sumDivs += div;
+//				
+//				// change happens ?
+//				if (sumDivs > threshold)
+//				{
+//					pointsOfChange.add(j);
+//					firstTimestep = nextTimestep;
+//					sumDivs = 0.0d;
+//				}
+//			}
 			
-			// find number of topic changes in time
-			double sumDivs = 0.0d;
-			ArrayList<Integer> pointsOfChange = new ArrayList<Integer>();
-			pointsOfChange.add(0);
-			for (int j = 1; j < topicSimilarities[i].length; ++j)
-			{
-				double nextTimestep = topicSimilarities[i][j];
-				
-				// get div from last chage to current
-				double div = Math.abs(firstTimestep - nextTimestep);
-				
-				// sum divs as long as no change happens as changes are computed between neighboring timesteps.
-				sumDivs += div;
-				
-				// change happens ?
-				if (sumDivs > threshold)
-				{
-					pointsOfChange.add(j);
-					firstTimestep = nextTimestep;
-					sumDivs = 0.0d;
-				}
-			}
+			ArrayList<Integer> pointsOfChange = findPointsOfChange(topicSimilarities[i], threshold);
 			
 			// list of existing topic and possible spinoffs
 			ArrayList<ArrayList<Float> > newTopics = new ArrayList<ArrayList<Float> >();
@@ -145,6 +159,99 @@ public class DTMEvaluator
 		return moreTopics;
 	}
 	
+	public ArrayList<Integer> findPointsOfChange(final double[] topicSimilarities,
+			final double threshold)
+	{
+		double firstTimestep = topicSimilarities[0];
+		
+		// find number of topic changes in time
+		double sumDivs = 0.0d;
+		ArrayList<Integer> pointsOfChange = new ArrayList<Integer>();
+		pointsOfChange.add(0);
+		for (int j = 1; j < topicSimilarities.length; ++j)
+		{
+			double nextTimestep = topicSimilarities[j];
+			
+			// get div from last change to current
+			double div = Math.abs(firstTimestep - nextTimestep);
+			
+			// sum divs as long as no change happens as changes are computed between neighboring timesteps.
+			sumDivs += div;
+			
+			// change happens ?
+			if (sumDivs > threshold)
+			{
+				pointsOfChange.add(j);
+				firstTimestep = nextTimestep;
+				sumDivs = 0.0d;
+			}
+		}	
+		return pointsOfChange;
+	}
+	
+	/**
+	 * Add new topics to timestepTopics according to changes in word vectors exceeding threshold
+	 * 
+	 * @param timestepTopics
+	 * @param wds
+	 * @param threshold
+	 * @return timestepTopics with additional topics
+	 */
+	public String[][] findNewTopicsWords(final WordDistributions wds,
+			final float threshold,
+			Vocabulary vocabulary, 
+			int numTopWords)
+	{
+		LinkedList<String> vocabularyList = vocabulary.getAsList();
+		
+		if (numTopWords < 1)
+			numTopWords = vocabularyList.size();
+		
+		ArrayList<List<String>> allNewWordLists = new ArrayList<List<String>>();
+	
+		double[][] topicSimilarities = wds.computeIntraTopicSimilarities();
+
+		// iterate through topics
+		for (int topicId = 0; topicId < topicSimilarities.length; topicId++) 
+		{
+			// no word distributions for this topic !? Should not happen.
+			if (topicSimilarities[topicId].length < 1)
+			{
+				System.err.println("[findNewTopics] ERROR: topicSimilarities have no timesteps");
+				continue;
+			}
+			
+			ArrayList<Integer> pointsOfChange = findPointsOfChange(topicSimilarities[topicId], threshold);
+			
+			// list of existing topic and possible spinoffs
+			ArrayList<List<String> > newWordLists = new ArrayList<List<String> >();
+			
+			// newWordLists.size() = pointsOfchange.size()
+			for(Integer temp : pointsOfChange)
+			{
+				String[] wordLists = wds.getWordListForTopic(vocabulary, numTopWords, temp, topicId);
+				
+				List<String> newWordList = Arrays.asList(wordLists);
+				
+				newWordLists.add(newWordList);
+			}
+			
+			for (List<String> wordList : newWordLists)
+			{
+				allNewWordLists.add(wordList);
+			}
+		}
+		
+		String[][] moreTopics = new String[allNewWordLists.size()][numTopWords];
+		for (int i = 0; i < moreTopics.length; i++) 
+		{
+			for (int j = 0; j < moreTopics[i].length; j++) 
+			{
+				moreTopics[i][j] = allNewWordLists.get(i).get(j);	
+			}
+		}
+		return moreTopics;
+	}
 	
 	/**
 	 * Computes topic weights.
@@ -200,8 +307,6 @@ public class DTMEvaluator
 			}
 			
 			int timeStepLength = mDocsPerDate.size() / numTimeSteps;
-			
-			System.out.println("mDocsPerDate.size() " + mDocsPerDate.size() + " / numTimeSteps " + numTimeSteps + " = timeStepLength " + timeStepLength);
 			
 			ArrayList<Integer> liKeys = new ArrayList<Integer>();
 			liKeys.addAll(mDocsPerDate.keySet());

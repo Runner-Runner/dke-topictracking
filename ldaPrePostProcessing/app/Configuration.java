@@ -44,6 +44,10 @@ public class Configuration {
 	public String IntraTopicSimilaritiesFilename;
 	public String InterTopicSimilaritiesFilename;
 	
+	public float similarityTreshold;
+	
+	public int numTopWords;
+	
 	public Configuration()
 	{}
 	
@@ -169,26 +173,31 @@ public class Configuration {
 				dtmTopicScorePerTimestepFilename = prop.getProperty("TopicScorePerTimestepFilename");
 				dtmTopicWordDistributions = prop.getProperty("DTMTopicsFilename");
 				String dtmNumTimestepsString = prop.getProperty("DTMNumTimesteps");
+				String similarityTresholdString = prop.getProperty("SimilarityTreshold");
+				String numTopWordsString = prop.getProperty("NumTopWords");
 				
 				if (resultDir == null
 						||dtmTopicScorePerTimestepFilename == null
 						||dtmTopicWordDistributions == null
-						|| dtmNumTimestepsString == null)
+						|| dtmNumTimestepsString == null
+						|| similarityTresholdString == null
+						|| numTopWordsString == null)
 				{
-					System.out.println("TopicScorePerTimestepFilename or DTMTopicsFilename or DTMNumTimesteps missing.");
+					System.out.println("TopicScorePerTimestepFilename or DTMTopicsFilename or DTMNumTimesteps or SimilarityTreshold missing.");
 					return false;
 				}
 
 				try
 				{
 					dtmNumTimesteps = Integer.parseInt(dtmNumTimestepsString);
+					similarityTreshold = Float.parseFloat(similarityTresholdString);
+					numTopWords = Integer.parseInt(numTopWordsString);
 				}
 				catch (NumberFormatException e)
 				{
-					System.out.println("DTMNumTimesteps is not an integer.");
+					System.out.println("DTMNumTimesteps or SimilarityTreshold or are NumTopWords wrongly formatted.");
 					return false;
 				}
-
 			}
 			break;
 			case evaluateReutersTopics:
