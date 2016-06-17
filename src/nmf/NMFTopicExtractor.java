@@ -6,15 +6,20 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+
 
 import data.Vocabulary;
 import data.WordCounter;
-import java.util.Arrays;
+import java.util.Calendar;
+
 import normalization.Normalizer;
 
 public class NMFTopicExtractor
@@ -22,63 +27,81 @@ public class NMFTopicExtractor
   private static final String STOPWORD_PATH = "ressources/stopwords.txt";
   private static final String VOCABULARY_PATH = "ressources/vocabulary.xml";
 
+  
   public static void main(String[] args)
   {
-    runMultipleNMF("/media/Storage/Meine Daten/Schutzbereich/MoS/Research Project 2/savedata/96 - 97",
-            "year", "19970501", 7, 1);
+	if(args.length == 0){
+		TreeMap<Date, List<Document>> files = new TreeMap<>();
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+		try {
+			listFiles(new File("/mnt/dualuse/sharedData/Git-Projects/dke-topictracking/Reuters Corpus Volume 1 (RCV1) - Disk 1 of 2/unzipped/extractions/"), files, new SimpleDateFormat("yyyyMMdd"), df.parse("19960820"), 7, 1);
+			runMultipleNMF(files, 7, df, new File(""));
+		} catch (ParseException e) {
+		}
+	}
+	else if(args.length != 6){
+		printUsage();
+		return ;
+	}
+	else{
+	DateFormat format = new SimpleDateFormat(args[2], Locale.ENGLISH);
+	int interval=0;
+	int sequence=0;
+	Date startDate;
+	try{
+		interval = Integer.parseInt(args[0]);
+		sequence = Integer.parseInt(args[1]);
+		startDate = format.parse(args[3]);
+	}catch(NumberFormatException | ParseException ex){
+		printUsage();
+		return;
+	}
+	File inputDirectory = new File(args[4]);
+	File outputDirectory = new File(args[5]);
+	if(!inputDirectory.isDirectory() || !outputDirectory.isDirectory()){
+		System.out.println("given path is not a directory");
+		printUsage();
+		return;
+	}
+	TreeMap<Date, List<Document>> files = new TreeMap<>();
+	listFiles(inputDirectory, files, format, startDate, interval, sequence);
+	runMultipleNMF(files, interval, format, outputDirectory);
+	}
+  
+  }
+  
+  private static void printUsage(){
+	  System.out.println("NMFTopicExtractor:");
+	  System.out.println("java -jar NMFTopicExtractor <interval> <sequence> <dateformat> <startdate> <input-directory> <output-directory>");
+	  System.out.println("interval (int) - defines the day range of each interval");
+	  System.out.println("sequence (int) - defines number of intervals, which will be extracted");
+	  System.out.println("dateformat (String) - defines the dateformat for documents directories e.g. yyyyMMdd");
+	  System.out.println("startdate (String) define the startdate (in given dateformat)");
+	  System.out.println("input-directory (Path) parent directory, which contains all documents");
+	  System.out.println("output-directory (Path) directory to store extracted xml files");
   }
 
-  public static void runNMF(String directory, String outputFileName)
-  {
-    runMultipleNMF(directory, outputFileName, null, 0, 1);
-  }
 
-  /**
-   * Executes NMF for arbitrary number of folders combined to arbitrary
-   * intervals.
-   *
-   * @param startDirectory Directory containing the folders with all time spans
-   * (e.g. days) which contain the text files.
-   * @param outputFileName Output without file ending.
-   * @param startFolder Folder inside startDirectory from which to start. Null
-   * for "take all directories".
-   * @param interval How many time spans (e.g. days) make an interval? (e.g. 7
-   * for a week). Set 0 if all files should be executed as one interval.
-   * @param intervalCount How many intervals shall be executed? (e.g. 4 weeks).
-   * Set 0 if all files should be executed interval-wise.
-   */
-  public static void runMultipleNMF(String startDirectory, String outputFileName,
-          String startFolder, int interval, int intervalCount)
+
+  public static void runMultipleNMF(TreeMap<Date, List<Document>> documents, int interval, DateFormat format, File outputDirectory)
   {
     System.out.println("Run NMF iterations:");
     long completeStartTime = System.currentTimeMillis();
-    
-    File dir = new File(startDirectory);
-    List<List<File>> intervalFiles = new ArrayList<>();
-    List<List<Date>> intervalDates = new ArrayList<>();
-    DateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
-    listFiles(dir, intervalFiles, intervalDates, format,
-            startFolder, interval, intervalCount);
 
-    Date startDate = intervalDates.get(0).get(0);
-    List<Date> lastDates = intervalDates.get(intervalDates.size() - 1);
-    Date endDate = lastDates.get(lastDates.size() - 1);
-    System.out.println(
-            "Starting NMF intervals: From " + startDate + " until " + endDate);
-    for (int i = 0; i < intervalFiles.size(); i++)
+    for (Entry<Date,List<Document>> entry: documents.entrySet())
     {
-      System.out.println("Interval #" + (i+1) + "/" + 
-              (intervalFiles.size()/interval+1) + " (" + interval + " days):");
+      System.out.println("Interval from " + (entry.getKey().toString()) + " (" + 
+              (interval) + " days)");
       long nmfStartTime = System.currentTimeMillis();
       
-      List<File> files = intervalFiles.get(i);
-      List<Date> dates = intervalDates.get(i);
-      runNMF(files, dates, outputFileName);
+      runNMF(entry.getKey(),entry.getValue(),outputDirectory,format);
       
       long nmfElapsedTime = System.currentTimeMillis() - nmfStartTime;
       //In minutes
       nmfElapsedTime = nmfElapsedTime / 1000 / 60;
-      System.out.println("Interval #" + i + " done. Duration: " + nmfElapsedTime + " mins.");
+      System.out.print("Interval from " + (entry.getKey().toString()) + " (" + 
+              (interval) + " days)");
+      System.out.println("- done. Duration: " + nmfElapsedTime + " mins.");
       System.gc();
     }
     
@@ -96,98 +119,48 @@ public class NMFTopicExtractor
    * @param intervalDates
    * @param format
    */
-  private static void listFiles(File startDirectory, List<List<File>> intervalFiles,
-          List<List<Date>> intervalDates, DateFormat format, String startFolderName,
+  private static void listFiles(File startDirectory, Map<Date,List<Document>> intervalFiles,
+         DateFormat format, Date startDate,
           int interval, int intervalCount)
   {
-    //Expected format: directory which contains a directory for every 
-    //day/time span, which contains the text files
-
-    if (startDirectory.isDirectory())
-    {
-      File[] timeSpanDirectories = startDirectory.listFiles();
-
-      if (startFolderName != null)
-      {
-        List<File> startFolderFollowingDirs = new ArrayList<File>();
-        boolean foundStartFolder = false;
-        for (int i = 0; i < timeSpanDirectories.length; i++)
-        {
-          File file = timeSpanDirectories[i];
-          if (file.getName().equals(startFolderName))
-          {
-            foundStartFolder = true;
-          }
-
-          if (foundStartFolder)
-          {
-            startFolderFollowingDirs.add(file);
-          }
-        }
-
-        if (foundStartFolder == false)
-        {
-          System.out.println("ERROR: Start folder not found.");
-          return;
-        }
-        timeSpanDirectories = new File[startFolderFollowingDirs.size()];
-        timeSpanDirectories = startFolderFollowingDirs.toArray(timeSpanDirectories);
-      }
-
-      if (interval == 0)
-      {
-        interval = timeSpanDirectories.length;
-      }
-
-      int maxIterations;
-
-      if (intervalCount == 0)
-      {
-        maxIterations = timeSpanDirectories.length;
-      }
-      else
-      {
-        maxIterations = Math.min(intervalCount * interval, timeSpanDirectories.length);
-      }
-
-      List<File> files = new ArrayList<>();
-      List<Date> dates = new ArrayList<>();
-
-      int timespanCount = 0;
-      for (int i = 0; i < maxIterations; i++)
-      {
-        File timespanDirectory = timeSpanDirectories[i];
-
-        if (timespanDirectory.isDirectory())
-        {
-          timespanCount++;
-
-          try
-          {
-            Date date = format.parse(timespanDirectory.getName());
-            dates.add(date);
-          }
-          catch (ParseException ex)
-          {
-            //Ignore
-          }
-
-          files.addAll(Arrays.asList(timespanDirectory.listFiles()));
-
-          if (i == maxIterations - 1
-                  || (timespanCount != 0 && timespanCount % interval == 0))
-          {
-            intervalFiles.add(files);
-            intervalDates.add(dates);
-            files = new ArrayList<>();
-            dates = new ArrayList<>();
-          }
-        }
-      }
-    }
+	  if(startDirectory.isDirectory()){
+		  try {
+			Date date = format.parse(startDirectory.getName());
+			if(date.before(startDate))
+				return;
+			long timeDiff = date.getTime() - startDate.getTime();
+		    int dayDiff = (int) TimeUnit.DAYS.convert(timeDiff, TimeUnit.MILLISECONDS);
+		    if(dayDiff < interval*intervalCount){
+				Calendar c = Calendar.getInstance();
+				c.setTime(startDate);
+				c.add(Calendar.DATE, (dayDiff/interval)*interval);
+				List<Document> documents = intervalFiles.get(c.getTime());
+				if(documents == null)
+					documents = new ArrayList<>();
+				for(File file:startDirectory.listFiles()){
+					if(!file.isDirectory()){
+						Document document = new Document();
+						document.setDate(date);
+						document.setTitle(file.getName());
+						document.setPath(file.getPath());
+						documents.add(document);
+					}
+				}
+				intervalFiles.put(c.getTime(), documents);
+		    }
+		} catch (ParseException e) {
+			for(File file:startDirectory.listFiles()){
+				if(file.isDirectory()){
+					listFiles(file, intervalFiles, format, startDate, interval, intervalCount);
+				}
+			}
+		}
+	  }
+	
+ 
   }
 
-  public static void runNMF(List<File> files, List<Date> dates, String outputFileName)
+  public static void runNMF(Date timestamp, List<Document> documents, File outputDirectory, DateFormat format)
   {
     // read stopwords for normalizer
     System.out.print("Read stopwords ");
@@ -199,10 +172,10 @@ public class NMFTopicExtractor
 
     // fill vocabulary
     System.out.print("Generate vocabulary ");
-    for (File file : files)
+    for (Document document : documents)
     {
-      vocabulary.nextFile(file.getName());
-      Normalizer.normalize(file, vocabulary, stopwords);
+      vocabulary.nextDocument(document);
+      Normalizer.normalize(new File(document.getPath()), vocabulary, stopwords);
     }
     vocabulary.removeLowOccurrances(5, 5);
     System.out.println("- done, Vocabulary Size: " + vocabulary.size());
@@ -216,10 +189,10 @@ public class NMFTopicExtractor
     WordCounter wordCounter = new WordCounter(vocabulary);
     // read each file separate
     System.out.print("Count document words ");
-    for (File file : files)
+    for (Document document: documents)
     {
-      wordCounter.nextFile(file.getName());
-      Normalizer.normalize(file, wordCounter, stopwords);
+      wordCounter.nextDocument(document);
+      Normalizer.normalize(new File(document.getPath()), wordCounter, stopwords);
     }
     System.out.println("- done");
 
@@ -229,24 +202,18 @@ public class NMFTopicExtractor
     nmfExecutor.execute(wordCounter.getDocumentTermMatrix());
     System.out.println("Run NMF - done");
 
-    // determine first date
-    System.out.println("Determine timestamp");
-    Date timestamp = null;
-    if (dates.size() > 0)
-    {
-      Collections.sort(dates);
-      timestamp = dates.get(0);
-    }
     // create TopicData
     System.out.print("Extract Topics ");
-    TopicTimeStepCollection topicData = new TopicTimeStepCollection(nmfExecutor.getTopicTerm(), nmfExecutor.getTopicDocument(),
-            wordCounter.getVocabulary().getVocabulary(), wordCounter.getDocumentNames(), timestamp);
+    TopicTimeStepCollection ttsc = new TopicTimeStepCollection();
+    ttsc.setTimestamp(timestamp);
+    ttsc.extractTopicsFromMatrices(nmfExecutor.getTopicTerm(), nmfExecutor.getTopicDocument(), wordCounter.getVocabulary().getVocabulary(), wordCounter.getDocumentNames());
     System.out.println(" - done");
     // save topics
     System.out.print("Save extracted topics ");
-    outputFileName += " " + timestamp + ".xml";
-    topicData.retranslateStemming();
-    TopicTimeStepCollection.save(outputFileName, topicData);
+    String outputFileName = outputDirectory.getAbsolutePath()+File.separator+format.format(timestamp) + ".xml";
+    ttsc.retranslateStemming();
+    TopicTimeStepCollection.save(outputFileName, ttsc);
     System.out.println(" - done");
+    System.out.println(ttsc);
   }
 }

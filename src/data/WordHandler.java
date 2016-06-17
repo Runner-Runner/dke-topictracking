@@ -1,7 +1,9 @@
 package data;
 
+import nmf.Document;
+
 public interface WordHandler {
 	public void addWord(String word);
 
-	void nextFile(String path);
+	void nextDocument(Document document);
 }

@@ -24,7 +24,10 @@ public class VisualizationDataConverter
   {
     //Utility Class
   }
-
+  public static void writeCSVData(TopicRiver topicRiver){
+	  List<TopicWave> waves = topicRiver.getWaves();
+	    Set<Integer> uniqueTimeSteps = new HashSet<>();
+  }
   public static void writeJSONData(TopicRiver topicRiver)
   {
     List<TopicWave> waves = topicRiver.getWaves();

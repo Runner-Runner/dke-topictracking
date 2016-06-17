@@ -7,13 +7,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import nmf.Document;
 import normalization.Normalizer;
 
 public class Topic implements Serializable {
 	private static final long serialVersionUID = 6420397376392250856L;
 	private TreeMap<Double, String> terms;
 	private TreeMap<Double, String> relativeTerms;
-	private TreeMap<Double, String> documentRankings;
+	private TreeMap<Double, Document> documentRankings;
 	private double relativeRelevance;
 	private double absoluteRelevance;
 
@@ -53,7 +54,7 @@ public class Topic implements Serializable {
 		this.terms = terms;
 	}
 
-	public void setDocumentRankings(TreeMap<Double, String> documentRankings) {
+	public void setDocumentRankings(TreeMap<Double, Document> documentRankings) {
 		this.documentRankings = documentRankings;
 	}
 
@@ -85,7 +86,7 @@ public class Topic implements Serializable {
 		return bestTerms;
 	}
 
-	public TreeMap<Double, String> getDocumentRankings() {
+	public TreeMap<Double, Document> getDocumentRankings() {
 		return documentRankings;
 	}
 
@@ -107,16 +108,16 @@ public class Topic implements Serializable {
 		}
 
 		termsText += "\t\t\t\t";
-		Iterator<Map.Entry<Double, String>> docIterator = getDocumentRankings().descendingMap().entrySet().iterator();
+		Iterator<Map.Entry<Double, Document>> docIterator = getDocumentRankings().descendingMap().entrySet().iterator();
 		int docIndex = 0;
 		while (docIterator.hasNext() && docIndex < 5) {
 			docIndex++;
-			Map.Entry<Double, String> docEntry = docIterator.next();
+			Map.Entry<Double, Document> docEntry = docIterator.next();
 			Double tfidf = docEntry.getKey();
 			if (tfidf <= 0.00001) {
 				break;
 			}
-			String doc = docEntry.getValue();
+			String doc = docEntry.getValue().getTitle();
 			termsText += " " + doc;
 		}
 
@@ -142,16 +143,16 @@ public class Topic implements Serializable {
 		}
 
 		termsText += "\nMost Relevant Documents: ";
-		Iterator<Map.Entry<Double, String>> docIterator = getDocumentRankings().descendingMap().entrySet().iterator();
+		Iterator<Map.Entry<Double, Document>> docIterator = getDocumentRankings().descendingMap().entrySet().iterator();
 		int docIndex = 0;
 		while (docIterator.hasNext() && docIndex < 3) {
 			docIndex++;
-			Map.Entry<Double, String> docEntry = docIterator.next();
+			Map.Entry<Double, Document> docEntry = docIterator.next();
 			Double tfidf = docEntry.getKey();
 			if (tfidf <= 0.00001) {
 				break;
 			}
-			String doc = docEntry.getValue();
+			String doc = docEntry.getValue().getTitle();
 			termsText += " " + doc + " (" + tfidf + ")";
 		}
 

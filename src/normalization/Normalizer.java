@@ -11,7 +11,6 @@ import java.util.HashSet;
 
 import data.WordHandler;
 
-//TODO remove August, Juli etc.
 
 //TODO Write mapping into file
 
@@ -83,7 +82,7 @@ public class Normalizer {
 								if (!stopwords.contains(original)) {
 									String stemmString = s.toString();
 									wordHandler.addWord(stemmString);
-									if (!stemmString.equals(original)) {
+									if (!stemmString.equals(original)&&!stemmingOriginalMapping.containsKey(stemmString)) {
 										stemmingOriginalMapping.put(stemmString, original);
 									}
 								}

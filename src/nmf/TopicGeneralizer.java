@@ -53,17 +53,17 @@ public class TopicGeneralizer
     Date timestamp = null;
     // create TopicData
     System.out.print("Extract Topics ");
-    TopicTimeStepCollection topicTimeStepCollection = new TopicTimeStepCollection(
-            nmfExecutor.getTopicTerm(), nmfExecutor.getTopicDocument(),
-            vocabulary, waveNames, timestamp);
-    System.out.println(" - done");
-    // save topics
-    System.out.print("Save extracted topics ");
-    String outputFileName = "generalized_" + timestamp + ".xml";
-    TopicTimeStepCollection.save(outputFileName, topicTimeStepCollection);
-    System.out.println(" - done");
-    
-    System.out.println(topicTimeStepCollection);
+//    TopicTimeStepCollection topicTimeStepCollection = new TopicTimeStepCollection();
+//    topicTimeStepCollection.setTimestamp(timestamp);
+//    topicTimeStepCollection.extractTopicsFromMatrices(nmfExecutor.getTopicTerm(), nmfExecutor.getTopicDocument(), vocabulary, waveNames);
+//    System.out.println(" - done");
+//    // save topics
+//    System.out.print("Save extracted topics ");
+//    String outputFileName = "generalized_" + timestamp + ".xml";
+//    TopicTimeStepCollection.save(outputFileName, topicTimeStepCollection);
+//    System.out.println(" - done");
+//    
+//    System.out.println(topicTimeStepCollection);
     //TODO return river or collection?
     return null;
   }

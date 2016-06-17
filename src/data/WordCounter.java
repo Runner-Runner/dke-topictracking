@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import nmf.Document;
+
 public class WordCounter implements WordHandler
 {
-  private List<String> documentNames;
+  private List<Document> documentNames;
 
   // word counts for each document
   private List<HashMap<String, Integer>> documents;
@@ -17,7 +19,6 @@ public class WordCounter implements WordHandler
   // whole vocabulary (includes idf)
   private Vocabulary vocabulary;
 
-  private boolean tfidf = false;
 
   public WordCounter(Vocabulary vocabulary)
   {
@@ -27,11 +28,11 @@ public class WordCounter implements WordHandler
   }
 
   @Override
-  public void nextFile(String name)
+  public void nextDocument(Document document)
   {
     currentDocument = new HashMap<>();
     documents.add(currentDocument);
-    documentNames.add(name);
+    documentNames.add(document);
   }
 
   public Vocabulary getVocabulary()
@@ -87,7 +88,7 @@ public class WordCounter implements WordHandler
     return documentTermMatrix;
   }
 
-  public List<String> getDocumentNames()
+  public List<Document> getDocumentNames()
   {
     return documentNames;
   }

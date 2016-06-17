@@ -1,6 +1,5 @@
 package model;
 
-
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
@@ -8,6 +7,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -19,177 +19,131 @@ import java.util.Map.Entry;
 
 import la.matrix.Matrix;
 import la.vector.Vector;
+import nmf.Document;
 import normalization.Normalizer;
 
 //TODO Merge within same timestep
-public class TopicTimeStepCollection
-{
-  private Matrix topicTermMatrix;
-  private Matrix topicDocumentMatrix;
-  private Set<String> vocabulary;
+public class TopicTimeStepCollection implements Serializable {
+	private static final long serialVersionUID = 6420397376392250857L;
+	private TreeMap<Double, Topic> topics;
+	private Date timestamp;
+	private double absoluteValuesTotal;
+	
+	public TopicTimeStepCollection() {
+		// for serializing
+	}
 
-  private TreeMap<Double, Topic> topics;
-  private List<String> documentNames;
-  private Date timestamp;
+	public Date getTimestamp() {
+		return timestamp;
+	}
 
-  public Date getTimestamp() {
-	return timestamp;
-}
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
 
-public void setTimestamp(Date timestamp) {
-	this.timestamp = timestamp;
-}
+	public TreeMap<Double, Topic> getTopics() {
+		return topics;
+	}
 
-private double absoluteValuesTotal;
+	public List<Topic> getTopicList() {
+		List<Topic> topicList = new ArrayList<>();
+		topicList.addAll(topics.values());
+		return topicList;
+	}
 
-  private static final String TOPIC_DOCUMENT = "topicdocument:";
-  private static final String TOPIC_TERM = "topicterm:";
-  private static final String VOCABULARY = "vocabulary:";
-  private static final String DOCUMENTNAMES = "documentnames:";
-  private static final String STEMMING_ORIGINAL_MAPPING = "stemmingOriginalMapping:";
+	public void setTopics(TreeMap<Double, Topic> topics) {
+		this.topics = topics;
+	}
 
-  private static final String OUTPUT_FILE_NAME = "ressources/topicdata.txt";
+	public static void save(String filename, TopicTimeStepCollection topicData) {
+		XMLEncoder encoder = null;
+		try {
+			encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(filename)));
+		} catch (FileNotFoundException fileNotFound) {
+			System.out.println("ERROR: While Creating or Opening the File " + filename);
+		}
+		encoder.writeObject(topicData);
+		encoder.close();
+	}
 
-  private static final long serialVersionUID = 6420397376392250857L;
+	public static TopicTimeStepCollection load(String filename) {
+		XMLDecoder decoder = null;
+		try {
+			decoder = new XMLDecoder(new BufferedInputStream(new FileInputStream(filename)));
+		} catch (FileNotFoundException e) {
+			System.out.println("ERROR: File " + filename + " not found");
+		}
+		return (TopicTimeStepCollection) decoder.readObject();
+	}
 
-  public TopicTimeStepCollection()
-  {
-    //for serializing
-  }
+	public void extractTopicsFromMatrices(Matrix topicTermMatrix, Matrix topicDocumentMatrix, Set<String> vocabulary,
+			List<Document> documents) {
+		topics = new TreeMap<>();
 
-  public TopicTimeStepCollection(Matrix topicTermMatrix, Matrix topicDocumentMatrix, Set<String> vocabulary,
-          List<String> documentNames, Date timestamp)
-  {
-    this.topicTermMatrix = topicTermMatrix;
-    this.topicDocumentMatrix = topicDocumentMatrix;
-    this.vocabulary = vocabulary;
-    this.documentNames = documentNames;
-    this.timestamp = timestamp;
+		int topicCount = topicTermMatrix.getRowDimension();
+		int termCount = topicTermMatrix.getColumnDimension();
 
-    extractTopicsFromMatrices();
-  }
+		for (int i = 0; i < topicCount; i++) {
+			Topic topic = new Topic();
 
-  public TreeMap<Double, Topic> getTopics()
-  {
-    return topics;
-  }
-  
-  public List<Topic> getTopicList()
-  {
-    List<Topic> topicList = new ArrayList<>();
-    topicList.addAll(topics.values());
-    return topicList;
-  }
+			Iterator<String> iterator = vocabulary.iterator();
+			for (int j = 0; j < termCount; j++) {
+				String term = iterator.next();
+				double termValue = topicTermMatrix.getEntry(i, j);
+				topic.addTerm(term, termValue);
+			}
 
-  public void setTopics(TreeMap<Double, Topic> topics)
-  {
-    this.topics = topics;
-  }
+			Vector columnVector = topicDocumentMatrix.getColumnVector(i);
+			double tfidfSum = 0;
 
-  public static void save(String filename, TopicTimeStepCollection topicData)
-  {
-    XMLEncoder encoder = null;
-    try
-    {
-      encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(filename)));
-    }
-    catch (FileNotFoundException fileNotFound)
-    {
-      System.out.println("ERROR: While Creating or Opening the File " + filename);
-    }
-    encoder.writeObject(topicData);
-    encoder.close();
-  }
-  
-  public static TopicTimeStepCollection load(String filename)
-  {
-    XMLDecoder decoder = null;
-    try
-    {
-      decoder = new XMLDecoder(new BufferedInputStream(new FileInputStream(filename)));
-    }
-    catch (FileNotFoundException e)
-    {
-      System.out.println("ERROR: File " + filename + " not found");
-    }
-    return (TopicTimeStepCollection) decoder.readObject();
-  }
-  
-  private void extractTopicsFromMatrices()
-  {
-    topics = new TreeMap<>();
+			TreeMap<Double, Document> documentRankings = new TreeMap<>();
 
-    int topicCount = topicTermMatrix.getRowDimension();
-    int termCount = topicTermMatrix.getColumnDimension();
+			for (int j = 0; j < columnVector.getDim(); j++) {
+				double tfidf = columnVector.get(j);
+				tfidfSum += tfidf;
+				documentRankings.put(tfidf, documents.get(j));
+			}
+			topic.setDocumentRankings(documentRankings);
+			topic.setAbsoluteRelevance(tfidfSum);
+			absoluteValuesTotal += tfidfSum;
+			topics.put(tfidfSum, topic);
+		}
+		// set relative values
+		for (Topic topic : topics.values()) {
+			topic.setRelativeRelevance(topic.getAbsoluteRelevance() / absoluteValuesTotal);
+		}
+	}
 
-    for (int i = 0; i < topicCount; i++)
-    {
-      Topic topic = new Topic();
+	public double getAbsoluteValuesTotal() {
+		return absoluteValuesTotal;
+	}
 
-      Iterator<String> iterator = vocabulary.iterator();
-      for (int j = 0; j < termCount; j++)
-      {
-        String term = iterator.next();
-        double termValue = topicTermMatrix.getEntry(i, j);
-        topic.addTerm(term, termValue);
-      }
+	public void setAbsoluteValuesTotal(double absoluteValuesTotal) {
+		this.absoluteValuesTotal = absoluteValuesTotal;
+	}
 
-      Vector columnVector = topicDocumentMatrix.getColumnVector(i);
-      double tfidfSum = 0;
-
-      TreeMap<Double, String> documentRankings = new TreeMap<>();
-
-      for (int j = 0; j < columnVector.getDim(); j++)
-      {
-        double tfidf = columnVector.get(j);
-        tfidfSum += tfidf;
-        documentRankings.put(tfidf, documentNames.get(j));
-      }
-      topic.setDocumentRankings(documentRankings);
-      topic.setAbsoluteRelevance(tfidfSum);
-      absoluteValuesTotal += tfidfSum;
-      topics.put(tfidfSum, topic);
-    }
-    //set relative values
-    for(Topic topic:topics.values()){
-    	topic.setRelativeRelevance(topic.getAbsoluteRelevance()/absoluteValuesTotal);
-    }
-  }
-
-  public double getAbsoluteValuesTotal()
-  {
-    return absoluteValuesTotal;
-  }
-
-  public void setAbsoluteValuesTotal(double absoluteValuesTotal)
-  {
-    this.absoluteValuesTotal = absoluteValuesTotal;
-  }
-  
-  public void retranslateStemming(){
-		for(Topic topic: topics.values()){
+	public void retranslateStemming() {
+		for (Topic topic : topics.values()) {
 			TreeMap<Double, String> terms = new TreeMap<>();
-			for(Entry<Double, String> entry: topic.getTerms().entrySet()){
+			for (Entry<Double, String> entry : topic.getTerms().entrySet()) {
 				terms.put(entry.getKey(), Normalizer.getOriginal(entry.getValue()));
 			}
 			topic.setTerms(terms);
 		}
 	}
 
-  @Override
-  public String toString()
-  {
-    Iterator<Map.Entry<Double, Topic>> topicIterator = topics.descendingMap().entrySet().iterator();
-    int index = 0;
-    String text = "";
-    while (topicIterator.hasNext())
-    {
-      index++;
-      Map.Entry<Double, Topic> topicEntry = topicIterator.next();
-      Double cumulatedTfidf = topicEntry.getKey();
-      Topic topic = topicEntry.getValue();
-      text += "\nTopic #" + index + " (" + cumulatedTfidf + "):" + topic;
-    }
-    return text;
-  }
+	@Override
+	public String toString() {
+		Iterator<Map.Entry<Double, Topic>> topicIterator = topics.descendingMap().entrySet().iterator();
+		int index = 0;
+		String text = "";
+		while (topicIterator.hasNext()) {
+			index++;
+			Map.Entry<Double, Topic> topicEntry = topicIterator.next();
+			Double cumulatedTfidf = topicEntry.getKey();
+			Topic topic = topicEntry.getValue();
+			text += "\nTopic #" + index + " (" + cumulatedTfidf + "):" + topic;
+		}
+		return text;
+	}
 }

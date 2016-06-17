@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import nmf.Document;
+
 public class Vocabulary implements WordHandler {
 	
 	private HashMap<String, TermCounter> vocabulary;
@@ -24,7 +26,7 @@ public class Vocabulary implements WordHandler {
 		currentFileID = 0;
 	}
 	@Override
-	public void nextFile(String name) {
+	public void nextDocument(Document document) {
 		currentFileID++;
 	}
 	
