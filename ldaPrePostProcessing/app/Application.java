@@ -176,34 +176,40 @@ public class Application {
 				
 				TopicDistributions ldaData = new TopicDistributions(config.resultDir + "/" + config.topicsPerDocFilename);
 
-				DTMEvaluator eva = new DTMEvaluator(reutersData, ldaData, config.dtmNumTimesteps);
+				WordDistributions wordData = new WordDistributions(config.dtmNumTimesteps,
+						config.resultDir + "/" + config.dtmTopicWordDistributions);
+				
+				DTMEvaluator eva = new DTMEvaluator(reutersData, ldaData, wordData, config.dtmNumTimesteps);
+				
+				Vocabulary vocabulary = new Vocabulary(config.resultDir + "/" + config.vocabularyFilenameBase);
+				
+				double[][] topicSimilarities = wordData.computeIntraTopicSimilarities();
+
+				float[][] timestepTopics = eva.computeTopicsWithDocsPerTime(true, 0.1f);
+				
+				eva.addTopics(topicSimilarities,
+						config.similarityTreshold,
+						config.numTopWords,
+						vocabulary, 
+						config.numTopWords,
+						timestepTopics,
+						config.resultDir + "/topicTopDocs3.txt",
+						config.resultDir + "/topicTopWords3.txt",
+						config.resultDir + "/topics3.txt");
+				
+				
 				
 //				eva.writeTopicsWithDocWeight(config.resultDir + "/" + config.docsPerTopicFilename);
 
 //				eva.writeTopicsWithDocsPerTime(true,
 //						config.resultDir + "/" + config.docsPerTopicFilename);
 			
-				WordDistributions wordData = new WordDistributions(config.dtmNumTimesteps,
-						config.resultDir + "/" + config.dtmTopicWordDistributions);
-				
-				Vocabulary vocabulary = new Vocabulary(config.resultDir + "/" + config.vocabularyFilenameBase);
-				
 				//String[][] topWords = wordData.getTopicsAsWordsForTimeStep(vocabulary, 5, 0);
-				String[][] topWords = eva.findNewTopicsWords(wordData, config.similarityTreshold, vocabulary, config.numTopWords);
-				tools.IOUtils.writeTopicTopWords(config.resultDir + "/topicTopWords1.txt", topWords);
-				
-				float[][] timestepTopics = eva.computeTopicsWithDocsPerTime(true, 0.1f);
-				
-				System.out.println("num topics " + timestepTopics.length);
-				System.out.println("num timesteps " + timestepTopics[0].length);
-				
-				float[][] timestepTopics2 = eva.findNewTopics(timestepTopics, wordData, config.similarityTreshold);
-				
-				System.out.println("num topics 2 " + timestepTopics2.length);
-				System.out.println("num timesteps 2 " + timestepTopics2[0].length);
-				
-				
-				tools.IOUtils.writeTimestepTopicsAsJason(config.resultDir + "/topics_n.js", topWords, timestepTopics2);
+				//tools.IOUtils.writeTopicTopWords(config.resultDir + "/topicTopWords2.txt", topWords);
+
+//				tools.IOUtils.writeTimestepTopicsAsJason(config.resultDir + "/topics2_n.js", 
+//						topWords, 
+//						timestepTopics2);
 				
 				System.out.println("DTM topic evaluation finished.");
 			}

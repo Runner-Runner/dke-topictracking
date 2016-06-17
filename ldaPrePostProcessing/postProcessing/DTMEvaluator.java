@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.stream.Stream;
 
 import javax.sound.midi.Synthesizer;
 
+import app.Configuration;
 import container.Vocabulary;
 import tools.IOUtils;
 import tools.Utils;
@@ -22,235 +24,26 @@ public class DTMEvaluator
 {
 	final ReutersMetaData dataReuters;
 	
-	final TopicDistributions dataLDA;
+	final TopicDistributions topicDistributions;
+
+	final WordDistributions wordDistributions;
 	
 	final int numTimeSteps;
 
 	public DTMEvaluator(final ReutersMetaData dataReuters,
-			final TopicDistributions dataLDA,
+			final TopicDistributions td,
+			final WordDistributions wd,
 			final int numTimeSteps) 
 	{
 		this.dataReuters = dataReuters;
 		
-		this.dataLDA = dataLDA;
+		this.topicDistributions = td;
+		
+		this.wordDistributions = wd;
 		
 		this.numTimeSteps = numTimeSteps;
 		
 		System.out.println("[DTMEvaluator] initialization done.");
-	}
-	
-	/**
-	 * Add new topics to timestepTopics according to changes in word vectors exceeding threshold
-	 * 
-	 * @param timestepTopics
-	 * @param wds
-	 * @param threshold
-	 * @return timestepTopics with additional topics
-	 */
-	public float[][] findNewTopics(final float[][] timestepTopics,
-			final WordDistributions wds,
-			final float threshold)
-	{
-		ArrayList<ArrayList<Float>> allNewTopics = new ArrayList<ArrayList<Float>>();
-		
-		double[][] topicSimilarities = wds.computeIntraTopicSimilarities();
-
-		if (timestepTopics.length != topicSimilarities.length)
-		{
-			System.err.println("[findNewTopics] ERROR: number of topics do not match.");
-			return null;
-		}
-		
-		if (timestepTopics.length < 1)
-		{
-			System.err.println("[findNewTopics] ERROR: timestepTopics does not contain topics.");
-			return null;
-		}
-		
-		if (timestepTopics[0].length != numTimeSteps)
-		{
-			System.err.println("[findNewTopics] ERROR: timestepTopics timesteps do not match.");
-			return null;
-		}
-
-		// iterate through topics
-		for (int i = 0; i < topicSimilarities.length; i++) 
-		{
-			// no word distributions for this topic !? Should not happen.
-			if (topicSimilarities[i].length < 1)
-			{
-				System.err.println("[findNewTopics] ERROR: topicSimilarities have no timesteps");
-				continue;
-			}
-			
-//			// first timestep is first reference
-//			double firstTimestep = topicSimilarities[i][0];
-//			
-//			// find number of topic changes in time
-//			double sumDivs = 0.0d;
-//			ArrayList<Integer> pointsOfChange = new ArrayList<Integer>();
-//			pointsOfChange.add(0);
-//			for (int j = 1; j < topicSimilarities[i].length; ++j)
-//			{
-//				double nextTimestep = topicSimilarities[i][j];
-//				
-//				// get div from last change to current
-//				double div = Math.abs(firstTimestep - nextTimestep);
-//				
-//				// sum divs as long as no change happens as changes are computed between neighboring timesteps.
-//				sumDivs += div;
-//				
-//				// change happens ?
-//				if (sumDivs > threshold)
-//				{
-//					pointsOfChange.add(j);
-//					firstTimestep = nextTimestep;
-//					sumDivs = 0.0d;
-//				}
-//			}
-			
-			ArrayList<Integer> pointsOfChange = findPointsOfChange(topicSimilarities[i], threshold);
-			
-			// list of existing topic and possible spinoffs
-			ArrayList<ArrayList<Float> > newTopics = new ArrayList<ArrayList<Float> >();
-			
-			// newTopics.size() = pointsOfchange.size()
-			for(Integer temp : pointsOfChange)
-			{
-				ArrayList<Float> newTopic = new ArrayList<Float>();
-				newTopics.add(newTopic);
-			}
-			
-			int activeTopic = 0;
-			for (int j = 0; j < timestepTopics[i].length; ++j)
-			{
-				if (j != 0 && pointsOfChange.contains(j))
-				{
-					++activeTopic;
-				}
-				
-				for(int k = 0; k < newTopics.size(); ++k)
-				{
-					if (k == activeTopic)
-					{
-						newTopics.get(k).add(timestepTopics[i][j]);
-					}
-					else
-					{
-						newTopics.get(k).add(0.0f);
-					}
-				}
-			}
-			
-			for (ArrayList<Float> newTopic : newTopics)
-			{
-				allNewTopics.add(newTopic);
-			}
-		}
-		
-		float[][] moreTopics = new float[allNewTopics.size()][numTimeSteps];
-		for (int i = 0; i < moreTopics.length; i++) 
-		{
-			for (int j = 0; j < moreTopics[i].length; j++) 
-			{
-				moreTopics[i][j] = allNewTopics.get(i).get(j);	
-			}
-		}
-		return moreTopics;
-	}
-	
-	public ArrayList<Integer> findPointsOfChange(final double[] topicSimilarities,
-			final double threshold)
-	{
-		double firstTimestep = topicSimilarities[0];
-		
-		// find number of topic changes in time
-		double sumDivs = 0.0d;
-		ArrayList<Integer> pointsOfChange = new ArrayList<Integer>();
-		pointsOfChange.add(0);
-		for (int j = 1; j < topicSimilarities.length; ++j)
-		{
-			double nextTimestep = topicSimilarities[j];
-			
-			// get div from last change to current
-			double div = Math.abs(firstTimestep - nextTimestep);
-			
-			// sum divs as long as no change happens as changes are computed between neighboring timesteps.
-			sumDivs += div;
-			
-			// change happens ?
-			if (sumDivs > threshold)
-			{
-				pointsOfChange.add(j);
-				firstTimestep = nextTimestep;
-				sumDivs = 0.0d;
-			}
-		}	
-		return pointsOfChange;
-	}
-	
-	/**
-	 * Add new topics to timestepTopics according to changes in word vectors exceeding threshold
-	 * 
-	 * @param timestepTopics
-	 * @param wds
-	 * @param threshold
-	 * @return timestepTopics with additional topics
-	 */
-	public String[][] findNewTopicsWords(final WordDistributions wds,
-			final float threshold,
-			Vocabulary vocabulary, 
-			int numTopWords)
-	{
-		LinkedList<String> vocabularyList = vocabulary.getAsList();
-		
-		if (numTopWords < 1)
-			numTopWords = vocabularyList.size();
-		
-		ArrayList<List<String>> allNewWordLists = new ArrayList<List<String>>();
-	
-		double[][] topicSimilarities = wds.computeIntraTopicSimilarities();
-
-		// iterate through topics
-		for (int topicId = 0; topicId < topicSimilarities.length; topicId++) 
-		{
-			// no word distributions for this topic !? Should not happen.
-			if (topicSimilarities[topicId].length < 1)
-			{
-				System.err.println("[findNewTopics] ERROR: topicSimilarities have no timesteps");
-				continue;
-			}
-			
-			ArrayList<Integer> pointsOfChange = findPointsOfChange(topicSimilarities[topicId], threshold);
-			
-			// list of existing topic and possible spinoffs
-			ArrayList<List<String> > newWordLists = new ArrayList<List<String> >();
-			
-			// newWordLists.size() = pointsOfchange.size()
-			for(Integer temp : pointsOfChange)
-			{
-				String[] wordLists = wds.getWordListForTopic(vocabulary, numTopWords, temp, topicId);
-				
-				List<String> newWordList = Arrays.asList(wordLists);
-				
-				newWordLists.add(newWordList);
-			}
-			
-			for (List<String> wordList : newWordLists)
-			{
-				allNewWordLists.add(wordList);
-			}
-		}
-		
-		String[][] moreTopics = new String[allNewWordLists.size()][numTopWords];
-		for (int i = 0; i < moreTopics.length; i++) 
-		{
-			for (int j = 0; j < moreTopics[i].length; j++) 
-			{
-				moreTopics[i][j] = allNewWordLists.get(i).get(j);	
-			}
-		}
-		return moreTopics;
 	}
 	
 	/**
@@ -265,13 +58,13 @@ public class DTMEvaluator
 	public float [][] computeTopicsWithDocsPerTime(final boolean scoreInsteadOfDocNumbers,
 			final float threshold)
 	{
-		int numTopics = dataLDA.getDocumentsPerTopics().size();
+		int numTopics = topicDistributions.getDocumentsPerTopics().size();
 		
 		float [][] weightsTopicsPerTimesteps = new float [numTopics][numTimeSteps];
 		
 		for (Integer index = 0; index < numTopics; index++)
 		{
-			HashMap<Integer, Float> docs = dataLDA.getDocumentsAndWeightsForTopic(index);
+			HashMap<Integer, Float> docs = topicDistributions.getDocumentsAndWeightsForTopic(index);
 			
 			HashMap<Integer, ArrayList<Integer>> mDocsPerDate = new HashMap<Integer, ArrayList<Integer>>();
 			
@@ -353,15 +146,348 @@ public class DTMEvaluator
 		return weightsTopicsPerTimesteps;
 	}
 	
+	/**
+	 * Add new topics to timestepTopics according to changes in word vectors exceeding threshold
+	 * 
+	 * @param topicSimilarities
+	 * @param threshold
+	 * @param numTopDocs
+	 * @param vocabulary
+	 * @param numTopWords
+	 * @param timestepTopics
+	 * @param docsFilename
+	 * @param wordsFilename
+	 * @param topicsFilename
+	 */
+	public void addTopics(final double[][] topicSimilarities,
+			final float threshold,
+			int numTopDocs,
+			Vocabulary vocabulary, 
+			int numTopWords,
+			final float[][] timestepTopics,
+			final String docsFilename,
+			final String wordsFilename,
+			final String topicsFilename)
+	{
+		LinkedList<String> vocabularyList = vocabulary.getAsList();
+		
+		if (numTopWords < 1)
+			numTopWords = vocabularyList.size();
+		
+		ArrayList<List<String>> allNewWordLists = new ArrayList<List<String>>();
+	
+		ArrayList<List<String>> allNewDocLists = new ArrayList<List<String>>();
+
+		ArrayList<List<Float>> allNewTopics = new ArrayList<List<Float>>();
+		
+		if (timestepTopics.length != topicSimilarities.length)
+		{
+			System.err.println("[addTopics] ERROR: number of topics do not match.");
+			return;
+		}
+		
+		if (timestepTopics.length < 1)
+		{
+			System.err.println("[addTopics] ERROR: timestepTopics does not contain topics.");
+			return;
+		}
+		
+		if (timestepTopics[0].length != numTimeSteps)
+		{
+			System.err.println("[addTopics] ERROR: timestepTopics timesteps do not match.");
+			return;
+		}
+
+		// iterate through topics
+		for (int topicId = 0; topicId < topicSimilarities.length; topicId++) 
+		{
+			// no word distributions for this topic !? Should not happen.
+			if (topicSimilarities[topicId].length < 1)
+			{
+				System.err.println("[addTopics] ERROR: topicSimilarities have no timesteps");
+				continue;
+			}
+			
+			ArrayList<Integer> pointsOfChange = findPointsOfChange(topicSimilarities[topicId], threshold);
+			
+			if (pointsOfChange.size() < 1)
+			{
+				System.err.println("[addTopics] ERROR: pointsOfChange have no timesteps");
+				continue;
+			}
+			
+			allNewWordLists = getWords(allNewWordLists,
+					pointsOfChange,
+					vocabulary, 
+					numTopWords,
+					topicId);
+			
+			allNewDocLists = getDocs(allNewDocLists,
+					pointsOfChange,
+					numTopDocs,
+					topicId);
+			
+			allNewTopics = computeTopics(allNewTopics,
+					pointsOfChange,
+					timestepTopics,
+					topicId);
+		}
+		
+		System.out.println("[findDocs] num topics: " + allNewDocLists.size());
+		
+		tools.IOUtils.writeListMatrix(docsFilename, allNewDocLists);
+		
+		System.out.println("[findWords] num topics: " + allNewWordLists.size());
+		
+		tools.IOUtils.writeListMatrix(wordsFilename, allNewWordLists);
+				
+		System.out.println("[findTopics] num topics: " + allNewTopics.size());
+		
+		tools.IOUtils.writeListMatrix(topicsFilename, allNewTopics);
+	}
+	
+	/**
+	 * Identify the timesteps, where the similarity exceeds the threshold for this topic.
+	 * Similarities are summed up along the timeline until threshold is exceeded, then reset.
+	 * 
+	 * @param topicSimilarities
+	 * @param threshold
+	 * @return List of timesteps exceeding similarity threshold.
+	 */
+	public ArrayList<Integer> findPointsOfChange(final double[] topicSimilarities,
+			final double threshold)
+	{
+		double firstTimestep = topicSimilarities[0];
+		
+		// find number of topic changes in time
+		double sumDivs = 0.0d;
+		ArrayList<Integer> pointsOfChange = new ArrayList<Integer>();
+		pointsOfChange.add(0);
+		for (int j = 1; j < topicSimilarities.length; ++j)
+		{
+			double nextTimestep = topicSimilarities[j];
+			
+			// get div from last change to current
+			double div = Math.abs(firstTimestep - nextTimestep);
+			
+			// sum divs as long as no change happens as changes are computed between neighboring timesteps.
+			sumDivs += div;
+			
+			// change happens ?
+			if (sumDivs > threshold)
+			{
+				pointsOfChange.add(j);
+				firstTimestep = nextTimestep;
+				sumDivs = 0.0d;
+			}
+		}	
+		return pointsOfChange;
+	}
+	
+	/**
+	 * Get the top words for the topics, including new topics according to similarity and threshold.
+	 * 
+	 * @param allNewWordLists
+	 * @param pointsOfChange
+	 * @param vocabulary
+	 * @param numTopWords
+	 * @param topicId
+	 * @return allNewWordLists for topics with evtl. new topics' word lists
+	 */
+	private ArrayList<List<String>> getWords(ArrayList<List<String>> allNewWordLists,
+			final ArrayList<Integer> pointsOfChange,
+			final Vocabulary vocabulary, 
+			final int numTopWords,
+			final int topicId)
+	{
+		// list of existing topic and possible spinoffs
+		ArrayList<List<String> > newWordLists = new ArrayList<List<String> >();
+
+		// newWordLists.size() = pointsOfchange.size()
+		for(Integer temp : pointsOfChange)
+		{
+			String[] wordLists = wordDistributions.getWordListForTopic(vocabulary, numTopWords, temp, topicId);
+
+			List<String> newWordList = Arrays.asList(wordLists);
+
+			newWordLists.add(newWordList);
+		}
+
+		for (List<String> wordList : newWordLists)
+		{
+			allNewWordLists.add(wordList);
+		}
+		
+		return allNewWordLists;
+	}
+	
+	/**
+	 * Get the top documents for the topics, including new topics according to similarity and threshold.
+	 * 
+	 * @param allNewDocLists
+	 * @param pointsOfChange
+	 * @param numTopDocs
+	 * @param topicId
+	 * @return allNewDocLists for topics with evtl. new topics' document lists
+	 */
+	private ArrayList<List<String>> getDocs(ArrayList<List<String>> allNewDocLists,
+			final ArrayList<Integer> pointsOfChange,
+			final int numTopDocs,
+			final int topicId)
+	{
+		// list of existing topic and possible spinoffs
+		ArrayList<List<String> > newDocLists = new ArrayList<List<String> >();
+
+		// get documents and sort them by score
+		HashMap<Integer, Float> docs = topicDistributions.getDocumentsAndWeightsForTopic(topicId);
+		docs = Utils.sortByValue(docs);
+
+		// get document dates
+		ArrayList<Integer> docDates = dataReuters.getDocDates();
+		int timeStepLength = docDates.size() / numTimeSteps;
+
+		if (pointsOfChange.size() == 1)
+		{
+			List<String> newDocList = new ArrayList<String>();
+
+			int topDocs = numTopDocs;
+			Iterator<Integer> keys = docs.keySet().iterator();
+			while (topDocs > 0 && keys.hasNext())
+			{
+				String articeId = dataReuters.getDocName(keys.next());
+				
+				//articeId.replaceFirst("^0*", "");
+				articeId = tools.Utils.removeLeadingZeros(articeId);
+				articeId += ".xml";
+				
+				newDocList.add(articeId);
+				--topDocs;
+			}
+			//						for (Integer docId : docs.keySet())
+			//						{
+			//							newDocList.add(dataReuters.getDocName(docId));
+			//						}
+
+			newDocLists.add(newDocList);
+		}
+		else
+		{
+			ArrayList<Integer> pointsOfChangeTemp = (ArrayList<Integer>) pointsOfChange.clone();
+			
+			pointsOfChangeTemp.add(numTimeSteps + 1);
+			int prevPoint = 0;
+			for(int point = 1; point < pointsOfChangeTemp.size(); ++point)
+			{
+				int currentPoint = pointsOfChangeTemp.get(point);
+				int diff = currentPoint - prevPoint;
+				int firstDate = prevPoint * timeStepLength;
+				int numDates = diff * timeStepLength;
+
+				// ids are needed !!
+				//docDates.subList(firstDate, numDates);
+
+				List<String> newDocList = new ArrayList<String>();
+
+				int topDocs = numTopDocs;
+				Iterator<Integer> keys = docs.keySet().iterator();
+				while (topDocs > 0 && keys.hasNext())
+				{
+					int docId = keys.next();
+					if (docId >= firstDate && docId < (firstDate + numDates))
+					{
+						String articeId = dataReuters.getDocName(docId);
+						
+						//articeId.replaceFirst("^0*", "");
+						articeId = tools.Utils.removeLeadingZeros(articeId);
+						articeId += ".xml";
+						
+						newDocList.add(articeId);
+						--topDocs;
+					}
+				}
+
+				newDocLists.add(newDocList);
+
+				prevPoint = currentPoint;
+			}
+		}
+
+		for (List<String> wordList : newDocLists)
+		{
+			allNewDocLists.add(wordList);
+		}
+					
+		return allNewDocLists;
+	}
+	
+	/**
+	 * Add new topics to timestepTopics according to changes in word vectors exceeding threshold
+	 * 
+	 * @param allNewTopics
+	 * @param pointsOfChange
+	 * @param timestepTopics
+	 * @param topicId
+	 * @return allNewTopics containing timestepTopics' values for this topic and evtl. new ones
+	 */
+	private ArrayList<List<Float>> computeTopics(ArrayList<List<Float>> allNewTopics,
+			final ArrayList<Integer> pointsOfChange,
+			final float[][] timestepTopics,
+			final int topicId)
+	{
+		// list of existing topic and possible spinoffs
+		ArrayList<List<Float> > newTopics = new ArrayList<List<Float> >();
+
+		// newTopics.size() = pointsOfchange.size()
+		for(Integer temp : pointsOfChange)
+		{
+			ArrayList<Float> newTopic = new ArrayList<Float>();
+			newTopics.add(newTopic);
+		}
+
+		int activeTopic = 0;
+		for (int j = 0; j < timestepTopics[topicId].length; ++j)
+		{
+			if (j != 0 && pointsOfChange.contains(j))
+			{
+				++activeTopic;
+			}
+
+			for(int k = 0; k < newTopics.size(); ++k)
+			{
+				if (k == activeTopic)
+				{
+					newTopics.get(k).add(timestepTopics[topicId][j]);
+				}
+				else
+				{
+					newTopics.get(k).add(0.0f);
+				}
+			}
+		}
+
+		for (List<Float> newTopic : newTopics)
+		{
+			allNewTopics.add(newTopic);
+		}
+		
+		return allNewTopics;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param scoreInsteadOfDocNumbers
+	 * @param filename
+	 */
 	public void writeTopicsWithDocsPerTime(boolean scoreInsteadOfDocNumbers,
 			final String filename)
 	{
 		String content = "";
 		
-		for (Integer index = 0; index < dataLDA.getDocumentsPerTopics().size(); index++)
+		for (Integer index = 0; index < topicDistributions.getDocumentsPerTopics().size(); index++)
 		{
 			//ArrayList<Integer> docs = liLDATopicsToDocs.get(index);
-			HashMap<Integer, Float> docs = dataLDA.getDocumentsAndWeightsForTopic(index);
+			HashMap<Integer, Float> docs = topicDistributions.getDocumentsAndWeightsForTopic(index);
 			if (!scoreInsteadOfDocNumbers)
 			{
 				content += docs.size();
@@ -437,14 +563,19 @@ public class DTMEvaluator
 		IOUtils.saveContentToFile(content, filename);
 	}
 	
-		public void writeTopicsWithDocWeight(final String filename)
+	/**
+	 * 
+	 * 
+	 * @param filename
+	 */
+	public void writeTopicsWithDocWeight(final String filename)
 	{
 		String content = "";
 		
-		for (Integer index = 0; index < dataLDA.getDocumentsPerTopics().size(); index++)
+		for (Integer index = 0; index < topicDistributions.getDocumentsPerTopics().size(); index++)
 		{
 			//ArrayList<Integer> docs = liLDATopicsToDocs.get(index);
-			HashMap<Integer, Float> docs = dataLDA.getDocumentsAndWeightsForTopic(index);
+			HashMap<Integer, Float> docs = topicDistributions.getDocumentsAndWeightsForTopic(index);
 			docs = Utils.sortByValue(docs);
 			
 			content += docs.size();

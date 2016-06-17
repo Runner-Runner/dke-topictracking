@@ -19,6 +19,9 @@ public class ReutersMetaData {
 
 	private ArrayList<String> liDocNames;
 	
+	/**
+	 * date yyyymmdd integers assuming to be sorted!
+	 */
 	private ArrayList<Integer> liDocDates;
 	
 	private ArrayList<ArrayList<String> > liTopicsPerDocument;
@@ -91,14 +94,29 @@ public class ReutersMetaData {
 		return mDocumentsPerTopic.get(index);
 	}
 	
-	public int getNumDocsPerDate(int date)
+	public int getNumDocsPerDateForDate(int date)
 	{
 		return mDocsPerDate.get(date);
 	}
 	
-	public HashMap<Integer, Integer> getDocsPerDate()
+	public HashMap<Integer, Integer> getNumDocsPerDate()
 	{
 		return mDocsPerDate;
+	}
+	
+	public ArrayList<Integer> getDocumentIdsForDate(int date)
+	{
+		ArrayList<Integer> liDocIdsForDate = new ArrayList<>();
+		
+		for (int i = 0; i < liDocDates.size(); ++i)
+		{
+			if (liDocDates.get(i).equals(date))
+			{
+				liDocIdsForDate.add(i);
+			}
+		}
+		
+		return liDocIdsForDate;
 	}
 	
 	private void computeDocsPerDate()
@@ -183,6 +201,12 @@ public class ReutersMetaData {
 		}
 	}
 	
+	/**
+	 * Compute for each timestep the normalized number of documents for each RCV1 topic. 
+	 * 
+	 * @param numTimeSteps
+	 * @return float[numTopics][numTimeSteps]
+	 */
 	public float [][] computeAnnotatedTopicsWithDocsPerTime(int numTimeSteps)
 	{
 		int numTopics = getDocumentsPerTopics().size();
@@ -231,7 +255,7 @@ public class ReutersMetaData {
 			int numDocsPerDateOverall = 0;
 			for (int iDateIndex : liKeys)
 			{
-				numDocsPerDateOverall += getNumDocsPerDate(iDateIndex);
+				numDocsPerDateOverall += getNumDocsPerDateForDate(iDateIndex);
 				iSum += mDocsPerDate.get(iDateIndex).size();
 								
 				if (iMod % timeStepLength == 0)
