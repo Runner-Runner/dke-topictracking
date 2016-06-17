@@ -1,7 +1,18 @@
 \section{Existing Software Frameworks}\label{sec:software}
 
-This section gives an overview of existing solutions for the modules of the topic detection and tracking system.
+This section gives an overview of existing implementations for the modules of the topic detection and tracking system.
 
 \subsection{LDA Implementation by Blei}
 
-Among the various implementations provided by David Blei and his group at Columbia University there is also a ready-to-use application\footnote{https://github.com/Blei-Lab/dtm} corresponding to the dynamic model described in \cite{Blei:2006:DTM:1143844.1143859}. Unfortunately there is no implementation for the continuous extension. Another backdraw is that the documentation is very sparse and the implementation is in C as most of the original work.
+Among the various implementations provided by David Blei and his group at Columbia University there is also a ready-to-use application\footnote{https://github.com/Blei-Lab/dtm} corresponding to the dynamic model described in \cite{Blei:2006:DTM:1143844.1143859}. The programming language is C as for most of the original work. Unfortunately there is no implementation for the continuous extension. As a drawback the documentation is very sparse.
+
+\subsection{NMF Implementation LIBNMF}
+
+A library implementing non-negative matrix factorization is available in the programming language C, called LIBNMF, which provides a number of variations of the algorithm. \cite{NMFSoftware} can serve as documentation.
+
+\subsection{Java Library for Machine Learning}
+
+There is also a Java library available covering multiple algorithms and techniques in the field of machine learning, including both LDA and NMF \cite{MLSoftware}. Documentation and examples how to use the algorithms can be found directly on sourceforge.net/projects/jlml/files/JML/. It has to be determined whether the algorithms are configurable to the needs of the project's problem domain (dynamic tracking of topics).
+
+\subsection{JGibbLDA / GibbLDA++}
+GibbLDA is a framework implemented in Java or C, which is based on the LDA algorithm and Gibbs sampling. Functionality for information retrieval, document classification, collaborative filtering and content-based image Clustering are provided by this library and might be very useful in the matter of topic detection. It is able to handle large databases and was successfully applied to fractions of wikipedia. 
