@@ -1,0 +1,56 @@
+F:\Userdata\Documents\Visual Studio 2013\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe.config
+F:\Userdata\Documents\Visual Studio 2013\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.csprojResolveAssemblyReference.cache
+F:\Userdata\Documents\Visual Studio 2013\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.Properties.Resources.resources
+F:\Userdata\Documents\Visual Studio 2013\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.csproj.GenerateResource.Cache
+F:\Userdata\Documents\Visual Studio 2013\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe
+F:\Userdata\Documents\Visual Studio 2013\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.pdb
+F:\Userdata\Documents\Visual Studio 2013\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.exe
+F:\Userdata\Documents\Visual Studio 2013\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.pdb
+F:\Userdata\Documents\Visual Studio 2013\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.MainForm.resources
+C:\Users\Darius\Dropbox\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe.config
+C:\Users\Darius\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.exe
+C:\Users\Darius\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.pdb
+C:\Users\Darius\Dropbox\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe
+C:\Users\Darius\Dropbox\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.pdb
+C:\Users\Darius\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.csprojResolveAssemblyReference.cache
+C:\Users\Darius\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.MainForm.resources
+C:\Users\Darius\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.Properties.Resources.resources
+C:\Users\Darius\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.csproj.GenerateResource.Cache
+C:\Users\Azubi\Dropbox\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe.config
+C:\Users\Azubi\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.exe
+C:\Users\Azubi\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.pdb
+C:\Users\Azubi\Dropbox\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe
+C:\Users\Azubi\Dropbox\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.pdb
+C:\Users\Azubi\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.csprojResolveAssemblyReference.cache
+C:\Users\Azubi\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.MainForm.resources
+C:\Users\Azubi\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.Properties.Resources.resources
+C:\Users\Azubi\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.csproj.GenerateResource.Cache
+C:\Users\Azubi\Dropbox\ReutersCrawler\ReutersCrawler\bin\Debug\AngleSharp.dll
+C:\Users\Azubi\Dropbox\ReutersCrawler\ReutersCrawler\bin\Debug\AngleSharp.xml
+C:\Users\Darius\Dropbox\ReutersCrawler\ReutersCrawler\bin\Debug\AngleSharp.dll
+C:\Users\Darius\Dropbox\ReutersCrawler\ReutersCrawler\bin\Debug\AngleSharp.xml
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe.config
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.exe
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.pdb
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe.config
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.exe
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.pdb
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.pdb
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Debug\AngleSharp.dll
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Debug\AngleSharp.xml
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.csprojResolveAssemblyReference.cache
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.MainForm.resources
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.Properties.Resources.resources
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.csproj.GenerateResource.Cache
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe.config
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.exe
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.pdb
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.pdb
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Debug\AngleSharp.dll
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Debug\AngleSharp.xml
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.csprojResolveAssemblyReference.cache
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.MainForm.resources
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.Properties.Resources.resources
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.csproj.GenerateResource.Cache

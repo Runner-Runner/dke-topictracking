@@ -1,0 +1,33 @@
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\bin\Release\ReutersCrawler.exe.config
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\bin\Release\ReutersCrawler.exe
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\bin\Release\ReutersCrawler.pdb
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\bin\Release\AngleSharp.dll
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\bin\Release\AngleSharp.xml
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.csprojResolveAssemblyReference.cache
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.MainForm.resources
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.Properties.Resources.resources
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.csproj.GenerateResource.Cache
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.exe
+C:\Users\SND\Dropbox\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.pdb
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Release\ReutersCrawler.exe.config
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.exe
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.pdb
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Release\ReutersCrawler.exe
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Release\ReutersCrawler.pdb
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Release\AngleSharp.dll
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Release\AngleSharp.xml
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.csprojResolveAssemblyReference.cache
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.MainForm.resources
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.Properties.Resources.resources
+C:\Users\SND\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.csproj.GenerateResource.Cache
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Release\ReutersCrawler.exe.config
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.exe
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.pdb
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Release\ReutersCrawler.exe
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Release\ReutersCrawler.pdb
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Release\AngleSharp.dll
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Release\AngleSharp.xml
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.csprojResolveAssemblyReference.cache
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.MainForm.resources
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.Properties.Resources.resources
+C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Release\ReutersCrawler.csproj.GenerateResource.Cache

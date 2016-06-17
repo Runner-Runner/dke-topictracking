@@ -42,4 +42,15 @@ public class Utils {
 		
 		return map;
 	}
+	
+	public static String removeLeadingZeros(String s)
+	{
+	      try {
+	          Integer intVal = Integer.parseInt(s);
+	          s = intVal.toString();
+	      } catch (Exception ex) {
+	          // whatever
+	      }
+	      return s;
+	    }
 }

@@ -1,16 +1,22 @@
 
 \section{State Of The Art}\label{sec:SOTA}
 
-This section gives an overview of the technical approaches currently used in the field of topic detection and tracking as they are explored so far.
+This section gives an overview of the technical approaches currently used in the field of topic detection and tracking. First the approaches to preprocess the document dataset are described. Then the general tasks, that have to be performed to detect and track topics over time, are presented. Finally the two major approaches, namely Latent Dirichlet Allocation and non-negative matrix factorization, are presented.
 
-\subsection{Topic Detection and Tracking}\label{sec:TDT}
-Topic detection and tracking tasks according to \cite{Fiscus:2002:TDT:772260.772263} :
+\input{./tex/Preprocessing.tex}
+
+\subsection{Topic Detection and Tracking Tasks}\label{sec:TDT}
+The topic detection and tracking tasks according to \cite{Fiscus:2002:TDT:772260.772263} are as follows:
 \begin{itemize}
-	\item Topic Tracking
-	\item Link Detection
-	\item Topic Detection
-	\item First Story Detection
-	\item Story Segmentation
+	\item Topic Tracking: Track an identified topic over a period of time.
+	\item Link Detection: Detect links between topics at different time points.
+	\item Topic Detection: Identify different topics.
+	\item First Story Detection: Identify the first occurence of a certain topic in the timeline.
+	\item Story Segmentation: Identify splitting of topics into new ones and the corresponding points in time.
 \end{itemize}
 
+Some of these tasks are reflected in the approaches presented in the following sections and some have to be considered in addition to the given implementations.
+
 \input{./tex/LDA.tex}
+
+\input{./tex/NMF.tex}

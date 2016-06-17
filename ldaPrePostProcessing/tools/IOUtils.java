@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 public class IOUtils {
 
@@ -23,6 +24,24 @@ public class IOUtils {
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public static <T> void writeListMatrix(final String filename,
+			final List<List<T>> data)
+	{
+		String content = "";
+
+		for (List<T> list : data)
+		{
+			for (T item : list)
+			{
+				content += item + " ";
+			}
+			content += "\n";
+		}
+		
+		System.out.println("[IOUtils::writeListMatrix] Saving data to " + filename);
+		IOUtils.saveContentToFile(content, filename);
 	}
 	
 	public static void writeIntegerHashListMatrix(final String filename,
@@ -78,6 +97,24 @@ public class IOUtils {
 		}
 
 		System.out.println("[IOUtils::writeDoubleMatrix] Saving data to " + filename);
+		IOUtils.saveContentToFile(content, filename);
+	}
+	
+	public static void writeFloatMatrix(final String filename,
+			final float[][] matrix)
+	{
+		String content = "";
+
+		for (int i = 0; i < matrix.length; i++) 
+		{
+			for (int j = 0; j < matrix[i].length; j++) 
+			{
+				content += matrix[i][j] + " ";
+			}
+			content += "\n";
+		}
+
+		System.out.println("[IOUtils::writeFloatMatrix] Saving data to " + filename);
 		IOUtils.saveContentToFile(content, filename);
 	}
 	

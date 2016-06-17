@@ -1,0 +1,8 @@
+\subsection{Non-Negative Matrix Factorization}\label{sec:NMF}
+
+Non-negative matrix factorization is an algorithm that can be used in the field of text mining to factorize and thereby decrease the dimension of a large matrix \cite{Lee}. For topic detection, the original matrix can be composed of terms represented by the rows and documents represented by the columns. The cell values typically represent the number of occurrences of a word in a document. As this value cannot be negative, the algorithm's requirement of a matrix with only non-negative values is fulfilled. This matrix is then factorized into two positive matrices which have significantly lower dimensions, one representing a term-feature relation, the other one representing a feature-document relation. \\
+The new matrices' features are hidden and might represent correlations not visible before. When multiplied with each other, these matrices form an approximation of the original matrix and fill in zero-values, acting as predictors for the cell values.\\
+
+Advantages of this algorithm are storage savings due to the sparsity of factorization and the good scalability for increasing matrix dimensions. Disadvantages are that the factorization is not unique and convergence is not always guaranteed.\\
+Although the original data size can be too large for matrix factorization, there already exist variants of the algorithm using an dynamic approach, processing data in chunks \cite{NMFOnline}. A dynamic and online processing of web articles using NMF is thus feasible.
+
