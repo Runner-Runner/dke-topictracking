@@ -40,14 +40,14 @@ public class VisualizationDataConverter
 			topicWriter.close();
 			
 			//write mapping file
-			DateFormat dateFormat = new SimpleDateFormat("DD.MM.YYYY");
+			DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 			File topicMapping = new File(outputFile+"-mapping.csv");
 			PrintWriter mappingWriter = new PrintWriter(topicMapping);
 			Calendar cal = Calendar.getInstance();
 	        cal.setTime(topicRiver.getStartDate());
 	        Date current = cal.getTime();
+	        mappingWriter.println(dateFormat.format(current));
 	        while(current.before(topicRiver.getEndDate())){
-	        	mappingWriter.println(dateFormat.format(current));
 	        	for(TopicWave wave:waves){
 	        		Topic t = wave.getTopic(current);
 	        		if(t!=null){

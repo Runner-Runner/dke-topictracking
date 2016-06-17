@@ -200,7 +200,7 @@ public class Topic implements Serializable {
 	public List<String> getRankedDocuments(Date date){
 		List<String> list = new ArrayList<>();
 		for(Entry<Double, Document> entry: documentRankings.descendingMap().entrySet()){
-			if(entry.getKey()<0.0001)
+			if(entry.getKey()<0.001)
 				break;
 			if(entry.getValue().getDate().equals(date))
 				list.add(entry.getValue().getTitle());
