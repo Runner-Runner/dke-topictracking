@@ -1,8 +1,11 @@
 package model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -17,11 +20,39 @@ public class Topic implements Serializable {
 	private TreeMap<Double, Document> documentRankings;
 	private double relativeRelevance;
 	private double absoluteRelevance;
+	private Date timeStamp;
+	private int interval;
 
 	public Topic() {
 		terms = new TreeMap<>();
 	}
 	
+	
+	
+	public Date getTimeStamp() {
+		return timeStamp;
+	}
+
+
+
+	public void setTimeStamp(Date timeStamp) {
+		this.timeStamp = timeStamp;
+	}
+
+
+
+	public int getInterval() {
+		return interval;
+	}
+
+
+
+	public void setInterval(int interval) {
+		this.interval = interval;
+	}
+
+
+
 	public double getAbsoluteRelevance() {
 		return absoluteRelevance;
 	}
@@ -165,6 +196,16 @@ public class Topic implements Serializable {
 
 	public void setRelativeRelevance(double relativeRelevance) {
 		this.relativeRelevance = relativeRelevance;
+	}
+	public List<String> getRankedDocuments(Date date){
+		List<String> list = new ArrayList<>();
+		for(Entry<Double, Document> entry: documentRankings.entrySet()){
+			if(entry.getKey()<0.0001)
+				break;
+			if(entry.getValue().getDate().equals(date))
+				list.add(entry.getValue().getTitle());
+		}
+		return list;
 	}
 
 }

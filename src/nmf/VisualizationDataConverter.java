@@ -3,13 +3,18 @@ package nmf;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Topic;
@@ -24,22 +29,64 @@ public class VisualizationDataConverter
   {
     //Utility Class
   }
-  public static void writeCSVData(TopicRiver topicRiver){
-	  List<TopicWave> waves = topicRiver.getWaves();
-	    Set<Integer> uniqueTimeSteps = new HashSet<>();
+  public static void writeCSVData(TopicRiver topicRiver, String outputFile){
+	    File topics = new File(outputFile+"-topics.csv");
+	    try {
+			PrintWriter topicWriter = new PrintWriter(topics);
+			//write topic file
+			List<TopicWave> waves = topicRiver.getWaves();
+			for(TopicWave wave:waves){
+				TreeMap<Double, String> bestTerms = wave.getTermsAverageTFIDF();
+				Iterator<Entry<Double, String>> it = bestTerms.entrySet().iterator();
+				for(int i = 0; i<10;i++){
+					String term = it.next().getValue();
+					topicWriter.print(term+"; ");
+				}
+				topicWriter.println();
+			}
+			topicWriter.close();
+			
+			//write mapping file
+			DateFormat dateFormat = new SimpleDateFormat("DD.MM.YYYY");
+			File topicMapping = new File(outputFile+"-mapping.csv");
+			PrintWriter mappingWriter = new PrintWriter(topicMapping);
+			Calendar cal = Calendar.getInstance();
+	        cal.setTime(topicRiver.getStartDate());
+	        Date current = cal.getTime();
+	        while(current.before(topicRiver.getEndDate())){
+	        	mappingWriter.println(dateFormat.format(current));
+	        	for(TopicWave wave:waves){
+	        		Topic t = wave.getTopic(current);
+	        		if(t!=null){
+	        			mappingWriter.print(t.getRelativeRelevance()+":");
+	        			mappingWriter.print(String.join(", ", t.getRankedDocuments(current)));
+	        		}
+	        		else{
+	        			mappingWriter.print("0:");
+	        		}
+	        		mappingWriter.print(";");
+	        	}
+	        	mappingWriter.println();
+	        	cal.add(Calendar.DATE, 1);
+	        	current = cal.getTime();
+	        }
+	        mappingWriter.close();
+		} catch (FileNotFoundException e) {
+			
+		}
+	    
   }
+  
   public static void writeJSONData(TopicRiver topicRiver)
   {
     List<TopicWave> waves = topicRiver.getWaves();
 
-    Set<Integer> uniqueTimeSteps = new HashSet<>();
+    TreeSet<Date> uniqueTimeSteps = new TreeSet<>();
     for (TopicWave wave : waves)
     {
-      Set<Integer> keySet = wave.getTopicSequence().keySet();
+      Set<Date> keySet = wave.getTopicSequence().keySet();
       uniqueTimeSteps.addAll(keySet);
     }
-    //Create as many time steps as are uniquely given by the topic waves
-    int timeSteps = uniqueTimeSteps.size();
 
     HashMap<TopicWave, List<Double>> yValueMap = new HashMap<>();
     HashMap<TopicWave, String> nameMap = new HashMap<>();
@@ -47,13 +94,13 @@ public class VisualizationDataConverter
     for (TopicWave wave : waves)
     {
       List<Double> yValues = new ArrayList<>();
-      TreeMap<Integer, Topic> topicSequence = wave.getTopicSequence();
+      TreeMap<Date, Topic> topicSequence = wave.getTopicSequence();
 
       HashMap<String, Double> bestTermMap = new HashMap<>();
 
-      for (int i = 1; i <= timeSteps; i++)
+      for (Date d: uniqueTimeSteps)
       {
-        Topic topic = topicSequence.get(i);
+        Topic topic = topicSequence.get(d);
         double relativeRelevance;
         if (topic == null)
         {

@@ -1,7 +1,8 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -10,12 +11,12 @@ import java.util.TreeMap;
 
 public class TopicWave
 {
-  private TreeMap<Integer, Topic> topicSequence;
+  private TreeMap<Date, Topic> topicSequence;
 
-  public TopicWave(int timeunit, Topic topic)
+  public TopicWave(Date date, Topic topic)
   {
     topicSequence = new TreeMap<>();
-    addTopic(timeunit, topic);
+    addTopic(date, topic);
   }
 
   public Topic getLastTopic()
@@ -38,17 +39,14 @@ public class TopicWave
     return topic;
   }
 
-  public TreeMap<Integer, Topic> getTopicSequence()
+  public TreeMap<Date, Topic> getTopicSequence()
   {
     return topicSequence;
   }
 
-  public void addTopic(int timeunit, Topic topic)
+  public void addTopic(Date timestamp, Topic topic)
   {
-    Topic previousTopic = topicSequence.get(timeunit);
-    //TODO Merge if previousTopic != null
-
-    topicSequence.put(timeunit, topic);
+    topicSequence.put(timestamp, topic);
   }
 
   public double getRelativeRelevance()
@@ -125,10 +123,10 @@ public class TopicWave
     return ret;
   }
 
-  public String toString(HashMap<Integer, Double> tfidfTotalMap)
+  public String toString(HashMap<Date, Double> tfidfTotalMap)
   {
     String text = "";
-    for (Entry<Integer, Topic> entry : topicSequence.entrySet())
+    for (Entry<Date, Topic> entry : topicSequence.entrySet())
     {
       double relativeRelevance = entry.getValue().getAbsoluteRelevance()
               / tfidfTotalMap.get(entry.getKey());
@@ -136,6 +134,18 @@ public class TopicWave
               + "%): " + entry.getValue().toShortString();
     }
     return text;
+  }
+  public Topic getTopic(Date date){
+	  Calendar cal = Calendar.getInstance();
+	  for(Topic topic:topicSequence.values()){
+		  Date start = topic.getTimeStamp();
+		  cal.setTime(start);
+		  cal.add(Calendar.DATE, topic.getInterval());
+		  Date endDate = cal.getTime();
+		  if(start.compareTo(date)<=0 && endDate.compareTo(date)>=0)
+			  return topic;
+	  }
+	  return null;
   }
 
 }

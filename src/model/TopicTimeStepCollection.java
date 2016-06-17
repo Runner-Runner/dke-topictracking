@@ -27,10 +27,19 @@ public class TopicTimeStepCollection implements Serializable {
 	private static final long serialVersionUID = 6420397376392250857L;
 	private TreeMap<Double, Topic> topics;
 	private Date timestamp;
+	private int interval;
 	private double absoluteValuesTotal;
 	
 	public TopicTimeStepCollection() {
 		// for serializing
+	}
+	
+	public int getInterval() {
+		return interval;
+	}
+
+	public void setInterval(int interval) {
+		this.interval = interval;
 	}
 
 	public Date getTimestamp() {
@@ -77,14 +86,18 @@ public class TopicTimeStepCollection implements Serializable {
 	}
 
 	public void extractTopicsFromMatrices(Matrix topicTermMatrix, Matrix topicDocumentMatrix, Set<String> vocabulary,
-			List<Document> documents) {
+			List<Document> documents, int interval, Date timestamp) {
 		topics = new TreeMap<>();
 
+		this.timestamp = timestamp;
+		this.interval = interval;
 		int topicCount = topicTermMatrix.getRowDimension();
 		int termCount = topicTermMatrix.getColumnDimension();
 
 		for (int i = 0; i < topicCount; i++) {
 			Topic topic = new Topic();
+			topic.setInterval(interval);
+			topic.setTimeStamp(timestamp);
 
 			Iterator<String> iterator = vocabulary.iterator();
 			for (int j = 0; j < termCount; j++) {

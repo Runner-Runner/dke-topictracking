@@ -34,7 +34,7 @@ public class NMFTopicExtractor
 		TreeMap<Date, List<Document>> files = new TreeMap<>();
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		try {
-			listFiles(new File("/mnt/dualuse/sharedData/Git-Projects/dke-topictracking/Reuters Corpus Volume 1 (RCV1) - Disk 1 of 2/unzipped/extractions/"), files, new SimpleDateFormat("yyyyMMdd"), df.parse("19960820"), 7, 1);
+			listFiles(new File("/mnt/dualuse/sharedData/Git-Projects/dke-topictracking/Reuters Corpus Volume 1 (RCV1) - Disk 1 of 2/unzipped/extractions/"), files, new SimpleDateFormat("yyyyMMdd"), df.parse("19960820"), 2, 1);
 			runMultipleNMF(files, 7, df, new File(""));
 		} catch (ParseException e) {
 		}
@@ -94,7 +94,7 @@ public class NMFTopicExtractor
               (interval) + " days)");
       long nmfStartTime = System.currentTimeMillis();
       
-      runNMF(entry.getKey(),entry.getValue(),outputDirectory,format);
+      runNMF(entry.getKey(),entry.getValue(),outputDirectory,format, interval);
       
       long nmfElapsedTime = System.currentTimeMillis() - nmfStartTime;
       //In minutes
@@ -160,7 +160,7 @@ public class NMFTopicExtractor
  
   }
 
-  public static void runNMF(Date timestamp, List<Document> documents, File outputDirectory, DateFormat format)
+  public static void runNMF(Date timestamp, List<Document> documents, File outputDirectory, DateFormat format, int interval)
   {
     // read stopwords for normalizer
     System.out.print("Read stopwords ");
@@ -205,12 +205,11 @@ public class NMFTopicExtractor
     // create TopicData
     System.out.print("Extract Topics ");
     TopicTimeStepCollection ttsc = new TopicTimeStepCollection();
-    ttsc.setTimestamp(timestamp);
-    ttsc.extractTopicsFromMatrices(nmfExecutor.getTopicTerm(), nmfExecutor.getTopicDocument(), wordCounter.getVocabulary().getVocabulary(), wordCounter.getDocumentNames());
+    ttsc.extractTopicsFromMatrices(nmfExecutor.getTopicTerm(), nmfExecutor.getTopicDocument(), wordCounter.getVocabulary().getVocabulary(), wordCounter.getDocumentNames(), interval, timestamp);
     System.out.println(" - done");
     // save topics
-    System.out.print("Save extracted topics ");
     String outputFileName = outputDirectory.getAbsolutePath()+File.separator+format.format(timestamp) + ".xml";
+    System.out.print("Save extracted topics "+outputFileName);
     ttsc.retranslateStemming();
     TopicTimeStepCollection.save(outputFileName, ttsc);
     System.out.println(" - done");
