@@ -5,12 +5,13 @@ import model.TopicRiver;
 
 public class TopicTimeTracker {
 	public static void main(String[] args) {
-		TopicRiver tr = TopicRiver.loadTopicRiver("/mnt/dualuse/sharedData/Git-Projects/dke-topictracking/year");
+		TopicRiver tr = TopicRiver.loadTopicRiver("/home/carsten/workspace/dke-topictracking/csvtest");
 		System.out.println(tr);
     
 //    TopicGeneralizer.generalize(tr, 0);
     
     VisualizationDataConverter.writeJSONData(tr);
+    VisualizationDataConverter.writeCSVData(tr, "test.csv");
 	}
 	 
 

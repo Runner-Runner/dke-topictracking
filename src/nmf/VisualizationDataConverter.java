@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -36,13 +35,7 @@ public class VisualizationDataConverter
 			//write topic file
 			List<TopicWave> waves = topicRiver.getWaves();
 			for(TopicWave wave:waves){
-				TreeMap<Double, String> bestTerms = wave.getTermsAverageTFIDF();
-				Iterator<Entry<Double, String>> it = bestTerms.entrySet().iterator();
-				for(int i = 0; i<10;i++){
-					String term = it.next().getValue();
-					topicWriter.print(term+"; ");
-				}
-				topicWriter.println();
+				topicWriter.println(wave.getName("; "));
 			}
 			topicWriter.close();
 			
@@ -126,7 +119,7 @@ public class VisualizationDataConverter
       }
       yValueMap.put(wave, yValues);
 
-      nameMap.put(wave, wave.getName());
+      nameMap.put(wave, wave.getName(", "));
     }
 
     String jsonText = "var data = [";

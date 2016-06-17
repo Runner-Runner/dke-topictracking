@@ -20,7 +20,7 @@ public class TopicGeneralizer
     List<TopicWave> waves = topicRiver.getWaves();
     for (TopicWave wave : waves)
     {
-      waveNames.add(wave.getName());
+      waveNames.add(wave.getName(", "));
       for (Topic topic : wave.getTopicSequence().values())
       {
         vocabulary.addAll(topic.getTerms().values());

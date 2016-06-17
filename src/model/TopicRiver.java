@@ -79,7 +79,7 @@ public class TopicRiver {
 		}
 		if (bestWave != null && bestValue > TopicMatcher.TOPIC_THRESHOLD) {
 			System.out.println("New Topic: " + topic);
-			System.out.println("Best Matching Wave (" + bestValue + "): " + bestWave.getName());
+			System.out.println("Best Matching Wave (" + bestValue + "): " + bestWave.getName(", "));
 			System.out.println(bestWave.getLastTopic());
 			System.out.println("------------------------");
 
