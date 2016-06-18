@@ -10,3 +10,11 @@ c:\users\azubi\documents\visual studio 2015\Projects\TopicTrackingVisualization\
 C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\bin\Debug\TopicTrackingVisualization.exe.config
 C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.exe
 C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.pdb
+C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\bin\Debug\TopicTrackingVisualization.exe
+C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\bin\Debug\TopicTrackingVisualization.pdb
+C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.csprojResolveAssemblyReference.cache
+C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.BasefolderSelectionForm.resources
+C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.Main.resources
+C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.Properties.Resources.resources
+C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.csproj.GenerateResource.Cache
+C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.TopicsOverviewForm.resources

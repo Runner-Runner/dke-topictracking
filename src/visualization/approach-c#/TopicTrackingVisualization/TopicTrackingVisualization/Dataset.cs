@@ -12,19 +12,30 @@ namespace TopicTrackingVisualization
 	{
 		private List<string> _topics;
 		private List<Series> _serieses;
+		private List<List<string[]>> _documentPoints;
+		private DateTime _startdate;
+
 
 		public List<string> Topics { get { return _topics; } }
 		public List<Series> Serieses { get { return _serieses; } }
+		public List<List<string[]>> DocumentPoints { get { return _documentPoints; } }
+		public DateTime Startdate { get { return _startdate; } }
 
-		public Dataset(List<string> topics, List<Series> serieses)
+		public Dataset(List<string> topics, List<Series> serieses, List<List<string[]>> documentPoints, DateTime startdate)
 		{
+			if (topics == null ||serieses ==null || documentPoints == null || startdate == null)
+			{
+				throw new ArgumentException("None of the parameters may be null");
+			}
 			//incoherent data
-			if (topics.Count != serieses.Count)
+			if (topics.Count != serieses.Count || topics.Count != documentPoints[0].Count)
 			{
 				throw new ArgumentException("The number of topics does not match the number of serieses");
 			}
 			_topics = topics;
 			_serieses = serieses;
+			_documentPoints = documentPoints;
+			_startdate = startdate;
 		}
 
 		public static Dataset CreateFromFiles(string[] topicsFileContent, string[] dataFileContent)
@@ -52,6 +63,7 @@ namespace TopicTrackingVisualization
 				for (int i = 0; i < dataFileLines.Count; i++)
 				{
 					pointsDocuments.Add(new List<KeyValuePair<double, string[]>>());
+					double normalizer = DataFilelineSum(dataFileLines[i]);
 					foreach(string point in dataFileLines[i].Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
 					{
 						string[] pointDocs = point.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
@@ -63,7 +75,7 @@ namespace TopicTrackingVisualization
 						double y;
 						if (Double.TryParse(pointDocs[0].Trim(), NumberStyles.Float, CultureInfo.GetCultureInfo("en-US"), out y))
 						{
-							pointsDocuments.Last().Add(new KeyValuePair<double, string[]>(y, pointDocs[1].Split(',').Select(x => x.Trim()).ToArray()));
+							pointsDocuments.Last().Add(new KeyValuePair<double, string[]>(y / normalizer, pointDocs[1].Split(',').Select(x => x.Trim()).ToArray()));
 						}
 						else
 						{
@@ -79,22 +91,29 @@ namespace TopicTrackingVisualization
 						Name = topics[i],
 						ChartType = SeriesChartType.StackedArea100
 					});
-					//System.Windows.Forms.MessageBox.Show($"{startdate.ToShortDateString()}, {pointsDocuments[0][i].Key}");
-					serieses[i].Points.AddXY(startdate.ToShortDateString(), pointsDocuments[0][i].Key);
+					serieses[i].Points.AddXY(0, pointsDocuments[0][i].Key);
 				}
 				for (int i = 1; i < pointsDocuments.Count; i++)
 				{
 					for (int j = 0; j < pointsDocuments[i].Count; j++)
 					{
-						serieses[j].Points.AddXY(startdate.AddDays(i).ToShortDateString(), pointsDocuments[i][j].Key);
+						serieses[j].Points.AddXY(i, pointsDocuments[i][j].Key);
 					}
 				}
-				return new Dataset(topics, serieses);
+				List<List<string[]>> documentPoints = pointsDocuments.Select(x => x.Select(y => y.Value).ToList()).ToList();
+				return new Dataset(topics, serieses, documentPoints, startdate);
 			}
 			else
 			{
 				throw new ArgumentException($"The date in the first line of the datafile could not be parsed; {dataFileLines[0]}");
 			}
+		}
+
+		private static double DataFilelineSum(string line)
+		{
+			return line.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).
+				Select(x => x.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[0].Trim()).
+				Sum(x => Double.Parse(x, NumberStyles.Float, CultureInfo.GetCultureInfo("en-US")));
 		}
 	}
 }

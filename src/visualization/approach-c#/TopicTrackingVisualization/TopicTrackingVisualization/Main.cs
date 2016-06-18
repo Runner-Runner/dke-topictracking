@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ExtensionMethods;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
@@ -16,6 +17,17 @@ namespace TopicTrackingVisualization
 	public partial class Main : Form
 	{
 		private Dataset _dataset;
+		private string _basefolder;
+		private TopicsOverviewForm tof;
+
+		private int _min;
+
+		public string Basefolder { get { return _basefolder; } }
+
+		public void DataForDay(int index)
+		{
+			//_dataset.Serieses[index];
+		}
 
 		public Main()
 		{
@@ -28,20 +40,23 @@ namespace TopicTrackingVisualization
 			topicOverviewChart.Height = this.Height - 62;
 		}
 
-		private void topicOverviewChart_AxisViewChanged(object sender, System.Windows.Forms.DataVisualization.Charting.ViewEventArgs e)
+		private void topicOverviewChart_AxisViewChanged(object sender, ViewEventArgs e)
 		{
 			setAxisXInterval();
 		}
 
 		private void setAxisXInterval()
 		{
-			int selected = (int)Math.Abs((Double.IsNaN(topicOverviewChart.ChartAreas[0].AxisX.ScaleView.ViewMaximum) ? 0 : topicOverviewChart.ChartAreas[0].AxisX.ScaleView.ViewMaximum) - (Double.IsNaN(topicOverviewChart.ChartAreas[0].AxisX.ScaleView.ViewMinimum) ? 0 : topicOverviewChart.ChartAreas[0].AxisX.ScaleView.ViewMinimum));
+			int min = (int)(Double.IsNaN(topicOverviewChart.ChartAreas[0].AxisX.ScaleView.ViewMinimum) ? 0 : topicOverviewChart.ChartAreas[0].AxisX.ScaleView.ViewMinimum);
+			int max = (int)(Double.IsNaN(topicOverviewChart.ChartAreas[0].AxisX.ScaleView.ViewMaximum) ? 0 : topicOverviewChart.ChartAreas[0].AxisX.ScaleView.ViewMaximum);
+			int selected = (int)Math.Abs(max - min);
 			if (selected == 0)
 			{
 				selected = topicOverviewChart.Series[0].Points.Count;
 			}
 			//MessageBox.Show($"{topicOverviewChart.ChartAreas[0].AxisX.ScaleView.ViewMinimum} - {topicOverviewChart.ChartAreas[0].AxisX.ScaleView.ViewMaximum}");
 			topicOverviewChart.ChartAreas[0].AxisX.Interval = 1 + (selected / 50);
+			_min = min;
 		}
 
 		private void topicOverviewChart_Paint(object sender, PaintEventArgs e)
@@ -74,10 +89,18 @@ namespace TopicTrackingVisualization
 					{
 						topicOverviewChart.Series.Add(_dataset.Serieses[i]);
 					}
+					foreach(var s in topicOverviewChart.Series)
+					{
+						foreach(var pt in s.Points)
+						{
+							pt.ToolTip = $"{s.Name}:   {Math.Round(pt.YValues[0], 2)*100}%";
+						}
+					}
+
 					topicOverviewChart.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
 
-					topicOverviewChart.ChartAreas[0].AxisX.Maximum = topicOverviewChart.Series[0].Points.Count;
-					topicOverviewChart.ChartAreas[0].AxisX.Minimum = 1;
+					topicOverviewChart.ChartAreas[0].AxisX.Maximum = topicOverviewChart.Series[0].Points.Count - 1;
+					topicOverviewChart.ChartAreas[0].AxisX.Minimum = 0;
 					topicOverviewChart.ChartAreas[0].AxisX.MajorTickMark.Interval = 1;
 
 					setAxisXInterval();
@@ -147,6 +170,7 @@ namespace TopicTrackingVisualization
 			MessageBox.Show("TODO: Show tooltips, show documents");
 		}
 
+		/*
 		private void topicOverviewChart_PostPaint(object sender, ChartPaintEventArgs e)
 		{
 			return;
@@ -190,6 +214,57 @@ namespace TopicTrackingVisualization
 
 			return new RectangleF(CArp.X + pw * IPP.X, CArp.Y + ph * IPP.Y,
 			pw * IPP.Width, ph * IPP.Height);
+		}
+		*/
+
+		private void defineBasefolderToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			BasefolderSelectionForm bsf = new BasefolderSelectionForm();
+			if (bsf.ShowDialog() == DialogResult.OK)
+			{
+				_basefolder = bsf.Basefolder;
+				defineBasefolderToolStripMenuItem.Text = "Define Basefolder"  + (_basefolder != null ? $"\n{_basefolder}" : "");
+			}
+		}
+
+		private void topicOverviewChart_MouseClick(object sender, MouseEventArgs e)
+		{
+			HitTestResult r = topicOverviewChart.HitTest(e.X, e.Y);
+			int x = r.PointIndex;
+			int sx = topicOverviewChart.Series.IndexOf(r.Series);
+			//MessageBox.Show($"{r.PointIndex} {topicOverviewChart.Series.IndexOf(r.Series)}");
+			if (e.Button == MouseButtons.Right)
+			{
+				if (tof == null || tof.IsDisposed)
+				{
+					tof = new TopicsOverviewForm(this);
+				}
+				tof.Show();
+				tof.Focus();
+				List<string> relevantTopics = _dataset.Serieses
+					.Where(elem => elem.Points[x].YValues[0] > 0)
+					.Select(elem => elem.Name)
+					.ToList();
+				List<int> relevantTopicIndexes = _dataset.Topics
+					.Select((value, index) => new { value, index })
+					.Where(elem => relevantTopics.Contains(elem.value))
+					.Select(elem => elem.index).ToList();
+				List<string[]> relevantDocuments = _dataset.DocumentPoints[x].Where((value, index) => relevantTopicIndexes.Contains(index)).ToList();
+				tof.DayTopicDocuments(_dataset.Startdate.AddDays(x), relevantTopics, relevantDocuments, relevantTopics.IndexOf(r.Series.Name));
+			}
+		}
+
+		private void topicOverviewChart_Customize(object sender, EventArgs e)
+		{
+			for (int i = 0; i < topicOverviewChart.ChartAreas[0].AxisX.CustomLabels.Count; i++)
+			{
+				topicOverviewChart.ChartAreas[0].AxisX.CustomLabels[i].Text = _dataset.Startdate.AddDays(_min + i).ToShortDateString();
+			}
+		}
+
+		private void helpToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			MessageBox.Show("Help");
 		}
 	}
 }
