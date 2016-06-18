@@ -34,8 +34,8 @@ public class NMFTopicExtractor
 		TreeMap<Date, List<Document>> files = new TreeMap<>();
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		try {
-			listFiles(new File("/mnt/dualuse/sharedData/Git-Projects/dke-topictracking/Reuters Corpus Volume 1 (RCV1) - Disk 1 of 2/unzipped/extractions/"), files, new SimpleDateFormat("yyyyMMdd"), df.parse("19960820"), 7, 54);
-			runMultipleNMF(files, 7, df, new File(""));
+			listFiles(new File("/mnt/dualuse/sharedData/Git-Projects/dke-topictracking/Reuters Corpus Volume 1 (RCV1) - Disk 1 of 2/unzipped/extractions/"), files, new SimpleDateFormat("yyyyMMdd"), df.parse("19970103"), 1, 1);
+			runMultipleNMF(files, 7, df, new File("days"));
 		} catch (ParseException e) {
 		}
 	}

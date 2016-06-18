@@ -23,6 +23,7 @@ import model.TopicWave;
 public class VisualizationDataConverter
 {
   public static final String JSON_FILE_NAME = "topics.js";
+  public static final int EXPORT_DOCUMENT_COUNT = 15;
 
   private VisualizationDataConverter()
   {
@@ -41,7 +42,7 @@ public class VisualizationDataConverter
 			
 			//write mapping file
 			DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-			File topicMapping = new File(outputFile+"-mapping.csv");
+			File topicMapping = new File(outputFile+"-mapping.txt");
 			PrintWriter mappingWriter = new PrintWriter(topicMapping);
 			Calendar cal = Calendar.getInstance();
 	        cal.setTime(topicRiver.getStartDate());
@@ -52,12 +53,12 @@ public class VisualizationDataConverter
 	        		Topic t = wave.getTopic(current);
 	        		if(t!=null){
 	        			mappingWriter.print(t.getRelativeRelevance()+":");
-	        			mappingWriter.print(String.join(", ", t.getRankedDocuments(current)));
+	        			mappingWriter.print(String.join(", ", t.getRankedDocuments(current, EXPORT_DOCUMENT_COUNT)));
 	        		}
 	        		else{
 	        			mappingWriter.print("0:");
 	        		}
-	        		mappingWriter.print(";");
+	        		mappingWriter.print(" ;");
 	        	}
 	        	mappingWriter.println();
 	        	cal.add(Calendar.DATE, 1);

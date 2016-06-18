@@ -197,13 +197,16 @@ public class Topic implements Serializable {
 	public void setRelativeRelevance(double relativeRelevance) {
 		this.relativeRelevance = relativeRelevance;
 	}
-	public List<String> getRankedDocuments(Date date){
+	public List<String> getRankedDocuments(Date date, int count){
 		List<String> list = new ArrayList<>();
+		int counter = 0;
 		for(Entry<Double, Document> entry: documentRankings.descendingMap().entrySet()){
-			if(entry.getKey()<0.001)
-				break;
-			if(entry.getValue().getDate().equals(date))
+			if(entry.getValue().getDate().equals(date)){
 				list.add(entry.getValue().getTitle());
+				counter++;
+				if(counter >= count)
+					break;
+			}
 		}
 		return list;
 	}
