@@ -35,13 +35,13 @@ public class NMFTopicExtractor
       try
       {
         listFiles(new File("/mnt/dualuse/sharedData/Git-Projects/dke-topictracking/Reuters Corpus Volume 1 (RCV1) - Disk 1 of 2/unzipped/extractions/"), files, new SimpleDateFormat("yyyyMMdd"), df.parse("19970103"), 1, 1);
-        runMultipleNMF(files, 7, df, new File("days"));
+        runMultipleNMF(files, 7, df, new File("days"), 30);
       }
       catch (ParseException e)
       {
       }
     }
-    else if (args.length != 6)
+    else if (args.length != 7)
     {
       printUsage();
       return;
@@ -49,14 +49,16 @@ public class NMFTopicExtractor
     else
     {
       DateFormat format = new SimpleDateFormat(args[2], Locale.ENGLISH);
-      int interval = 0;
-      int sequence = 0;
+      int interval;
+      int sequence;
+      int topicCount;
       Date startDate;
       try
       {
         interval = Integer.parseInt(args[0]);
         sequence = Integer.parseInt(args[1]);
         startDate = format.parse(args[3]);
+        topicCount = Integer.parseInt(args[6]);
       }
       catch (NumberFormatException | ParseException ex)
       {
@@ -73,7 +75,7 @@ public class NMFTopicExtractor
       }
       TreeMap<Date, List<Document>> files = new TreeMap<>();
       listFiles(inputDirectory, files, format, startDate, interval, sequence);
-      runMultipleNMF(files, interval, format, outputDirectory);
+      runMultipleNMF(files, interval, format, outputDirectory, topicCount);
     }
 
   }
@@ -81,16 +83,17 @@ public class NMFTopicExtractor
   private static void printUsage()
   {
     System.out.println("NMFTopicExtractor:");
-    System.out.println("java -jar NMFTopicExtractor <interval> <sequence> <dateformat> <startdate> <input-directory> <output-directory>");
+    System.out.println("java -jar NMFTopicExtractor <interval> <sequence> <dateformat> <startdate> <input-directory> <output-directory> <topics>");
     System.out.println("interval (int) - defines the day range of each interval");
-    System.out.println("sequence (int) - defines number of intervals, which will be extracted");
-    System.out.println("dateformat (String) - defines the dateformat for documents directories e.g. yyyyMMdd");
-    System.out.println("startdate (String) - define the startdate (in given dateformat)");
+    System.out.println("sequence (int) - defines number of intervals which will be extracted");
+    System.out.println("dateformat (String) - defines the date format for documents directories, e.g. yyyyMMdd");
+    System.out.println("startdate (String) - define the start date (in given date format)");
     System.out.println("input-directory (Path) - takes a directory containing directories with the text files as input; the inner directories define the time steps (for example, days) to which the contained text files should be assigned.");
     System.out.println("output-directory (Path) - directory to store extracted xml files");
+    System.out.println("topics (int) - defines the number of topics to be generated in each time step");
   }
 
-  public static void runMultipleNMF(TreeMap<Date, List<Document>> documents, int interval, DateFormat format, File outputDirectory)
+  public static void runMultipleNMF(TreeMap<Date, List<Document>> documents, int interval, DateFormat format, File outputDirectory, int topicCount)
   {
     System.out.println("Run NMF iterations:");
     long completeStartTime = System.currentTimeMillis();
@@ -101,7 +104,7 @@ public class NMFTopicExtractor
               + (interval) + " days)");
       long nmfStartTime = System.currentTimeMillis();
 
-      runNMF(entry.getKey(), entry.getValue(), outputDirectory, format, interval);
+      runNMF(entry.getKey(), entry.getValue(), outputDirectory, format, interval, topicCount);
 
       long nmfElapsedTime = System.currentTimeMillis() - nmfStartTime;
       //In minutes
@@ -179,7 +182,8 @@ public class NMFTopicExtractor
 
   }
 
-  public static void runNMF(Date timestamp, List<Document> documents, File outputDirectory, DateFormat format, int interval)
+  public static void runNMF(Date timestamp, List<Document> documents, 
+          File outputDirectory, DateFormat format, int interval, int topicCount)
   {
     // read stopwords for normalizer
     System.out.print("Read stopwords ");
@@ -218,7 +222,7 @@ public class NMFTopicExtractor
     // run NMF
     NMFExecutor nmfExecutor = new NMFExecutor();
     System.out.println("Run NMF:");
-    nmfExecutor.execute(wordCounter.getDocumentTermMatrix());
+    nmfExecutor.execute(wordCounter.getDocumentTermMatrix(), topicCount);
     System.out.println("Run NMF - done");
 
     // create TopicData

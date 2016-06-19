@@ -46,7 +46,7 @@ public class TopicGeneralizer
 
     System.out.println("NMF on topic - term:");
     NMFExecutor nmfExecutor = new NMFExecutor();
-    nmfExecutor.execute(termWaveMatrix);
+    nmfExecutor.execute(termWaveMatrix, 30);
 
     // determine first date
     System.out.println("Determine timestamp");

@@ -12,12 +12,10 @@ public class NMFExecutor
   private Matrix topicTerm;
   private Matrix topicDocument;
 
-  public static final int TOPIC_COUNT = 30;
-  
-  public void execute(double[][] documentTermMatrix)
+  public void execute(double[][] documentTermMatrix, int topicCount)
   {
     KMeansOptions options = new KMeansOptions();
-    options.nClus = TOPIC_COUNT;
+    options.nClus = topicCount;
     options.verbose = true;
     options.maxIter = 20;
     KMeans kmeans = new KMeans(options);
@@ -26,7 +24,7 @@ public class NMFExecutor
     kmeans.clustering();
     Matrix indicatorMatrix = kmeans.getIndicatorMatrix();
     NMFOptions nmfOptions = new NMFOptions();
-    nmfOptions.nClus = TOPIC_COUNT;
+    nmfOptions.nClus = topicCount;
     nmfOptions.maxIter = 50;
     nmfOptions.verbose = true;
     nmfOptions.calc_OV = false;
