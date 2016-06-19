@@ -85,9 +85,9 @@ public class NMFTopicExtractor
     System.out.println("interval (int) - defines the day range of each interval");
     System.out.println("sequence (int) - defines number of intervals, which will be extracted");
     System.out.println("dateformat (String) - defines the dateformat for documents directories e.g. yyyyMMdd");
-    System.out.println("startdate (String) define the startdate (in given dateformat)");
-    System.out.println("input-directory (Path) parent directory, which contains all documents");
-    System.out.println("output-directory (Path) directory to store extracted xml files");
+    System.out.println("startdate (String) - define the startdate (in given dateformat)");
+    System.out.println("input-directory (Path) - takes a directory containing directories with the text files as input; the inner directories define the time steps (for example, days) to which the contained text files should be assigned.");
+    System.out.println("output-directory (Path) - directory to store extracted xml files");
   }
 
   public static void runMultipleNMF(TreeMap<Date, List<Document>> documents, int interval, DateFormat format, File outputDirectory)

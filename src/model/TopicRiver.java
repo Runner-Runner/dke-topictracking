@@ -117,9 +117,9 @@ public class TopicRiver
   public static TopicRiver loadTopicRiver(String directoryName)
   {
     File directory = new File(directoryName);
-    if (!directory.exists())
+    if (!directory.isDirectory())
     {
-      System.out.println("Directory path of topic river data does not exist!");
+      System.out.println("Path of topic river data is no existing directory!");
       return null;
     }
 
