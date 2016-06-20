@@ -79,7 +79,6 @@ public class Application {
 		}
 		
 		System.out.println("Application mode: " + config.mode);
-		System.out.println(config.corpusPath);
 
 		switch(config.mode)
 		{
@@ -87,6 +86,8 @@ public class Application {
 			{
 				try
 				{
+					System.out.println("Corpus path: " + config.corpusPath);
+					
 					DocumentHandlerInterface docReader = new ReutersXMLHandler();
 					
 					PreProcessor p = new PreProcessor(
