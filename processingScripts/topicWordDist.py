@@ -1,6 +1,11 @@
 #! /usr/bin/python
 
 # extract single line / topic from the topic word distributions
+#
+#usage: python3 topicWordDist.py <beta-file> <topic index>
+#
+# <beta-file> is output from the lda-c code
+# <topic index> index of the topic line to extract
 
 import sys
 from functools import cmp_to_key
@@ -11,7 +16,7 @@ def cmp(a, b):
 if (__name__ == '__main__'):
 
     if (len(sys.argv) != 3):
-       print('usage: python topicWordDist.py <beta-file> <topic index>\n')
+       print('usage: python3 topicWordDist.py <beta-file> <topic index>\n')
        sys.exit(1)
 
     beta_file = sys.argv[1]

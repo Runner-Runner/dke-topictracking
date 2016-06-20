@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-# usage: python topics.py <gamma-file> <num topics>
+# usage: python3 topics.py <gamma-file> <num topics>
 #
 # <gamma file> is output from the lda-c code
 # <num topics> is the number of topics to print from each document
@@ -46,7 +46,7 @@ def print_docs_full(gamma_file):
 if (__name__ == '__main__'):
 
     if (len(sys.argv) != 3):
-       print('usage: python topics.py <gamma-file> <num topics>\n')
+       print('usage: python3 topics.py <gamma-file> <num topics>\n')
        sys.exit(1)
 
     gamma_file = sys.argv[1]

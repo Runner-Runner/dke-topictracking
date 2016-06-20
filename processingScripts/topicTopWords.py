@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-# usage: python topicTopWords.py <beta file> <vocab file> <num words>
+# usage: python3 topicTopWords.py <beta file> <vocab file> <num words>
 #
 # <beta file> is output from the lda-c code
 # <vocab file> is a list of words, one per line
@@ -34,7 +34,7 @@ def print_topics(beta_file, vocab_file, nwords = 25):
 if (__name__ == '__main__'):
 
     if (len(sys.argv) != 4):
-       print('usage: python topicTopWords.py <beta-file> <vocab-file> <num words>\n')
+       print('usage: python3 topicTopWords.py <beta-file> <vocab-file> <num words>\n')
        sys.exit(1)
 
     beta_file = sys.argv[1]
