@@ -161,13 +161,19 @@ public class ReutersMetaData implements MetaDataInterface{
 	
 	public ArrayList<Integer> getDocsPerTimestep(final int numTimeSteps)
 	{
+		ArrayList<Integer> numDocsPerTimeStep = new ArrayList<Integer>();
+
+		if (mDocsPerDate.size() < numTimeSteps)
+		{
+			System.err.println("ERROR: Number of dates < number of timesteps.");
+			return numDocsPerTimeStep;
+		}
+		
 		int timeStepLength = mDocsPerDate.size() / numTimeSteps;
 
 		ArrayList<Integer> liKeys = new ArrayList<Integer>();
 		liKeys.addAll(mDocsPerDate.keySet());
 		Collections.sort(liKeys);
-		
-		ArrayList<Integer> numDocsPerTimeStep = new ArrayList<Integer>();
 		
 		int iMod = 1;
 		int numDocsPerDateOverall = 0;

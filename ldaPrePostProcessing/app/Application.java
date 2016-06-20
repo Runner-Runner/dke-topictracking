@@ -42,10 +42,10 @@ public class Application {
 			{
 				config.mode = modes.evaluateTopics;
 			}
-			else if (arg.equals("-generateVisData"))
-			{
-				config.mode = modes.generateVisData;
-			}
+//			else if (arg.equals("-generateVisData"))
+//			{
+//				config.mode = modes.generateVisData;
+//			}
 			else if (arg.equals("-evaluateDTM"))
 			{
 				config.mode = modes.evaluateDTMTopics;
@@ -137,29 +137,29 @@ public class Application {
 				
 				Evaluator eva = new Evaluator(reutersData, ldaData);
 				
-				eva.evaluteTopics();
+				eva.evaluteTopics(0.1f);
 		
 				System.out.println("evaluateTopics finished.");
 			}
 			break;
-			case generateVisData:
-			{
-				ReutersMetaData reutersData = new ReutersMetaData(config.resultDir + "/" + config.metaDataFilename);
-				
-				TopicDistributions ldaData = new TopicDistributions(config.resultDir + "/" + config.topicsPerDocFilename);
-
-				VisDataGenerator gen = new VisDataGenerator(reutersData, ldaData, config.corpusPath);
-				
-				DocumentHandlerInterface docReader = new ReutersXMLHandler();
-		
-				gen.writeTopicsWithDocWeightJson(config.resultDir + "/" + config.topicTopWordsFilename,
-						config.resultDir + "/" + config.topicClustersFilename,
-						config.resultDir + "/"+ config.visDataFilename,
-						docReader);
-				
-				System.out.println("generateVisData finished.");
-			}
-			break;
+//			case generateVisData:
+//			{
+//				ReutersMetaData reutersData = new ReutersMetaData(config.resultDir + "/" + config.metaDataFilename);
+//				
+//				TopicDistributions ldaData = new TopicDistributions(config.resultDir + "/" + config.topicsPerDocFilename);
+//
+//				VisDataGenerator gen = new VisDataGenerator(reutersData, ldaData, config.corpusPath);
+//				
+//				DocumentHandlerInterface docReader = new ReutersXMLHandler();
+//		
+//				gen.writeTopicsWithDocWeightJson(config.resultDir + "/" + config.topicTopWordsFilename,
+//						config.resultDir + "/" + config.topicClustersFilename,
+//						config.resultDir + "/"+ config.visDataFilename,
+//						docReader);
+//				
+//				System.out.println("generateVisData finished.");
+//			}
+//			break;
 			case evaluateWordDistributions:
 			{
 				WordDistributions dtmWDs = new WordDistributions(config.numTimesteps,

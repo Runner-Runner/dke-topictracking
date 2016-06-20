@@ -15,7 +15,7 @@ public class Configuration {
 	{
 		generateVocabulary,
 		generateWordCount,
-		generateVisData,
+//		generateVisData,
 		evaluateTopics,
 		evaluateWordDistributions,
 		evaluateDTMTopics,
@@ -49,9 +49,9 @@ public class Configuration {
 	public String outTopicScoresPerTimestepFilename;
 	public String outVisDataFilename;
 			
-	public String topicTopWordsFilename;
-	public String topicClustersFilename;
-	public String visDataFilename;
+//	public String topicTopWordsFilename;
+//	public String topicClustersFilename;
+//	public String visDataFilename;
 	
 //	public String docsPerTopicFilename;
 //	
@@ -165,25 +165,25 @@ public class Configuration {
 				}
 			}
 			break;
-			case generateVisData:
-			{
-				topicTopWordsFilename = prop.getProperty("TopicTopWordsFilename");
-				visDataFilename = prop.getProperty("VisDataFilename");
-				topicClustersFilename = prop.getProperty("TopicClustersFilename");
-
-				if (resultDir == null
-						|| corpusPath == null
-						|| metaDataFilename == null
-						|| topicsPerDocFilename == null
-						|| topicTopWordsFilename == null
-						|| topicClustersFilename == null
-						|| visDataFilename == null)
-				{
-					System.err.println("corpusPath or resultDir missing.");
-					return false;
-				}
-			}
-			break;
+//			case generateVisData:
+//			{
+//				topicTopWordsFilename = prop.getProperty("TopicTopWordsFilename");
+//				visDataFilename = prop.getProperty("VisDataFilename");
+//				topicClustersFilename = prop.getProperty("TopicClustersFilename");
+//
+//				if (resultDir == null
+//						|| corpusPath == null
+//						|| metaDataFilename == null
+//						|| topicsPerDocFilename == null
+//						|| topicTopWordsFilename == null
+//						|| topicClustersFilename == null
+//						|| visDataFilename == null)
+//				{
+//					System.err.println("corpusPath or resultDir missing.");
+//					return false;
+//				}
+//			}
+//			break;
 			case evaluateWordDistributions:
 			{
 				String dtmNumTimestepsString = prop.getProperty("NumTimesteps");

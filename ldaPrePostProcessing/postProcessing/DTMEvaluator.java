@@ -261,8 +261,7 @@ public class DTMEvaluator
 		
 		ArrayList<List<String>> visList = writeVisOutput(allNewDocLists, 
 				allNewTopics,
-				numTimeSteps,
-				"20.8.1996");
+				numTimeSteps);
 		
 		tools.IOTools.writeListMatrixWithoutSpace(visFilename, visList);
 	}
@@ -490,8 +489,7 @@ public class DTMEvaluator
 	 */
 	public ArrayList<List<String>> writeVisOutput(final ArrayList<List<String>> allNewDocLists, 
 			final ArrayList<List<Float>> allNewTopics,
-			final int numTimesteps,
-			final String startDate)
+			final int numTimesteps)
 	{
 		ArrayList<List<String>> outList = new ArrayList<List<String>>();
 
@@ -501,8 +499,42 @@ public class DTMEvaluator
 			return outList;
 		}
 		
+		// yyyymmdd
+		if (dataReuters.getDocDates().size() < 1)
+		{
+			System.err.println("Number of documents == 0 !?");
+			return outList;		
+		}
+		
+		int startDateInt = dataReuters.getDocDate(0);
+		int day = (startDateInt % 100);
+		int month = ((startDateInt % 10000) - day) / 100;
+		int year = (startDateInt - month - day) / 10000;
+		String strDay, strMonth;
+		if (day < 10)
+		{
+			strDay = "0" + day;
+		}
+		else
+		{
+			strDay = "" + day;
+		}
+		if (month < 10)
+		{
+			strMonth = "0" + month;
+		}
+		else
+		{
+			strMonth = "" + month;
+		}
+		String startDate = strDay + "." + strMonth + "." + year;
+		
+		int timeStepLength = dataReuters.getDocDates().size() / numTimeSteps;
+		
 		List<String> date = new ArrayList<String>();
 		date.add(startDate);
+		date.add(",");
+		date.add(timeStepLength + "");
 		outList.add(date);
 		
 		for (int timestep = 0; timestep < numTimesteps; ++timestep)

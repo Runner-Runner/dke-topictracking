@@ -26,7 +26,12 @@ public class Evaluator {
 		System.out.println("[Evaluator] initialization done.");
 	}
 	
-	public void evaluteTopics()
+	/**
+	 * Compare extracted topics to annotations
+	 * 
+	 * @param scoreThreshold for extracted topics to be taken into account
+	 */
+	public void evaluteTopics(float scoreThreshold)
 	{
 		HashMap<String, Integer> mAnnotatedTopicsTopicToIndex = new HashMap<String, Integer>();
 		HashMap<Integer, String> mAnnotatedTopicsIndexToTopic = new HashMap<Integer, String>();
@@ -69,12 +74,15 @@ public class Evaluator {
 			
 			for (Entry<Integer, Float> doc : docsLDA.entrySet())
 			{
-				ArrayList<String> topicsOrig = dataReuters.getTopicsForDocument(doc.getKey());
-				for (String topicOrig : topicsOrig)
+				if (doc.getValue() > scoreThreshold)
 				{
-					int indexTopicOrig = mAnnotatedTopicsTopicToIndex.get(topicOrig);
-					
-					++confusionMatrix[topicLDA][indexTopicOrig];
+					ArrayList<String> topicsOrig = dataReuters.getTopicsForDocument(doc.getKey());
+					for (String topicOrig : topicsOrig)
+					{
+						int indexTopicOrig = mAnnotatedTopicsTopicToIndex.get(topicOrig);
+						
+						++confusionMatrix[topicLDA][indexTopicOrig];
+					}
 				}
 			}
 		}
