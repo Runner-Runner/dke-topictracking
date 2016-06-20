@@ -1,4 +1,4 @@
-package postProcessing;
+package data;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -10,8 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.stream.Stream;
 
-import container.Vocabulary;
-import tools.Utils;
+import postProcessing.Similarities;
+import tools.Tools;
+import wordContainer.Vocabulary;
 
 public class WordDistributions {
 
@@ -122,7 +123,7 @@ public class WordDistributions {
 			wordIdsAndWeigths.put(wordId, topicWords.get(wordId));
 		}
 		
-		wordIdsAndWeigths = Utils.sortByValue(wordIdsAndWeigths);
+		wordIdsAndWeigths = Tools.sortByValue(wordIdsAndWeigths);
 		
 		int topWord = 0;
 		for (Integer wordId : wordIdsAndWeigths.keySet()) 
@@ -236,8 +237,8 @@ public class WordDistributions {
 		
 		for (int timeStep = 0; timeStep < numTimeSteps - 1; ++timeStep) 
 		{
-			double[] currentWD = Utils.convertToArray(getWordDistribution(topicId, timeStep));
-			double[] nextWD = Utils.convertToArray(getWordDistribution(topicId, timeStep + 1));
+			double[] currentWD = Tools.convertToArray(getWordDistribution(topicId, timeStep));
+			double[] nextWD = Tools.convertToArray(getWordDistribution(topicId, timeStep + 1));
 
 			double sim = Similarities.cosineSimilarity(currentWD, nextWD);
 
@@ -290,8 +291,8 @@ public class WordDistributions {
 			if (numWords < 1)
 				numWords = currentWordList.size();
 
-			LinkedHashMap<Integer, Float> wordListA = Utils.convertListToMap(currentWordList);
-			LinkedHashMap<Integer, Float> wordListB = Utils.convertListToMap(nextWordList);
+			LinkedHashMap<Integer, Float> wordListA = Tools.convertListToMap(currentWordList);
+			LinkedHashMap<Integer, Float> wordListB = Tools.convertListToMap(nextWordList);
 
 			int distance = Similarities.indexDistance(wordListA, wordListB, numWords);
 
@@ -314,13 +315,13 @@ public class WordDistributions {
 		
 		for (int currentTopicId = 0; currentTopicId < sizeLDATopics; ++currentTopicId) 
 		{
-			double[] currentWD = Utils.convertToArray(getWordDistribution(currentTopicId, timeStep));
+			double[] currentWD = Tools.convertToArray(getWordDistribution(currentTopicId, timeStep));
 			
 			for (int otherTopicId = 0; otherTopicId < sizeLDATopics; ++otherTopicId) 
 			{
 				if (currentTopicId != otherTopicId)
 				{
-					double[] otherWD = Utils.convertToArray(getWordDistribution(otherTopicId, timeStep));
+					double[] otherWD = Tools.convertToArray(getWordDistribution(otherTopicId, timeStep));
 					
 					double sim = Similarities.cosineSimilarity(currentWD, otherWD);
 					
@@ -351,14 +352,14 @@ public class WordDistributions {
 		for (int currentTopicId = 0; currentTopicId < sizeLDATopics; ++currentTopicId) 
 		{
 			ArrayList<Float> currentWordList = getWordDistribution(currentTopicId, timeStep);
-			LinkedHashMap<Integer, Float> wordListA = Utils.convertListToMap(currentWordList);
+			LinkedHashMap<Integer, Float> wordListA = Tools.convertListToMap(currentWordList);
 			
 			for (int otherTopicId = 0; otherTopicId < sizeLDATopics; ++otherTopicId) 
 			{
 				if (currentTopicId != otherTopicId)
 				{
 					ArrayList<Float> nextWordList = getWordDistribution(otherTopicId, timeStep);
-					LinkedHashMap<Integer, Float> wordListB = Utils.convertListToMap(nextWordList);
+					LinkedHashMap<Integer, Float> wordListB = Tools.convertListToMap(nextWordList);
 					
 					assert(currentWordList.size() == nextWordList.size());
 					

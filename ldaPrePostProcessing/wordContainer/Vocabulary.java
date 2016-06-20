@@ -1,4 +1,4 @@
-package container;
+package wordContainer;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import tools.IOUtils;
+import tools.IOTools;
 
 public class Vocabulary 
 {
@@ -22,6 +22,13 @@ public class Vocabulary
 	final private String filename;
 	final private String filenameSorted;
 	
+	/**
+	 * Corpus vocabulary.
+	 * Loads existing vocabulary from file, if it already exists.
+	 * Access is synchronized for parallelized processing.
+	 * 
+	 * @param outFile
+	 */
 	public Vocabulary(final String outFile)
 	{
 		vocabulary = Collections.synchronizedSet(new LinkedHashSet<String>());
@@ -83,7 +90,7 @@ public class Vocabulary
 			}
 		}
 
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 	}
 	
 	public void saveVocabularySorted()
@@ -105,7 +112,7 @@ public class Vocabulary
 			}
 		}
 
-		IOUtils.saveContentToFile(content, filenameSorted);
+		IOTools.saveContentToFile(content, filenameSorted);
 	}
 	
 

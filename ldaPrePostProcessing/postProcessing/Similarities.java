@@ -3,7 +3,7 @@ package postProcessing;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import tools.Utils;
+import tools.Tools;
 
 public class Similarities {
 
@@ -23,12 +23,20 @@ public class Similarities {
 		return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 	}
 	
+	// Should take the full vector and normalize by length!
+	/**
+	 * 
+	 * @param mapA
+	 * @param mapB
+	 * @param numIndices
+	 * @return
+	 */
 	public static int indexDistance(HashMap<Integer, Float> mapA, 
 			HashMap<Integer, Float> mapB,
 			int numIndices)
 	{
-		LinkedHashMap<Integer, Float> mapASorted = Utils.sortByValue(mapA);
-		LinkedHashMap<Integer, Float> mapBSorted = Utils.sortByValue(mapB);
+		LinkedHashMap<Integer, Float> mapASorted = Tools.sortByValue(mapA);
+		LinkedHashMap<Integer, Float> mapBSorted = Tools.sortByValue(mapB);
 		
 		ArrayList<Integer> indicesA = new ArrayList<Integer>(mapASorted.keySet());
 		ArrayList<Integer> indicesB = new ArrayList<Integer>(mapBSorted.keySet());

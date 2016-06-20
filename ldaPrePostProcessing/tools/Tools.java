@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class Utils {
+public class Tools {
 
 	public static <K, V extends Comparable<? super V>> LinkedHashMap<K, V> 
     sortByValue( Map<K, V> map )

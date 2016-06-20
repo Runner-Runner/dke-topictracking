@@ -1,4 +1,4 @@
-package container;
+package wordContainer;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.stream.Stream;
 
-import tools.IOUtils;
+import tools.IOTools;
 
 public class Dictionary {
 	
@@ -22,6 +22,11 @@ public class Dictionary {
 		return dictionary;
 	}
 
+	/**
+	 * Spell checking dictionary.
+	 * 
+	 * @param filename
+	 */
 	public Dictionary(final String filename)
 	{
 		dictionary = new HashSet<String>();
@@ -73,6 +78,6 @@ public class Dictionary {
 			content += word + "\n";
 		}
 
-		IOUtils.saveContentToFile(content, fileName);
+		IOTools.saveContentToFile(content, fileName);
 	}
 }

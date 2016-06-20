@@ -15,14 +15,19 @@ import java.util.stream.Stream;
 
 import javax.sound.midi.Synthesizer;
 
+import org.omg.Messaging.SyncScopeHelper;
+
 import app.Configuration;
-import container.Vocabulary;
-import tools.IOUtils;
-import tools.Utils;
+import data.MetaDataInterface;
+import data.TopicDistributions;
+import data.WordDistributions;
+import tools.IOTools;
+import tools.Tools;
+import wordContainer.Vocabulary;
 
 public class DTMEvaluator 
 {
-	final ReutersMetaData dataReuters;
+	final MetaDataInterface dataReuters;
 	
 	final TopicDistributions topicDistributions;
 
@@ -30,7 +35,15 @@ public class DTMEvaluator
 	
 	final int numTimeSteps;
 
-	public DTMEvaluator(final ReutersMetaData dataReuters,
+	/**
+	 * Postprocessing of LDA output data.
+	 * 
+	 * @param dataReuters
+	 * @param td
+	 * @param wd
+	 * @param numTimeSteps
+	 */
+	public DTMEvaluator(final MetaDataInterface dataReuters,
 			final TopicDistributions td,
 			final WordDistributions wd,
 			final int numTimeSteps) 
@@ -167,7 +180,8 @@ public class DTMEvaluator
 			final float[][] timestepTopics,
 			final String docsFilename,
 			final String wordsFilename,
-			final String topicsFilename)
+			final String topicsFilename,
+			final String visFilename)
 	{
 		LinkedList<String> vocabularyList = vocabulary.getAsList();
 		
@@ -235,15 +249,22 @@ public class DTMEvaluator
 		
 		System.out.println("[findDocs] num topics: " + allNewDocLists.size());
 		
-		tools.IOUtils.writeListMatrix(docsFilename, allNewDocLists);
+		tools.IOTools.writeListMatrix(docsFilename, allNewDocLists);
 		
 		System.out.println("[findWords] num topics: " + allNewWordLists.size());
 		
-		tools.IOUtils.writeListMatrix(wordsFilename, allNewWordLists);
+		tools.IOTools.writeListMatrix(wordsFilename, allNewWordLists);
 				
 		System.out.println("[findTopics] num topics: " + allNewTopics.size());
 		
-		tools.IOUtils.writeListMatrix(topicsFilename, allNewTopics);
+		tools.IOTools.writeListMatrix(topicsFilename, allNewTopics);
+		
+		ArrayList<List<String>> visList = writeVisOutput(allNewDocLists, 
+				allNewTopics,
+				numTimeSteps,
+				"20.8.1996");
+		
+		tools.IOTools.writeListMatrixWithoutSpace(visFilename, visList);
 	}
 	
 	/**
@@ -332,7 +353,7 @@ public class DTMEvaluator
 	 */
 	private ArrayList<List<String>> getDocs(ArrayList<List<String>> allNewDocLists,
 			final ArrayList<Integer> pointsOfChange,
-			final int numTopDocs,
+			int numTopDocs,
 			final int topicId)
 	{
 		// list of existing topic and possible spinoffs
@@ -340,8 +361,11 @@ public class DTMEvaluator
 
 		// get documents and sort them by score
 		HashMap<Integer, Float> docs = topicDistributions.getDocumentsAndWeightsForTopic(topicId);
-		docs = Utils.sortByValue(docs);
+		docs = Tools.sortByValue(docs);
 
+		if (numTopDocs < 1)
+			numTopDocs = docs.size();
+		
 		// get document dates
 		ArrayList<Integer> docDates = dataReuters.getDocDates();
 		int timeStepLength = docDates.size() / numTimeSteps;
@@ -354,13 +378,7 @@ public class DTMEvaluator
 			Iterator<Integer> keys = docs.keySet().iterator();
 			while (topDocs > 0 && keys.hasNext())
 			{
-				String articeId = dataReuters.getDocName(keys.next());
-				
-				//articeId.replaceFirst("^0*", "");
-				articeId = tools.Utils.removeLeadingZeros(articeId);
-				articeId += ".xml";
-				
-				newDocList.add(articeId);
+				newDocList.add(dataReuters.getDocFilename(keys.next()));
 				--topDocs;
 			}
 			//						for (Integer docId : docs.keySet())
@@ -395,13 +413,7 @@ public class DTMEvaluator
 					int docId = keys.next();
 					if (docId >= firstDate && docId < (firstDate + numDates))
 					{
-						String articeId = dataReuters.getDocName(docId);
-						
-						//articeId.replaceFirst("^0*", "");
-						articeId = tools.Utils.removeLeadingZeros(articeId);
-						articeId += ".xml";
-						
-						newDocList.add(articeId);
+						newDocList.add(dataReuters.getDocFilename(docId));
 						--topDocs;
 					}
 				}
@@ -471,6 +483,63 @@ public class DTMEvaluator
 		}
 		
 		return allNewTopics;
+	}
+	
+	/**
+	 * 
+	 */
+	public ArrayList<List<String>> writeVisOutput(final ArrayList<List<String>> allNewDocLists, 
+			final ArrayList<List<Float>> allNewTopics,
+			final int numTimesteps,
+			final String startDate)
+	{
+		ArrayList<List<String>> outList = new ArrayList<List<String>>();
+
+		if (allNewDocLists.size() != allNewTopics.size())
+		{
+			System.err.println("Number of topics do not match.");
+			return outList;
+		}
+		
+		List<String> date = new ArrayList<String>();
+		date.add(startDate);
+		outList.add(date);
+		
+		for (int timestep = 0; timestep < numTimesteps; ++timestep)
+		{
+			List<String> row = new ArrayList<String>();
+			for (int topicId = 0; topicId < allNewTopics.size(); ++topicId)
+			{
+				row.add(allNewTopics.get(topicId).get(timestep).toString());
+				row.add(":");
+				
+				// name is changed to filename by now, no longer retrievable.
+				// get document dates
+//				ArrayList<Integer> docDates = dataReuters.getDocDates();
+//				int timeStepLength = docDates.size() / numTimeSteps;
+//				
+//				int firstDocFromDate = timestep * timeStepLength;
+//				int tastDocFromDate = firstDocFromDate + timeStepLength;
+				
+				List<String> docs = allNewDocLists.get(topicId);
+				for (int docPos = 0; docPos < docs.size(); ++docPos)
+				{
+					String doc = docs.get(docPos);
+//					int docId = dataReuters.getDocIdForName(doc);
+//					if (docId >= firstDocFromDate && docId < lastDocFromDate)
+//					{
+//					}
+					row.add(doc);
+					
+					if (docPos != (docs.size() - 1))
+						row.add(",");
+				}
+				row.add(";");
+			}
+			outList.add(row);
+		}
+		
+		return outList;
 	}
 	
 	/**
@@ -560,7 +629,7 @@ public class DTMEvaluator
 		}
 		
 		System.out.println("[DTMEvaluator::writeTopicsWithDocsPerTime] Saving topics with number of docs to " + filename);
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 	}
 	
 	/**
@@ -576,7 +645,7 @@ public class DTMEvaluator
 		{
 			//ArrayList<Integer> docs = liLDATopicsToDocs.get(index);
 			HashMap<Integer, Float> docs = topicDistributions.getDocumentsAndWeightsForTopic(index);
-			docs = Utils.sortByValue(docs);
+			docs = Tools.sortByValue(docs);
 			
 			content += docs.size();
 			
@@ -595,6 +664,6 @@ public class DTMEvaluator
 		}
 		
 		System.out.println("[DTMEvaluator::writeTopicsWithDocWeight] Saving topics with number of docs to " + filename);
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 	}
 }

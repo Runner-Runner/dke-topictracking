@@ -1,16 +1,18 @@
 package app;
 
 
-import container.Vocabulary;
+import data.DocumentHandlerInterface;
+import data.ReutersMetaData;
+import data.ReutersXMLHandler;
+import data.TopicDistributions;
+import data.WordDistributions;
 import edu.stanford.nlp.io.IOUtils;
-import postProcessing.ReutersMetaData;
-import postProcessing.TopicDistributions;
 import postProcessing.DTMEvaluator;
-import postProcessing.WordDistributions;
 import postProcessing.Evaluator;
 import postProcessing.VisDataGenerator;
-import preProcessing.CorpusProcessor;
+import preProcessing.PreProcessor;
 import preProcessing.WordCounter;
+import wordContainer.Vocabulary;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,20 +61,20 @@ public class Application {
 			else
 			{
 				System.out.println("Application parameters defining operation mode (use one at a time):");
-				System.out.println("-generateVocabulary");
-				System.out.println("-generateWordcount");
-				System.out.println("-evaluate");
-				System.out.println("-generateVisData");
-				System.out.println("-evaluateDTM");
-				System.out.println("-evaluateWordDistributions");
-				System.out.println("See the config.properties for more information.");
+				System.out.println("-generateVocabulary\t\tGenerate vocabulary and intermediate document text files.");
+				System.out.println("-generateWordcount\t\tGenerate word counts from vocabulary and intermediate document text files.");
+				System.out.println("-evaluateDTM\t\t\tGenerate output for further processing like topic scores, word and document lists.");
+//				System.out.println("-evaluate\t\t\tbla");
+//				System.out.println("-generateVisData\t\tbla");
+//				System.out.println("-evaluateWordDistributions\tbla");
+				System.out.println("See the resources/config.properties for more information.");
 				return;
 			}
         }
 		
 		if (!config.loadConfig(propFileName))
 		{
-			System.out.println("Configuration error.");
+			System.err.println("Configuration error.");
 			return;
 		}
 		
@@ -85,12 +87,16 @@ public class Application {
 			{
 				try
 				{
-					CorpusProcessor p = new CorpusProcessor(
+					DocumentHandlerInterface docReader = new ReutersXMLHandler();
+					
+					PreProcessor p = new PreProcessor(
 							config.corpusPath,
 							config.resultDir,
 							config.stopwordsFile,
 							config.dictionaryFile,
-							config.vocabularyFilenameBase);
+							config.nerExclusionCategories,
+							config.vocabularyFilenameBase,
+							docReader);
 					//p.processDocuments(".text");
 					//p.processDocuments("2286newsML.text");
 					
@@ -109,8 +115,15 @@ public class Application {
 			{
 				Vocabulary vocabulary = new Vocabulary(config.resultDir + "/" + config.vocabularyFilenameBase);
 				
-				WordCounter wc = new WordCounter(config.resultDir, vocabulary);
+				WordCounter wc = new WordCounter(config.resultDir, 
+						config.dataFilenameBase,
+						vocabulary);
 				wc.processDocuments(".txt");
+				
+				ReutersMetaData reutersData = new ReutersMetaData(config.resultDir + "/" + config.metaDataFilename);
+				
+				reutersData.generateTimestepFile(config.resultDir + "/" + config.dataFilenameBase + "-seq.dat",
+						config.numTimesteps);
 				
 				System.out.println("generateWordCount finished.");
 			}
@@ -135,36 +148,53 @@ public class Application {
 				TopicDistributions ldaData = new TopicDistributions(config.resultDir + "/" + config.topicsPerDocFilename);
 
 				VisDataGenerator gen = new VisDataGenerator(reutersData, ldaData, config.corpusPath);
+				
+				DocumentHandlerInterface docReader = new ReutersXMLHandler();
 		
 				gen.writeTopicsWithDocWeightJson(config.resultDir + "/" + config.topicTopWordsFilename,
 						config.resultDir + "/" + config.topicClustersFilename,
-						config.resultDir + "/"+ config.visDataFilename);
+						config.resultDir + "/"+ config.visDataFilename,
+						docReader);
 				
 				System.out.println("generateVisData finished.");
 			}
 			break;
 			case evaluateWordDistributions:
 			{
-				WordDistributions dtmWDs = new WordDistributions(config.dtmNumTimesteps,
-						config.resultDir + "/" + config.dtmTopicWordDistributions);
+				WordDistributions dtmWDs = new WordDistributions(config.numTimesteps,
+						config.resultDir + "/" + config.wordsPerTopicsFilename);
 				
 				String filename = config.resultDir + "/" + config.IntraTopicSimilaritiesFilename;
 				
-				System.out.println("computing IntraTopicDistances.");
+				boolean distanceInsteadOfSimilarity = false;
 				
-				//tools.IOUtils.writeDoubleMatrix(filename, dtmWDs.computeIntraTopicSimilarities());
-				tools.IOUtils.writeIntMatrix(filename, dtmWDs.computeIntraTopicDistances(10));
+				if (distanceInsteadOfSimilarity)
+				{
+					System.out.println("computing IntraTopicDistances.");
+					tools.IOTools.writeIntMatrix(filename, dtmWDs.computeIntraTopicDistances(config.numTopWords));
+				}
+				else
+				{
+					System.out.println("computing IntraTopicSimilarities.");
+					tools.IOTools.writeDoubleMatrix(filename, dtmWDs.computeIntraTopicSimilarities());
+				}
 				
 				filename = config.resultDir + "/" + config.InterTopicSimilaritiesFilename;
 
-				System.out.println("computing InterTopicDistances.");
-				
 				int timeStep = 0;
-//				double[][] interTopipcSimiliarity = dtmWDs.computeInterTopicSimilarities(timeStep);
-//				tools.IOUtils.writeDoubleMatrix(filename, interTopipcSimiliarity);
-				
-				int[][] interTopipcSimiliarity = dtmWDs.computeInterTopicDistances(timeStep, 10);
-				tools.IOUtils.writeIntMatrix(filename, interTopipcSimiliarity);
+
+				if (distanceInsteadOfSimilarity)
+				{
+					System.out.println("computing InterTopicDistances.");
+					int[][] interTopipcSimiliarity = dtmWDs.computeInterTopicDistances(timeStep, config.numTopWords);
+					tools.IOTools.writeIntMatrix(filename, interTopipcSimiliarity);
+				}
+				else
+				{
+					System.out.println("computing InterTopicSimilarities.");
+					double[][] interTopipcSimiliarity = dtmWDs.computeInterTopicSimilarities(timeStep);
+					tools.IOTools.writeDoubleMatrix(filename, interTopipcSimiliarity);
+				}
 				
 				System.out.println("evaluateWordDistributions finished.");
 
@@ -176,10 +206,10 @@ public class Application {
 				
 				TopicDistributions ldaData = new TopicDistributions(config.resultDir + "/" + config.topicsPerDocFilename);
 
-				WordDistributions wordData = new WordDistributions(config.dtmNumTimesteps,
-						config.resultDir + "/" + config.dtmTopicWordDistributions);
+				WordDistributions wordData = new WordDistributions(config.numTimesteps,
+						config.resultDir + "/" + config.wordsPerTopicsFilename);
 				
-				DTMEvaluator eva = new DTMEvaluator(reutersData, ldaData, wordData, config.dtmNumTimesteps);
+				DTMEvaluator eva = new DTMEvaluator(reutersData, ldaData, wordData, config.numTimesteps);
 				
 				Vocabulary vocabulary = new Vocabulary(config.resultDir + "/" + config.vocabularyFilenameBase);
 				
@@ -189,15 +219,15 @@ public class Application {
 				
 				eva.addTopics(topicSimilarities,
 						config.similarityTreshold,
-						config.numTopWords,
+						config.numTopDocs,
 						vocabulary, 
 						config.numTopWords,
 						timestepTopics,
-						config.resultDir + "/topicTopDocs3.txt",
-						config.resultDir + "/topicTopWords3.txt",
-						config.resultDir + "/topics3.txt");
-				
-				
+						config.resultDir + "/" + config.outDocsPerTopicFilename,
+						config.resultDir + "/" + config.outWordsPerTopicFilename,
+						config.resultDir + "/" + config.outTopicScoresPerTimestepFilename,
+						config.resultDir + "/" + config.outVisDataFilename);
+
 				
 //				eva.writeTopicsWithDocWeight(config.resultDir + "/" + config.docsPerTopicFilename);
 
@@ -227,9 +257,9 @@ public class Application {
 					topicNamesTimesteppd[i][0] = topicNames[i];
 				}
 				
-				float[][] timestepTopics = reutersData.computeAnnotatedTopicsWithDocsPerTime(config.dtmNumTimesteps);
+				float[][] timestepTopics = reutersData.computeAnnotatedTopicsWithDocsPerTime(config.numTimesteps);
 				
-				tools.IOUtils.writeTimestepTopicsAsJason(config.resultDir + "/topics_a.js", topicNamesTimesteppd, timestepTopics);
+				tools.IOTools.writeTimestepTopicsAsJason(config.resultDir + "/topics_a.js", topicNamesTimesteppd, timestepTopics);
 				
 				System.out.println("DTM topic evaluation finished.");
 			}

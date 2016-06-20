@@ -18,9 +18,13 @@ import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import preProcessing.ReutersXMLHandler;
-import tools.IOUtils;
-import tools.Utils;
+import data.DocumentHandlerInterface;
+import data.MetaDataInterface;
+import data.ReutersMetaData;
+import data.ReutersXMLHandler;
+import data.TopicDistributions;
+import tools.IOTools;
+import tools.Tools;
 
 public class VisDataGenerator {
 
@@ -37,7 +41,7 @@ public class VisDataGenerator {
 //	HashMap<Integer, HashMap<Integer, Double> > mLDADocumentsPerTopic;
 //	HashMap<String, ArrayList<Integer> > liOrigTopicsToDocs;
 
-	ReutersMetaData dataReuters;
+	MetaDataInterface dataReuters;
 	
 	TopicDistributions dataLDA;
 
@@ -45,7 +49,7 @@ public class VisDataGenerator {
 
 	private Integer indexCounter = 0;
 
-	public VisDataGenerator(ReutersMetaData dataReuters,
+	public VisDataGenerator(MetaDataInterface dataReuters,
 			TopicDistributions dataLDA,
 			final String corpusDir)
 	{
@@ -64,7 +68,8 @@ public class VisDataGenerator {
 	
 	public void writeTopicsWithDocWeightJson(final String topicWordsFilename, 
 			final String topicClusterFilename, 
-			final String filename)
+			final String filename,
+			DocumentHandlerInterface docReader)
 	{
 		HashMap<Integer, String> topicsToClusters = new HashMap<Integer, String>();
 		if (Files.exists(Paths.get(topicClusterFilename))) 
@@ -90,7 +95,7 @@ public class VisDataGenerator {
 			return;
 		}
 		
-		HashMap<Integer, String>  topicsToClustersSorted = Utils.sortByValue(topicsToClusters);
+		HashMap<Integer, String>  topicsToClustersSorted = Tools.sortByValue(topicsToClusters);
 		
 		final HashMap<String, ArrayList<Integer> > clustersToTopics = new HashMap<String, ArrayList<Integer> >();
 		
@@ -172,7 +177,7 @@ public class VisDataGenerator {
 				topicsByCluster.put(topic, numDocs);
 			}
 			
-			topicsByCluster = Utils.sortByValue(topicsByCluster);
+			topicsByCluster = Tools.sortByValue(topicsByCluster);
 
 			String clusterContent = "";
 			
@@ -215,7 +220,7 @@ public class VisDataGenerator {
 				clusterContent += "\t\t\"weight\": " + numDocs + ",\n";// comma here because groups are following now
 				
 				HashMap<Integer, Float> docs = dataLDA.getDocumentsAndWeightsForTopic(topic);
-				docs = Utils.sortByValue(docs);
+				docs = Tools.sortByValue(docs);
 
 				clusterContent += "\t\t\"groups\": [\n";
 
@@ -228,7 +233,7 @@ public class VisDataGenerator {
 					int weight = (int) Math.round(entry.getValue());
 					String docName = dataReuters.getDocName(id);
 
-					String docContent = getDocumentText(docName + ".xml");
+					String docContent = getDocumentText(docReader,docName + ".xml");
 					
 					for (String word : topicWords)
 					{
@@ -265,7 +270,7 @@ public class VisDataGenerator {
 			// Do not mess the order if there was only one topic
 			if( mTopCLusterWords.size() > 1)
 			{
-				mTopCLusterWords = Utils.sortByValue(mTopCLusterWords);
+				mTopCLusterWords = Tools.sortByValue(mTopCLusterWords);
 			}
 			
 			Object[] aTopCLusterWords = mTopCLusterWords.keySet().toArray();
@@ -291,7 +296,7 @@ public class VisDataGenerator {
 		content += "]\n";
 		
 		System.out.println("[VisDataGenerator::writeTopicsWithDocWeightJson] Saving topics with number of docs to " + filename);
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 
 //		PrintWriter writer;
 //		try 
@@ -398,7 +403,7 @@ public class VisDataGenerator {
 			topicsByNumberOfDocs.put(entry.getKey(), entry.getValue().size());
 		}
 		
-		topicsByNumberOfDocs = Utils.sortByValue(topicsByNumberOfDocs);
+		topicsByNumberOfDocs = Tools.sortByValue(topicsByNumberOfDocs);
 		
 		PrintWriter writer;
 		try 
@@ -427,7 +432,8 @@ public class VisDataGenerator {
 		
 	}
 	
-	public String getDocumentText(final String fileName)
+	public String getDocumentText(DocumentHandlerInterface docReader,
+			final String fileName)
 	{
 		String text = "";
 		
@@ -439,7 +445,7 @@ public class VisDataGenerator {
 			
 			if (file.isPresent())
 			{
-				text = ReutersXMLHandler.readXMLDocumentText(file.get(), true);
+				text = docReader.readDocumentText(file.get(), true);
 			}
 		} 
 		catch (IOException e)

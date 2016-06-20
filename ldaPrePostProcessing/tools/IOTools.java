@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-public class IOUtils {
+public class IOTools {
 
 	public static  void saveContentToFile(final String content, final String fileName)
 	{
@@ -26,6 +26,24 @@ public class IOUtils {
 		}
 	}
 	
+	public static <T> void writeListMatrixWithoutSpace(final String filename,
+			final List<List<T>> data)
+	{
+		String content = "";
+
+		for (List<T> list : data)
+		{
+			for (T item : list)
+			{
+				content += item;
+			}
+			content += "\n";
+		}
+		
+		System.out.println("[IOUtils::writeListMatrix] Saving data to " + filename);
+		IOTools.saveContentToFile(content, filename);
+	}
+	
 	public static <T> void writeListMatrix(final String filename,
 			final List<List<T>> data)
 	{
@@ -41,7 +59,7 @@ public class IOUtils {
 		}
 		
 		System.out.println("[IOUtils::writeListMatrix] Saving data to " + filename);
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 	}
 	
 	public static void writeIntegerHashListMatrix(final String filename,
@@ -59,7 +77,7 @@ public class IOUtils {
 		}
 
 		System.out.println("[IOUtils::writeIntegerListMatrix] Saving data to " + filename);
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 	}
 	
 	public static void writeIntegerListMatrix(final String filename,
@@ -79,7 +97,7 @@ public class IOUtils {
 		}
 
 		System.out.println("[IOUtils::writeIntegerListMatrix] Saving data to " + filename);
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 	}
 	
 	public static void writeDoubleMatrix(final String filename,
@@ -97,7 +115,7 @@ public class IOUtils {
 		}
 
 		System.out.println("[IOUtils::writeDoubleMatrix] Saving data to " + filename);
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 	}
 	
 	public static void writeFloatMatrix(final String filename,
@@ -115,7 +133,7 @@ public class IOUtils {
 		}
 
 		System.out.println("[IOUtils::writeFloatMatrix] Saving data to " + filename);
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 	}
 	
 	public static void writeIntMatrix(final String filename,
@@ -133,7 +151,7 @@ public class IOUtils {
 		}
 
 		System.out.println("[IOUtils::writeDoubleMatrix] Saving data to " + filename);
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 	}
 	
 	public static void writeTopicTopWords(final String filename, 
@@ -151,7 +169,7 @@ public class IOUtils {
 		}
 
 		System.out.println("[IOUtils::writeTopicTopWords] Saving data to " + filename);
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 	}
 	
 	public static void writeTimestepTopicsAsJason(final String filename,
@@ -185,7 +203,7 @@ public class IOUtils {
 		String content = "var data = [" + String.join(",", topicStrings) + "];";
 
 		System.out.println("[IOUtils::writeTimestepTopicsAsJason] Saving data to " + filename);
-		IOUtils.saveContentToFile(content, filename);
+		IOTools.saveContentToFile(content, filename);
 		
 //		List<String> waveData = new ArrayList<>();
 //	    for (TopicWave wave : waves)

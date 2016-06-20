@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-import container.Dictionary;
-import container.Vocabulary;
+import data.DocumentHandlerInterface;
+import data.ReutersXMLHandler;
 import edu.stanford.nlp.dcoref.CorefChain;
 import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.*;
@@ -24,9 +24,11 @@ import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcess
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
-import tools.IOUtils;
+import tools.IOTools;
+import wordContainer.Dictionary;
+import wordContainer.Vocabulary;
 
-public class CorpusProcessor 
+public class PreProcessor 
 {
 
 	final private String corpusPath;
@@ -40,6 +42,8 @@ public class CorpusProcessor
 	final private String docFilename = "docs";
 	
 	final private String metaDataFilename = "metadata.txt";
+	
+	private DocumentHandlerInterface docReader;
 	
 	private Vocabulary vocabulary;
 	
@@ -62,15 +66,32 @@ public class CorpusProcessor
 	private int numTokens;
 	private int numCorrections;
 
-	public CorpusProcessor(final String corpusDir, 
+	/**
+	 * Corpus document preprocessor
+	 * Creates output directories, if they do not exist.
+	 * 
+	 * @param corpusDir
+	 * @param resultDir
+	 * @param stopwordsFile
+	 * @param dicFile
+	 * @param nerExclusionCategories
+	 * @param vocFilename
+	 * @param docReader
+	 * @throws Exception
+	 */
+	public PreProcessor(final String corpusDir, 
 			final String resultDir, 
 			final String stopwordsFile, 
 			final String dicFile,
-			final String vocFilename) 
+			final List<String> nerExclusionCategories,
+			final String vocFilename,
+			DocumentHandlerInterface docReader) 
 					throws Exception
 	{
 		this.corpusPath = corpusDir;
 		this.resultPath = resultDir;
+		
+		this.docReader = docReader;
 		
 		if (!Files.exists(Paths.get(resultDir)))
 		{
@@ -96,19 +117,25 @@ public class CorpusProcessor
 		stopWords = new Dictionary(stopwordsFile);
 
 		NEExcludedCategories = new HashSet<String>();
-		NEExcludedCategories.add("DATE");
-		NEExcludedCategories.add("DURATION");
-//		NEExcludedCategories.add("LOCATION");
-//		NEExcludedCategories.add("MISC");
-		NEExcludedCategories.add("MONEY");
-		NEExcludedCategories.add("NUMBER");
-//		NEExcludedCategories.add("O");
-		NEExcludedCategories.add("ORDINAL");
-//		NEExcludedCategories.add("ORGANIZATION");
-		NEExcludedCategories.add("PERCENT");
-//		NEExcludedCategories.add("PERSON");
-		NEExcludedCategories.add("TIME");
-		NEExcludedCategories.add("SET");
+		
+		for (String category : nerExclusionCategories)
+		{
+			NEExcludedCategories.add(category.trim());
+		}
+		
+//		NEExcludedCategories.add("DATE");
+//		NEExcludedCategories.add("DURATION");
+////		NEExcludedCategories.add("LOCATION");
+////		NEExcludedCategories.add("MISC");
+//		NEExcludedCategories.add("MONEY");
+//		NEExcludedCategories.add("NUMBER");
+////		NEExcludedCategories.add("O");
+//		NEExcludedCategories.add("ORDINAL");
+////		NEExcludedCategories.add("ORGANIZATION");
+//		NEExcludedCategories.add("PERCENT");
+////		NEExcludedCategories.add("PERSON");
+//		NEExcludedCategories.add("TIME");
+//		NEExcludedCategories.add("SET");
 				
 		vocabulary = new Vocabulary(resultDir + "/" + vocFilename);
 		
@@ -123,7 +150,7 @@ public class CorpusProcessor
 		liDocData = new LinkedList<String>();
 	}
 	
-	public String readDocument(final Path filePath)
+	private String readDocument(final Path filePath)
 	{
 		try 
 		{
@@ -137,9 +164,13 @@ public class CorpusProcessor
 		}
 	}
 	
-	
-	
-	public String getLemmas(final String text)
+	/**
+	 * Main NLP processing
+	 * 
+	 * @param text	raw document text
+	 * @return refined text
+	 */
+	private String getLemmas(final String text)
 	{
 		String processedText = "";
 		
@@ -206,29 +237,29 @@ public class CorpusProcessor
 		return processedText;
 	}
 	
-	public void saveProcessedText(final Path filePath, 
+	private void saveProcessedText(final Path filePath, 
 			final String document)
 	{
 		String filename = filePath.getFileName().toString().split("\\.")[0];
 		
 		String outFile = processedDocsPath + "/" + filename + ".txt";
 		
-		IOUtils.saveContentToFile(document, outFile);
+		IOTools.saveContentToFile(document, outFile);
 	}
 	
 	public void processDocument(final Path filePath)
 	{
-		String text = ReutersXMLHandler.readXMLDocumentText(filePath, false);
-//		String text = readDocument(filePath);
-//		
+		String text = docReader.readDocumentText(filePath, false);
+		//String text = readDocument(filePath);
+		
 		String processedText = getLemmas(text);
-//		
+		
 		saveProcessedText(filePath, processedText);
 	}
 	
 	public void processDocumentMeta(final Path filePath)
 	{
-        String metaData = ReutersXMLHandler.readXMLDocumentMeta(filePath);
+        String metaData = docReader.readDocumentMetaData(filePath);
         
         //System.out.println("metadata: " + data);
         liDocData.add(metaData);
@@ -288,7 +319,7 @@ public class CorpusProcessor
 		tokenVocabulary.saveVocabularySorted();
 	}
 	
-	public void saveMetaData(final String fileName)
+	private void saveMetaData(final String fileName)
 	{
 		System.out.println("[CorpusProcessor::saveMetaData] Saving metadata to " + fileName);
 
@@ -301,7 +332,7 @@ public class CorpusProcessor
 			content += data + "\n";
 		}
 
-		IOUtils.saveContentToFile(content, fileName);
+		IOTools.saveContentToFile(content, fileName);
 	}
 	
 	private String spellCheck(final String word, 

@@ -15,29 +15,33 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import container.Vocabulary;
+import wordContainer.Vocabulary;
 
 public class WordCounter {
 	private LinkedList<LinkedHashMap<Integer, Integer>> documents;
 	private LinkedList<String> vocabulary; // word -> index
 	final private String corpusPath;
 	final private String resultDir;
-	final private String resultFilename = "wc.txt";
+	final private String wordCountFilename;
 
-	public WordCounter(final String resultDir, final Vocabulary vocabulary)
+	public WordCounter(final String resultDir,
+			final String dataFilenameBase,
+			final Vocabulary vocabulary)
 	{
 		this.resultDir = resultDir;
 		this.corpusPath = resultDir + "/processedDocs";
+		
+		this.wordCountFilename = dataFilenameBase + "-mult.dat";
 
 		this.vocabulary = vocabulary.getAsList();
 		
 		documents = new LinkedList<LinkedHashMap<Integer, Integer>>();
 		
-		if (Files.exists(Paths.get(resultDir + "/" + resultFilename))) 
+		if (Files.exists(Paths.get(resultDir + "/" + wordCountFilename))) 
 		{
-			try (Stream<String> lines = Files.lines(Paths.get(resultDir + "/" + resultFilename), Charset.defaultCharset()))
+			try (Stream<String> lines = Files.lines(Paths.get(resultDir + "/" + wordCountFilename), Charset.defaultCharset()))
 			{
-				System.out.println("[WordCounter] Loading existing word counts from " + resultDir + "/" + resultFilename);
+				System.out.println("[WordCounter] Loading existing word counts from " + resultDir + "/" + wordCountFilename);
 				
 				lines.forEachOrdered(doc -> readCounts(doc));
 			} 
@@ -48,6 +52,11 @@ public class WordCounter {
 		}
 	}
 	
+	/**
+	 * Read word counts of previously analyzed documents from existing file
+	 * 
+	 * @param doc	word count filename
+	 */
 	private void readCounts(String doc)
 	{
 		String[] words = doc.split(" ");
@@ -76,6 +85,12 @@ public class WordCounter {
 		}
 	}
 	
+	/**
+	 * Count words from vocabulary in document text
+	 * and add result to global document list
+	 * 
+	 * @param text	document text
+	 */
 	private void count(final String text)
 	{
 		LinkedHashMap<Integer, Integer> currentDocument = new LinkedHashMap<Integer, Integer>();
@@ -106,6 +121,12 @@ public class WordCounter {
 		documents.add(currentDocument);
 	}
 
+	/**
+	 * Read document text from file
+	 * 
+	 * @param filePath
+	 * @return
+	 */
 	private String readDocument(final Path filePath)
 	{
 		try 
@@ -120,6 +141,11 @@ public class WordCounter {
 		}
 	}
 
+	/**
+	 * Process single document, i.e. read text from file and count words.
+	 * 
+	 * @param filePath
+	 */
 	public void processDocument(final Path filePath)
 	{
 		String text = readDocument(filePath);
@@ -127,6 +153,11 @@ public class WordCounter {
 		count(text);
 	}
 
+	/**
+	 * Proces all documents in resultDir/processedDocs with file ending extension, e.g. ".txt".
+	 * 
+	 * @param extension
+	 */
 	public void processDocuments(final String extension)
 	{
 		try (Stream<Path> paths = Files.walk(Paths.get(corpusPath))) 
@@ -146,15 +177,18 @@ public class WordCounter {
 		saveWordCounts();
 	}
 	
+	/**
+	 * Save the word counts for all documents to the output file in LDA input format.
+	 */
 	public void saveWordCounts()
 	{
 		// has to be done linewise, writing everything as one whole string is too much !
 		PrintWriter writer;
 		try 
 		{
-			writer = new PrintWriter(resultDir + "/" + resultFilename, "UTF-8");
+			writer = new PrintWriter(resultDir + "/" + wordCountFilename, "UTF-8");
 			
-			System.out.println("[WordCounter::saveWordCounts] Saving word counts to " + resultDir + "/" + resultFilename);
+			System.out.println("[WordCounter::saveWordCounts] Saving word counts to " + resultDir + "/" + wordCountFilename);
 
 			Iterator<LinkedHashMap<Integer, Integer>> it = documents.iterator();
 			while (it.hasNext())

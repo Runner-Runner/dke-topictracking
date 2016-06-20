@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import data.ReutersMetaData;
+import data.TopicDistributions;
+
 
 public class Evaluator {
 

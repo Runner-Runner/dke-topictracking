@@ -1,4 +1,4 @@
-package preProcessing;
+package data;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -13,9 +13,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class ReutersXMLHandler {
+public class ReutersXMLHandler implements DocumentHandlerInterface {
 
-	public static String readXMLDocumentText(final Path filePath,
+	public String readDocumentText(final Path filePath,
 			final boolean asHTML)
 	{
 	            	
@@ -104,7 +104,7 @@ public class ReutersXMLHandler {
 		return text;
 	}
 	
-	public static String readXMLDocumentMeta(final Path filePath)
+	public String readDocumentMetaData(final Path filePath)
 	{
 		String data = filePath.getFileName().toString().split("\\.")[0];
 		

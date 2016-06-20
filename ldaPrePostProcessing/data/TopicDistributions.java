@@ -1,4 +1,4 @@
-package postProcessing;
+package data;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import tools.IOUtils;
+import tools.IOTools;
 
 public class TopicDistributions {
 

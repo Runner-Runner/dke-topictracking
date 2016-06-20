@@ -1,4 +1,4 @@
-package postProcessing;
+package data;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -12,10 +12,14 @@ import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import container.Vocabulary;
-import tools.Utils;
+import org.omg.CORBA.ARG_IN;
 
-public class ReutersMetaData {
+import edu.stanford.nlp.io.IOUtils;
+import tools.IOTools;
+import tools.Tools;
+import wordContainer.Vocabulary;
+
+public class ReutersMetaData implements MetaDataInterface{
 
 	private ArrayList<String> liDocNames;
 	
@@ -55,13 +59,32 @@ public class ReutersMetaData {
 		mDocsPerDate = new HashMap<Integer, Integer>();
 
 		computeDocsPerDate();
-
+		
 		System.out.println("[CorpusTopicDataObject] initialization done.");
 	}
 	
 	public String getDocName(int index)
 	{
 		return liDocNames.get(index);
+	}
+	
+	public String getDocFilename(int index)
+	{
+		String docFilename = liDocNames.get(index);
+		
+		docFilename = tools.Tools.removeLeadingZeros(docFilename);
+		if (!docFilename.contains("newsML"))
+		{
+			docFilename += "newsML";
+		}
+		docFilename += ".xml";
+		
+		return docFilename;
+	}
+	
+	public int getDocIdForName(String name)
+	{
+		return liDocNames.indexOf(name);
 	}
 
 	public String[] getTopicNamesAsArray()
@@ -117,6 +140,51 @@ public class ReutersMetaData {
 		}
 		
 		return liDocIdsForDate;
+	}
+	
+	public void generateTimestepFile(final String timestepFilename,
+			final int numTimeSteps)
+	{
+		//String timeStepsFilename = dataFilenameBase + "-seq.dat";
+
+		ArrayList<Integer> numDocsPerTimeStep = getDocsPerTimestep(numTimeSteps);
+
+		String content = numTimeSteps + "\n";
+		
+		for(Integer numDocs : numDocsPerTimeStep)
+		{
+			content += numDocs  + "\n";
+		}
+
+		IOTools.saveContentToFile(content, timestepFilename);
+	}
+	
+	public ArrayList<Integer> getDocsPerTimestep(final int numTimeSteps)
+	{
+		int timeStepLength = mDocsPerDate.size() / numTimeSteps;
+
+		ArrayList<Integer> liKeys = new ArrayList<Integer>();
+		liKeys.addAll(mDocsPerDate.keySet());
+		Collections.sort(liKeys);
+		
+		ArrayList<Integer> numDocsPerTimeStep = new ArrayList<Integer>();
+		
+		int iMod = 1;
+		int numDocsPerDateOverall = 0;
+		for (int iDateIndex : liKeys)
+		{
+			numDocsPerDateOverall += getNumDocsPerDateForDate(iDateIndex);
+							
+			if (iMod % timeStepLength == 0)
+			{
+				numDocsPerTimeStep.add(numDocsPerDateOverall);
+				numDocsPerDateOverall = 0;
+			}
+			
+			++iMod;				
+		}
+
+		return numDocsPerTimeStep;
 	}
 	
 	private void computeDocsPerDate()
