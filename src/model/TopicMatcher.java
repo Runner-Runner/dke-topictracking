@@ -19,21 +19,11 @@ import net.didion.jwnl.dictionary.Dictionary;
 
 public class TopicMatcher
 {
-  private Dictionary dictionary;
 
   public static final double TOPIC_THRESHOLD = 0.2;
   
   public TopicMatcher()
   {
-    try
-    {
-      JWNL.initialize(new FileInputStream("ressources/WNProperities.xml"));
-      dictionary = Dictionary.getInstance();
-    }
-    catch (FileNotFoundException | JWNLException e)
-    {
-      e.printStackTrace();
-    }
 
   }
 
@@ -94,55 +84,7 @@ public class TopicMatcher
     return score;
   }
 
-  public int compareWords(String one, String two) throws JWNLException
-  {
-    IndexWord iWordOne = getIndexWord(one);
-    IndexWord iWordTwo = getIndexWord(two);
-    if (iWordOne == null || iWordTwo == null)
-    {
-      System.out.println(one + " " + two + " " + iWordOne + " " + iWordTwo);
-      if (one.equals(two))
-      {
-        return 0;
-      }
-      return 20;
-    }
-    RelationshipList horizontal = RelationshipFinder.getInstance().findRelationships(iWordOne.getSense(1), iWordTwo.getSense(1), PointerType.SIMILAR_TO);
-    RelationshipList vertical = RelationshipFinder.getInstance().findRelationships(iWordOne.getSense(1), iWordTwo.getSense(1), PointerType.HYPERNYM);
-
-    int h = 36, v = 36;
-    if (horizontal.size() > 0)
-    {
-      h = ((Relationship) horizontal.get(0)).getDepth();
-    }
-    if (vertical.size() > 0)
-    {
-      v = ((Relationship) vertical.get(0)).getDepth();
-    }
-    //return h>v?v:h;
-    return h + v;
-  }
-
-  private IndexWord getIndexWord(String word) throws JWNLException
-  {
-    IndexWord iWord = dictionary.lookupIndexWord(POS.NOUN, word);
-    if (iWord != null)
-    {
-      return iWord;
-    }
-    iWord = dictionary.lookupIndexWord(POS.VERB, word);
-    if (iWord != null)
-    {
-      return iWord;
-    }
-    iWord = dictionary.lookupIndexWord(POS.ADJECTIVE, word);
-    if (iWord != null)
-    {
-      return iWord;
-    }
-    return dictionary.lookupIndexWord(POS.ADVERB, word);
-
-  }
+ 
 
 
 }
