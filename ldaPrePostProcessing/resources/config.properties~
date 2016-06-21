@@ -36,5 +36,5 @@ NumTopDocs = 20
 # output of lda postprocessing
 OutDocsPerTopicFilename = topicTopDocs.txt
 OutWordsPerTopicFilename = topics.dat
-OutTopicScoresPerTimestepFilename = topicScores.txt
+OutTopicScoresPeTimestepFilename = topicScores.txt
 OutVisDataFilename = dataset.dat
