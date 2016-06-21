@@ -3,21 +3,12 @@ package postProcessing;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Stream;
 
-import javax.sound.midi.Synthesizer;
-
-import org.omg.Messaging.SyncScopeHelper;
-
-import app.Configuration;
 import data.MetaDataInterface;
 import data.TopicDistributions;
 import data.WordDistributions;
@@ -25,6 +16,9 @@ import tools.IOTools;
 import tools.Tools;
 import wordContainer.Vocabulary;
 
+/**
+ * Postprocessing of LDA output data.
+ */
 public class DTMEvaluator 
 {
 	final MetaDataInterface dataReuters;
@@ -259,7 +253,7 @@ public class DTMEvaluator
 		
 		tools.IOTools.writeListMatrix(topicsFilename, allNewTopics);
 		
-		ArrayList<List<String>> visList = writeVisOutput(allNewDocLists, 
+		ArrayList<List<String>> visList = generateVisOutput(allNewDocLists, 
 				allNewTopics,
 				numTimeSteps);
 		
@@ -274,7 +268,7 @@ public class DTMEvaluator
 	 * @param threshold
 	 * @return List of timesteps exceeding similarity threshold.
 	 */
-	public ArrayList<Integer> findPointsOfChange(final double[] topicSimilarities,
+	private ArrayList<Integer> findPointsOfChange(final double[] topicSimilarities,
 			final double threshold)
 	{
 		double firstTimestep = topicSimilarities[0];
@@ -485,9 +479,9 @@ public class DTMEvaluator
 	}
 	
 	/**
-	 * 
+	 * Generate output for .NET stacked graph visualization
 	 */
-	public ArrayList<List<String>> writeVisOutput(final ArrayList<List<String>> allNewDocLists, 
+	public ArrayList<List<String>> generateVisOutput(final ArrayList<List<String>> allNewDocLists, 
 			final ArrayList<List<Float>> allNewTopics,
 			final int numTimesteps)
 	{
@@ -572,6 +566,33 @@ public class DTMEvaluator
 		}
 		
 		return outList;
+	}
+	
+	/**
+	 * Aggregate similar topics at each timestep
+	 * 
+	 * @param threshold
+	 * @param numTopDocs
+	 * @param vocabulary
+	 * @param numTopWords
+	 * @param timestepTopics
+	 * @param topicClustersFilename
+	 */
+	public void aggregateTopics(final float threshold,
+			final String topicClustersFilename)
+	{
+		int numTimesteps = this.wordDistributions.getNumTimeSteps();
+		ArrayList<ArrayList<HashMap<Integer, Double>>> allSimilarTopics =
+				new ArrayList<ArrayList<HashMap<Integer,Double>>>();
+		for (int timestep = 0; timestep < numTimesteps; ++timestep)
+		{
+			double[][] interTopicSimilarities = 
+					this.wordDistributions.computeInterTopicSimilarities(timestep);
+			ArrayList<HashMap<Integer, Double> > similarTopics =
+					this.wordDistributions.findSimilarTopics(threshold, interTopicSimilarities);
+			
+			allSimilarTopics.add(similarTopics);
+		}
 	}
 	
 	/**

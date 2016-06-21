@@ -13,6 +13,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * Reuters RCV1 specific document reader
+ */
 public class ReutersXMLHandler implements DocumentHandlerInterface {
 
 	public String readDocumentText(final Path filePath,

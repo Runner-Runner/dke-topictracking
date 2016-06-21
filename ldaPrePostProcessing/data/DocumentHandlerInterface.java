@@ -2,6 +2,9 @@ package data;
 
 import java.nio.file.Path;
 
+/**
+ * Document reader interface
+ */
 public interface DocumentHandlerInterface {
 
 	/**

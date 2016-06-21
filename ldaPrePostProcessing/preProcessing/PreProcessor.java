@@ -12,22 +12,27 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 import data.DocumentHandlerInterface;
-import data.ReutersXMLHandler;
-import edu.stanford.nlp.dcoref.CorefChain;
-import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
+//import edu.stanford.nlp.dcoref.CorefChain;
+//import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.*;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.semgraph.SemanticGraph;
-import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
+//import edu.stanford.nlp.semgraph.SemanticGraph;
+//import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation;
+//import edu.stanford.nlp.trees.Tree;
+//import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
 import tools.IOTools;
 import wordContainer.Dictionary;
 import wordContainer.Vocabulary;
 
+/**
+ * Corpus document preprocessor
+ * Generates vocabulary from corpus documents using NLP techniques.
+ * Iterativ generation possible, reading a already processed corpus vocabulary and adding new words of additional documents.
+ * In this case, vocabulary must not be sorted, but new words for new documents are appended at the end.
+ */
 public class PreProcessor 
 {
 
@@ -39,7 +44,7 @@ public class PreProcessor
 	
 	final private String processedDocsDir = "processedDocs";
 	
-	final private String docFilename = "docs";
+//	final private String docFilename = "docs";
 	
 	final private String metaDataFilename = "metadata.txt";
 	
@@ -148,20 +153,6 @@ public class PreProcessor
 		tokenVocabulary = new Vocabulary(resultDir + "/" + vocFilename +  "token");
 		
 		liDocData = new LinkedList<String>();
-	}
-	
-	private String readDocument(final Path filePath)
-	{
-		try 
-		{
-			return new String(Files.readAllBytes(filePath));
-		} 
-		catch (IOException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return "";
-		}
 	}
 	
 	/**

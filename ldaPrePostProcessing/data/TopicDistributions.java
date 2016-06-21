@@ -5,14 +5,13 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
-import tools.IOTools;
-
+/**
+ * Class holding the LDA topic distributions for each document for further processing.
+ * This is usually read from the LDA gamma file output.
+ */
 public class TopicDistributions {
 
 	/**
@@ -27,6 +26,10 @@ public class TopicDistributions {
 
 	private Integer indexCounter = 0;
 
+	/**
+	 * 
+	 * @param ldaTopicsFilename	e.g. gamma.txt
+	 */
 	public TopicDistributions(final String ldaTopicsFilename)
 	{
 		liTopicsPerDocument = new ArrayList<HashMap<Integer, Float> >();
@@ -64,6 +67,11 @@ public class TopicDistributions {
 		return mDocumentsPerTopic.get(index);
 	}
 	
+	/**
+	 * load gamma file from LDA output.
+	 * 
+	 * @param filename
+	 */
 	private void loadLDATopics(final String filename)
 	{
 		if (Files.exists(Paths.get(filename))) 

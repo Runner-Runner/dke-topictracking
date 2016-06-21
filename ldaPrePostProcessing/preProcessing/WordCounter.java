@@ -17,6 +17,11 @@ import java.util.stream.Stream;
 
 import wordContainer.Vocabulary;
 
+/**
+ * Generator for LDA input word counts
+ * Iterativ generation possible, reading already processed document word counts and adding thos for new ones.
+ * In this case, vocabulary must not be sorted, but new words for new documents are appended at the end.
+ */
 public class WordCounter {
 	private LinkedList<LinkedHashMap<Integer, Integer>> documents;
 	private LinkedList<String> vocabulary; // word -> index
@@ -24,6 +29,13 @@ public class WordCounter {
 	final private String resultDir;
 	final private String wordCountFilename;
 
+	/**
+	 * Generator for LDA input word counts
+	 * 
+	 * @param resultDir
+	 * @param dataFilenameBase
+	 * @param vocabulary
+	 */
 	public WordCounter(final String resultDir,
 			final String dataFilenameBase,
 			final Vocabulary vocabulary)

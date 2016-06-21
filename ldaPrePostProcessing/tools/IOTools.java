@@ -172,6 +172,14 @@ public class IOTools {
 		IOTools.saveContentToFile(content, filename);
 	}
 	
+	/**
+	 * Write Rickshaw visualization data 
+	 * 
+	 * @param filename
+	 * @param wordLists
+	 * @param timestepTopics
+	 */
+	
 	public static void writeTimestepTopicsAsJason(final String filename,
 			final String[][] wordLists,
 			final float[][] timestepTopics)
@@ -204,26 +212,5 @@ public class IOTools {
 
 		System.out.println("[IOUtils::writeTimestepTopicsAsJason] Saving data to " + filename);
 		IOTools.saveContentToFile(content, filename);
-		
-//		List<String> waveData = new ArrayList<>();
-//	    for (TopicWave wave : waves)
-//	    {
-//	      String waveText = "{\"name\":\"Topic \\\"" + nameMap.get(wave)
-//	              + "\\\"\",\"data\":[";
-//	      List<Double> yValues = yValueMap.get(wave);
-//	      List<String> timeStepData = new ArrayList<>();
-//	      for (int i = 0; i < yValues.size(); i++)
-//	      {
-//	        String timeStepText = "{\"x\":" + i + ",\"y\":" + yValues.get(i) + "}";
-//	        timeStepData.add(timeStepText);
-//	      }
-//	      waveText += String.join(",", timeStepData);
-//	      waveText += "]}";
-//	      waveData.add(waveText);
-//	    }
-//	    jsonText += String.join(",", waveData);
-//	    jsonText += "];";
 	}
-	
-
 }

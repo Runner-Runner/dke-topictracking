@@ -9,13 +9,21 @@ import java.util.Map.Entry;
 import data.ReutersMetaData;
 import data.TopicDistributions;
 
-
+/**
+ * Evaluates LDA topics against RCV1 annotated topics
+ */ 
 public class Evaluator {
 
 	ReutersMetaData dataReuters;
 	
 	TopicDistributions dataLDA;
 	
+	/**
+	 * Evaluates LDA topics against RCV1 annotated topics
+	 * 
+	 * @param reutersData
+	 * @param ldaData
+	 */
 	public Evaluator(ReutersMetaData reutersData,
 			TopicDistributions ldaData)
 	{
@@ -27,7 +35,9 @@ public class Evaluator {
 	}
 	
 	/**
-	 * Compare extracted topics to annotations
+	 * Compare extracted topics to annotations.
+	 * Builds confusion matrix with annotated topics as given classes and extracted topics as predictions.
+	 * Computes precision, recall and f-score and assigns topics according to max f-score.
 	 * 
 	 * @param scoreThreshold for extracted topics to be taken into account
 	 */

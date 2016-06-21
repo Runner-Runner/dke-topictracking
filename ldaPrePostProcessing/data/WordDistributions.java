@@ -14,6 +14,12 @@ import postProcessing.Similarities;
 import tools.Tools;
 import wordContainer.Vocabulary;
 
+/**
+ * Class holding the LDA word distributions for each topic.
+ * This is usually read from the LDA beta file output.
+ * In case of dynamic LDA, holds word distributions for each topic at each time step.
+ *
+ */
 public class WordDistributions {
 
 	final int numTimeSteps;

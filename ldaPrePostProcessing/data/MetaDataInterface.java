@@ -2,6 +2,9 @@ package data;
 
 import java.util.ArrayList;
 
+/**
+ * Corpus meta information interface
+ */
 public interface MetaDataInterface {
 
 	/**

@@ -6,19 +6,11 @@ import data.ReutersMetaData;
 import data.ReutersXMLHandler;
 import data.TopicDistributions;
 import data.WordDistributions;
-import edu.stanford.nlp.io.IOUtils;
 import postProcessing.DTMEvaluator;
 import postProcessing.Evaluator;
-import postProcessing.VisDataGenerator;
 import preProcessing.PreProcessor;
 import preProcessing.WordCounter;
 import wordContainer.Vocabulary;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-
 import app.Configuration.modes;
 
 public class Application {
@@ -28,6 +20,21 @@ public class Application {
 		
 		Configuration config = new Configuration();
 		
+		if (args.length < 1)
+		{
+			System.out.println("Application parameters defining operation mode (use one at a time):");
+			System.out.println("-generateVocabulary\t\tGenerate vocabulary and intermediate document text files.");
+			System.out.println("-generateWordcount\t\tGenerate word counts from vocabulary and intermediate document text files.");
+			System.out.println("-evaluateDTM\t\t\tGenerate output for further processing like topic scores, word and document lists.");
+//			System.out.println("-evaluate\t\t\tbla");
+//			System.out.println("-evaluateWordDistributions\tbla");
+			System.out.println("See the resources/config.properties for more information.");
+			return;
+		}
+		
+		/**
+		 * Resolving operation mode from command line parameter
+		 */
 		for (String arg: args) 
 		{
 			if (arg.equals("-generateVocabulary"))
@@ -42,10 +49,6 @@ public class Application {
 			{
 				config.mode = modes.evaluateTopics;
 			}
-//			else if (arg.equals("-generateVisData"))
-//			{
-//				config.mode = modes.generateVisData;
-//			}
 			else if (arg.equals("-evaluateDTM"))
 			{
 				config.mode = modes.evaluateDTMTopics;
@@ -65,7 +68,6 @@ public class Application {
 				System.out.println("-generateWordcount\t\tGenerate word counts from vocabulary and intermediate document text files.");
 				System.out.println("-evaluateDTM\t\t\tGenerate output for further processing like topic scores, word and document lists.");
 //				System.out.println("-evaluate\t\t\tbla");
-//				System.out.println("-generateVisData\t\tbla");
 //				System.out.println("-evaluateWordDistributions\tbla");
 				System.out.println("See the resources/config.properties for more information.");
 				return;
@@ -79,7 +81,10 @@ public class Application {
 		}
 		
 		System.out.println("Application mode: " + config.mode);
-
+		
+		/**
+		 * Operate according to mode
+		 */
 		switch(config.mode)
 		{
 			case generateVocabulary:
@@ -142,24 +147,6 @@ public class Application {
 				System.out.println("evaluateTopics finished.");
 			}
 			break;
-//			case generateVisData:
-//			{
-//				ReutersMetaData reutersData = new ReutersMetaData(config.resultDir + "/" + config.metaDataFilename);
-//				
-//				TopicDistributions ldaData = new TopicDistributions(config.resultDir + "/" + config.topicsPerDocFilename);
-//
-//				VisDataGenerator gen = new VisDataGenerator(reutersData, ldaData, config.corpusPath);
-//				
-//				DocumentHandlerInterface docReader = new ReutersXMLHandler();
-//		
-//				gen.writeTopicsWithDocWeightJson(config.resultDir + "/" + config.topicTopWordsFilename,
-//						config.resultDir + "/" + config.topicClustersFilename,
-//						config.resultDir + "/"+ config.visDataFilename,
-//						docReader);
-//				
-//				System.out.println("generateVisData finished.");
-//			}
-//			break;
 			case evaluateWordDistributions:
 			{
 				WordDistributions dtmWDs = new WordDistributions(config.numTimesteps,

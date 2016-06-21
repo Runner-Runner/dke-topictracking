@@ -7,18 +7,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import org.omg.CORBA.ARG_IN;
-
-import edu.stanford.nlp.io.IOUtils;
 import tools.IOTools;
-import tools.Tools;
-import wordContainer.Vocabulary;
 
+/**
+ * Class holding Reuters RCV1 specific meta data information for corpus documents.
+ */
 public class ReutersMetaData implements MetaDataInterface{
 
 	private ArrayList<String> liDocNames;

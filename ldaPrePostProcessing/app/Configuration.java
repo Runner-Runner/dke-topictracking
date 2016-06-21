@@ -4,18 +4,19 @@ package app;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
 public class Configuration {
 
+	/**
+	 * Application operation modes
+	 */
 	public enum modes 
 	{
 		generateVocabulary,
 		generateWordCount,
-//		generateVisData,
 		evaluateTopics,
 		evaluateWordDistributions,
 		evaluateDTMTopics,
@@ -49,10 +50,6 @@ public class Configuration {
 	public String outTopicScoresPerTimestepFilename;
 	public String outVisDataFilename;
 			
-//	public String topicTopWordsFilename;
-//	public String topicClustersFilename;
-//	public String visDataFilename;
-	
 //	public String docsPerTopicFilename;
 //	
 //	public String dtmTopicScorePerTimestepFilename;
@@ -165,25 +162,6 @@ public class Configuration {
 				}
 			}
 			break;
-//			case generateVisData:
-//			{
-//				topicTopWordsFilename = prop.getProperty("TopicTopWordsFilename");
-//				visDataFilename = prop.getProperty("VisDataFilename");
-//				topicClustersFilename = prop.getProperty("TopicClustersFilename");
-//
-//				if (resultDir == null
-//						|| corpusPath == null
-//						|| metaDataFilename == null
-//						|| topicsPerDocFilename == null
-//						|| topicTopWordsFilename == null
-//						|| topicClustersFilename == null
-//						|| visDataFilename == null)
-//				{
-//					System.err.println("corpusPath or resultDir missing.");
-//					return false;
-//				}
-//			}
-//			break;
 			case evaluateWordDistributions:
 			{
 				String dtmNumTimestepsString = prop.getProperty("NumTimesteps");
