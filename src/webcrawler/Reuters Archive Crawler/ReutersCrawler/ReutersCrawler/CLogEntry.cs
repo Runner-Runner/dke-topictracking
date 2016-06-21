@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace ReutersCrawler
 {
+	/// <summary>
+	/// Statuscode of a CLogEntry
+	/// </summary>
 	public enum ELogcode { Status, Output, Warning, Error };
 
+	/// <summary>
+	/// Single log entry for CLog
+	/// </summary>
 	class CLogEntry
 	{
 		private DateTime _time;

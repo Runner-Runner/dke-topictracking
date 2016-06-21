@@ -117,7 +117,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="searchDirBackgroundWorker.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
+  <data name="label1.Text" xml:space="preserve">
+    <value>Hit Ctrl+O in the main window in order to select two files.
+The first file must contain the topics in order; one per line.
+The second file contains the start date and an interval for labelling reasons
+in the format of "DD.MM.YYYY; {integer}" in its first line.
+The start date represents the date at X=0, the interval is given in days, so in case
+the numbers have been calculated for weeks, the interval is 7.
+Each following line represents data for one day. It is a double-value for the topic
+and the documents that add to that value. The format is
+{double}: {doc1}, {doc2}, {doc3}, ... , {docn}; {double}: {doc1}, {doc2}, ...
+The number of doubles must match the number of topics from the first file.</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>Once built, the graph contains tooltips. Just hover somewhere over the graph to see the
+currently selected topic and its prevalence in percent.
+You can zoom by left-clicking somewhere in the graph, holding the mouse key down,
+then moving to the left or right. Then, let go of the mouse key and the selected range
+will be zoomed in. A scrollbar appear on the bottom along with a circle-button on the
+very left of the scrollbar. The scrollbar can be used in order to navigate through the
+zoomed area, the circle-button can be used in order to cancel the zoom. You can even
+zoom and unzoom multiple times this way. In order to get an overview of the topics for
+a day, right-click somewhere in the graph. A window will open up showing all the topics
+for the current day with the topic you clicked highlighted. On the right hand side, there
+will be a number of documents, that counted towards the prevalance of the selected
+topic. The topic selection can be changed by just clicking on a different one on the left
+hand side list. In order to select a different day, just right-click on the according day in
+the graph again.
+The documents, that are mentioned on the right hand side can be viewed on your local
+file system (if your local file system contains them). Using "File &gt; Source Documents"
+you can give the parent folder of the document corpus. When double-clicking on one
+of the document names, then, that folder will be searched for the document name.
+Your file explorer will be opened and the file will be highlighted. You can view it then.</value>
+  </data>
 </root>

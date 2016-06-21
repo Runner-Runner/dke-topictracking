@@ -15,28 +15,30 @@ namespace TopicTrackingVisualization
 {
 	public partial class TopicsOverviewForm : Form
 	{
-		private Main _mainForm;
+		private MainForm _mainForm;
 
 		private DateTime _date;
-		private List<string> _topics;
+		private List<KeyValuePair<string, double>> _topics;
 		private List<string[]> _topicDocuments;
 
-		public TopicsOverviewForm(Main mainForm)
+		private System.Threading.Timer _workTimer;
+
+		public TopicsOverviewForm(MainForm mainForm)
 		{
 			_mainForm = mainForm;
 			InitializeComponent();
 		}
 
-		public void DayTopicDocuments(DateTime date, List<string> topics, List<string[]> topicDocuments, int selection)
+		public void DayTopicDocuments(DateTime date, List<KeyValuePair<string, double>> topics, List<string[]> topicDocuments, int selection)
 		{
 			_date = date;
 			_topics = topics;
 			_topicDocuments = topicDocuments;
 			this.Text = $"Topics for {date.ToShortDateString()}";
 			topicListBox.Items.Clear();
-			foreach(string topic in topics)
+			foreach(KeyValuePair<string, double> topic in topics)
 			{
-				topicListBox.Items.Add(topic);
+				topicListBox.Items.Add($"{Math.Round(topic.Value*100, 2).ToString("0.00").PadLeft(5, ' ')}\t{topic.Key}");
 			}
 			topicListBox.SelectedIndex = selection;
 		}
@@ -64,26 +66,26 @@ namespace TopicTrackingVisualization
 			string basefolder = _mainForm.Basefolder;
 			if (basefolder != null && basefolder != "")
 			{
-				string v = $"{documentsListBox.Items[documentsListBox.SelectedIndex].ToString().Split('.')[0]}.*";
-				List<string> filesFound = new List<string>();
-				DirSearch(filesFound, basefolder, v);
-				if (filesFound.Count == 0)
-				{
-					MessageBox.Show("No files were found with that name");
-				}
-				else
-				{
-					Process.Start("explorer.exe", $"/select, \"{filesFound[0]}\"");
-				}
+				string filenameNoExtension = $"{documentsListBox.Items[documentsListBox.SelectedIndex].ToString().Split('.')[0]}.*";
+				searchDirBackgroundWorker.RunWorkerAsync(new string[] { basefolder, filenameNoExtension });
+				_workTimer = new System.Threading.Timer(Tick, null, 30000, 30000);
+
 			}
 			else
 			{
-				MessageBox.Show("You can watch the file in your File Explorer by selecting a basefolder using \"Documents\" > \"Define Basefolder\"");
+				MessageBox.Show("You can watch the file in your File Explorer by selecting a basefolder using \"File\" > \"Source Documents\"");
 			}
 		}
 
-		private void DirSearch(List<string> lstFilesFound, string sDir, string search)
+		private void Tick(object state)
 		{
+			searchDirBackgroundWorker.CancelAsync();
+			_workTimer.Dispose();
+		}
+
+		private void DirSearch(BackgroundWorker worker, List<string> lstFilesFound, string sDir, string search)
+		{
+			if (worker.CancellationPending) return;
 			try
 			{
 				foreach (string f in Directory.GetFiles(sDir, search))
@@ -92,12 +94,44 @@ namespace TopicTrackingVisualization
 				}
 				foreach (string d in Directory.GetDirectories(sDir))
 				{
-					DirSearch(lstFilesFound, d, search);
+					DirSearch(worker, lstFilesFound, d, search);
 				}
 			}
-			catch (System.Exception excpt)
+			catch (Exception)
 			{
 				MessageBox.Show("Error while searching for the file!");
+			}
+		}
+
+		private void searchDirBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+		{
+			string[] args = (string[])e.Argument;
+			List<string> filesFound = new List<string>();
+			DirSearch((BackgroundWorker)sender, filesFound, args[0], args[1]);
+			if (searchDirBackgroundWorker.CancellationPending)
+			{
+				e.Cancel = true;
+				return;
+			}
+			e.Result = filesFound;
+		}
+
+		private void searchDirBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+		{
+			_workTimer.Dispose();
+			if (e.Cancelled)
+			{
+				MessageBox.Show("Search took too long so it was aborted, please consider using less documents or a more precise location.");
+				return;
+			}
+			List<string> filesFound = (List<string>)e.Result;
+			if (filesFound.Count == 0)
+			{
+				MessageBox.Show("No files were found with that name");
+			}
+			else
+			{
+				Process.Start("explorer.exe", $"/select, \"{filesFound[0]}\"");
 			}
 		}
 	}

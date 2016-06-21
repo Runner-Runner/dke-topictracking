@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ReutersCrawler
 {
+	/// <summary>
+	/// Log data for download
+	/// </summary>
 	class CLog
 	{
 		private List<CLogEntry> _logEntries;

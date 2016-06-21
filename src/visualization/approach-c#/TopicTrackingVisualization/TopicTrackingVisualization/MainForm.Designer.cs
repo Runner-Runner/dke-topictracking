@@ -1,6 +1,6 @@
 ﻿namespace TopicTrackingVisualization
 {
-	partial class Main
+	partial class MainForm
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -29,14 +29,12 @@
 		private void InitializeComponent()
 		{
 			System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.topicOverviewChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.randomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.documentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.defineBasefolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.sourceDocumentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.topicOverviewChart)).BeginInit();
 			this.menuStrip1.SuspendLayout();
@@ -60,7 +58,6 @@
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.documentsToolStripMenuItem,
             this.helpToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
@@ -72,7 +69,7 @@
 			// 
 			this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
-            this.randomToolStripMenuItem});
+            this.sourceDocumentsToolStripMenuItem});
 			this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
 			this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
 			this.fileToolStripMenuItem.Text = "File";
@@ -81,41 +78,27 @@
 			// 
 			this.openToolStripMenuItem.Name = "openToolStripMenuItem";
 			this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-			this.openToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
-			this.openToolStripMenuItem.Text = "Open";
+			this.openToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+			this.openToolStripMenuItem.Text = "Open Dataset";
 			this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
 			// 
-			// randomToolStripMenuItem
+			// sourceDocumentsToolStripMenuItem
 			// 
-			this.randomToolStripMenuItem.Name = "randomToolStripMenuItem";
-			this.randomToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
-			this.randomToolStripMenuItem.Text = "Random";
-			this.randomToolStripMenuItem.Click += new System.EventHandler(this.randomToolStripMenuItem_Click);
-			// 
-			// documentsToolStripMenuItem
-			// 
-			this.documentsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.defineBasefolderToolStripMenuItem});
-			this.documentsToolStripMenuItem.Name = "documentsToolStripMenuItem";
-			this.documentsToolStripMenuItem.Size = new System.Drawing.Size(80, 20);
-			this.documentsToolStripMenuItem.Text = "Documents";
-			// 
-			// defineBasefolderToolStripMenuItem
-			// 
-			this.defineBasefolderToolStripMenuItem.Name = "defineBasefolderToolStripMenuItem";
-			this.defineBasefolderToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-			this.defineBasefolderToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
-			this.defineBasefolderToolStripMenuItem.Text = "Define Basefolder";
-			this.defineBasefolderToolStripMenuItem.Click += new System.EventHandler(this.defineBasefolderToolStripMenuItem_Click);
+			this.sourceDocumentsToolStripMenuItem.Name = "sourceDocumentsToolStripMenuItem";
+			this.sourceDocumentsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
+			this.sourceDocumentsToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+			this.sourceDocumentsToolStripMenuItem.Text = "Source Documents";
+			this.sourceDocumentsToolStripMenuItem.Click += new System.EventHandler(this.sourceDocumentsToolStripMenuItem_Click);
 			// 
 			// helpToolStripMenuItem
 			// 
 			this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+			this.helpToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
 			this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
 			this.helpToolStripMenuItem.Text = "Help";
 			this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
 			// 
-			// Main
+			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -123,7 +106,7 @@
 			this.Controls.Add(this.topicOverviewChart);
 			this.Controls.Add(this.menuStrip1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.Name = "Main";
+			this.Name = "MainForm";
 			this.Text = "Topic Tracking";
 			this.Resize += new System.EventHandler(this.Main_Resize);
 			((System.ComponentModel.ISupportInitialize)(this.topicOverviewChart)).EndInit();
@@ -140,9 +123,7 @@
 		private System.Windows.Forms.MenuStrip menuStrip1;
 		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem randomToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem documentsToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem defineBasefolderToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem sourceDocumentsToolStripMenuItem;
 	}
 }

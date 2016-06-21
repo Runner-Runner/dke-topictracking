@@ -16,6 +16,9 @@ using AngleSharp.Parser.Html;
 
 namespace ReutersCrawler
 {
+	/// <summary>
+	/// Controller of the main form
+	/// </summary>
 	public partial class MainForm : Form
 	{
 		private const int _maxRequestInterval = 250; // milliseconds; too low values may Reuters cause to block the client

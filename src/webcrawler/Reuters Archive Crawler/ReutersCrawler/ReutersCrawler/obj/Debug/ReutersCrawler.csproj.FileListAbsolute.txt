@@ -54,3 +54,6 @@ C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\ob
 C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.MainForm.resources
 C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.Properties.Resources.resources
 C:\Users\Darius\Dropbox\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.csproj.GenerateResource.Cache
+C:\Users\Azubi\Desktop\dke-topictracking\src\webcrawler\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\bin\Debug\ReutersCrawler.exe.config
+C:\Users\Azubi\Desktop\dke-topictracking\src\webcrawler\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.exe
+C:\Users\Azubi\Desktop\dke-topictracking\src\webcrawler\Reuters Archive Crawler\ReutersCrawler\ReutersCrawler\obj\Debug\ReutersCrawler.pdb
