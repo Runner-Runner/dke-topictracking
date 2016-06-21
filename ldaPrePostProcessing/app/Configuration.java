@@ -40,7 +40,8 @@ public class Configuration {
 	public String wordsPerTopicsFilename;
 	public int numTimesteps;
 	
-	public float similarityTreshold;
+	public float intraSimilarityTreshold;
+	public float interSimilarityTreshold;
 	
 	public int numTopWords;
 	public int numTopDocs;
@@ -49,7 +50,8 @@ public class Configuration {
 	public String outWordsPerTopicFilename;
 	public String outTopicScoresPerTimestepFilename;
 	public String outVisDataFilename;
-			
+	public String outTopicAggregationFilename;		
+	
 //	public String docsPerTopicFilename;
 //	
 //	public String dtmTopicScorePerTimestepFilename;
@@ -166,7 +168,7 @@ public class Configuration {
 			{
 				String dtmNumTimestepsString = prop.getProperty("NumTimesteps");
 				IntraTopicSimilaritiesFilename = prop.getProperty("IntraTopicSimilaritiesFilename");
-				InterTopicSimilaritiesFilename = prop.getProperty("InterTopicSimilaritiesFilename");
+				InterTopicSimilaritiesFilename = prop.getProperty("InterTopicSimilaritiesFilenameBase");
 				
 				if (resultDir == null
 						|| wordsPerTopicsFilename == null
@@ -195,11 +197,13 @@ public class Configuration {
 				outWordsPerTopicFilename = prop.getProperty("OutWordsPerTopicFilename");
 				outTopicScoresPerTimestepFilename = prop.getProperty("OutTopicScoresPerTimestepFilename");
 				outVisDataFilename = prop.getProperty("OutVisDataFilename");
+				outTopicAggregationFilename = prop.getProperty("OutTopicAggregationFilename");
 				
 				String dtmNumTimestepsString = prop.getProperty("NumTimesteps");
-				String similarityTresholdString = prop.getProperty("SimilarityTreshold");
+				String intraSimilarityTresholdString = prop.getProperty("intraTopicSimilarityTreshold");
 				String numTopWordsString = prop.getProperty("NumTopWords");
 				String numTopDocsString = prop.getProperty("NumTopDocs");
+				String interSimilarityTresholdString = prop.getProperty("interTopicSimilarityTreshold");
 				
 				if (resultDir == null
 						|| metaDataFilename == null
@@ -207,7 +211,8 @@ public class Configuration {
 						|| wordsPerTopicsFilename == null
 						|| vocabularyFilenameBase == null
 						|| dtmNumTimestepsString == null
-						|| similarityTresholdString == null
+						|| intraSimilarityTresholdString == null
+						|| interSimilarityTresholdString == null
 						|| numTopWordsString == null
 						|| numTopDocsString == null
 						|| outDocsPerTopicFilename == null
@@ -215,16 +220,17 @@ public class Configuration {
 						|| outTopicScoresPerTimestepFilename == null
 						|| outVisDataFilename == null)
 				{
-					System.err.println("ResultDir, TopicsPerDocsFilename, WordsPerTopicsFilename, VocabularyFilenameBase, MetaDataFilename, OutDocsPerTopicFilename, OutWordsPerTopicFilename, OutTopicScoresPerTimestepFilename, OutVisDataFilename, NumTopWords, NumTopDocs, NumTimesteps or SimilarityTreshold missing.");
+					System.err.println("ResultDir, TopicsPerDocsFilename, WordsPerTopicsFilename, VocabularyFilenameBase, MetaDataFilename, OutDocsPerTopicFilename, OutWordsPerTopicFilename, OutTopicScoresPerTimestepFilename, OutVisDataFilename, NumTopWords, NumTopDocs, NumTimesteps, intraTopicSimilarityTreshold or interTopicSimilarityTreshold missing.");
 					return false;
 				}
 
 				try
 				{
 					numTimesteps = Integer.parseInt(dtmNumTimestepsString);
-					similarityTreshold = Float.parseFloat(similarityTresholdString);
+					intraSimilarityTreshold = Float.parseFloat(intraSimilarityTresholdString);
 					numTopWords = Integer.parseInt(numTopWordsString);
 					numTopDocs = Integer.parseInt(numTopDocsString);
+					interSimilarityTreshold = Float.parseFloat(interSimilarityTresholdString);
 				}
 				catch (NumberFormatException e)
 				{

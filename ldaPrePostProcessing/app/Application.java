@@ -27,7 +27,7 @@ public class Application {
 			System.out.println("-generateWordcount\t\tGenerate word counts from vocabulary and intermediate document text files.");
 			System.out.println("-evaluateDTM\t\t\tGenerate output for further processing like topic scores, word and document lists.");
 //			System.out.println("-evaluate\t\t\tbla");
-//			System.out.println("-evaluateWordDistributions\tbla");
+			System.out.println("-evaluateSimilarities\t\tCompute cosine similarites among topic time steps as well as between all topics");
 			System.out.println("See the resources/config.properties for more information.");
 			return;
 		}
@@ -53,7 +53,7 @@ public class Application {
 			{
 				config.mode = modes.evaluateDTMTopics;
 			}
-			else if (arg.equals("-evaluateWordDistributions"))
+			else if (arg.equals("-evaluateSimilarities"))
 			{
 				config.mode = modes.evaluateWordDistributions;
 			}
@@ -68,7 +68,7 @@ public class Application {
 				System.out.println("-generateWordcount\t\tGenerate word counts from vocabulary and intermediate document text files.");
 				System.out.println("-evaluateDTM\t\t\tGenerate output for further processing like topic scores, word and document lists.");
 //				System.out.println("-evaluate\t\t\tbla");
-//				System.out.println("-evaluateWordDistributions\tbla");
+				System.out.println("-evaluateSimilarities\tCompute cosine similarites among topic time steps as well as between all topics");
 				System.out.println("See the resources/config.properties for more information.");
 				return;
 			}
@@ -167,21 +167,22 @@ public class Application {
 					tools.IOTools.writeDoubleMatrix(filename, dtmWDs.computeIntraTopicSimilarities());
 				}
 				
-				filename = config.resultDir + "/" + config.InterTopicSimilaritiesFilename;
-
-				int timeStep = 0;
-
-				if (distanceInsteadOfSimilarity)
+				for (int timeStep = 0; timeStep < config.numTimesteps; ++timeStep)
 				{
-					System.out.println("computing InterTopicDistances.");
-					int[][] interTopipcSimiliarity = dtmWDs.computeInterTopicDistances(timeStep, config.numTopWords);
-					tools.IOTools.writeIntMatrix(filename, interTopipcSimiliarity);
-				}
-				else
-				{
-					System.out.println("computing InterTopicSimilarities.");
-					double[][] interTopipcSimiliarity = dtmWDs.computeInterTopicSimilarities(timeStep);
-					tools.IOTools.writeDoubleMatrix(filename, interTopipcSimiliarity);
+					filename = config.resultDir + "/" + config.InterTopicSimilaritiesFilename + timeStep + ".txt";
+
+					if (distanceInsteadOfSimilarity)
+					{
+						System.out.println("computing InterTopicDistances.");
+						int[][] interTopipcSimiliarity = dtmWDs.computeInterTopicDistances(timeStep, config.numTopWords);
+						tools.IOTools.writeIntMatrix(filename, interTopipcSimiliarity);
+					}
+					else
+					{
+						System.out.println("computing InterTopicSimilarities.");
+						double[][] interTopipcSimiliarity = dtmWDs.computeInterTopicSimilarities(timeStep);
+						tools.IOTools.writeDoubleMatrix(filename, interTopipcSimiliarity);
+					}
 				}
 				
 				System.out.println("evaluateWordDistributions finished.");
@@ -206,7 +207,7 @@ public class Application {
 				float[][] timestepTopics = eva.computeTopicsWithDocsPerTime(true, 0.1f);
 				
 				eva.addTopics(topicSimilarities,
-						config.similarityTreshold,
+						config.intraSimilarityTreshold,
 						config.numTopDocs,
 						vocabulary, 
 						config.numTopWords,
@@ -216,6 +217,8 @@ public class Application {
 						config.resultDir + "/" + config.outTopicScoresPerTimestepFilename,
 						config.resultDir + "/" + config.outVisDataFilename);
 
+				
+				eva.aggregateTopics(config.interSimilarityTreshold, config.resultDir + "/" + config.outTopicAggregationFilename);
 				
 //				eva.writeTopicsWithDocWeight(config.resultDir + "/" + config.docsPerTopicFilename);
 

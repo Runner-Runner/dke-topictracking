@@ -582,8 +582,10 @@ public class DTMEvaluator
 			final String topicClustersFilename)
 	{
 		int numTimesteps = this.wordDistributions.getNumTimeSteps();
-		ArrayList<ArrayList<HashMap<Integer, Double>>> allSimilarTopics =
-				new ArrayList<ArrayList<HashMap<Integer,Double>>>();
+		
+		ArrayList<List<Integer>> allSimilarTopics =
+				new ArrayList<List<Integer>>();
+		
 		for (int timestep = 0; timestep < numTimesteps; ++timestep)
 		{
 			double[][] interTopicSimilarities = 
@@ -591,8 +593,27 @@ public class DTMEvaluator
 			ArrayList<HashMap<Integer, Double> > similarTopics =
 					this.wordDistributions.findSimilarTopics(threshold, interTopicSimilarities);
 			
-			allSimilarTopics.add(similarTopics);
+			ArrayList<Integer> topSimilarTopics = new ArrayList<>();
+			
+			for (HashMap<Integer, Double> topics: similarTopics)
+			{
+				if (topics.size() > 0)
+				{
+					// get the top similar topic
+					topics = tools.Tools.sortByValue(topics);
+					int topicId = topics.keySet().iterator().next();
+					topSimilarTopics.add(topicId);
+				}
+				else
+				{
+					topSimilarTopics.add(-1);
+				}
+			}
+			
+			allSimilarTopics.add(topSimilarTopics);
 		}
+		
+		IOTools.writeListMatrix(topicClustersFilename, allSimilarTopics);
 	}
 	
 	/**

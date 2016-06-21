@@ -335,7 +335,7 @@ public class WordDistributions {
 				}
 				else
 				{
-					interTopipcSimiliarity[currentTopicId][otherTopicId] = 1.0;
+					interTopipcSimiliarity[currentTopicId][otherTopicId] = 0.0;
 				}
 			}
 		}
