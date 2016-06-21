@@ -23,25 +23,12 @@ import normalization.Normalizer;
 
 public class NMFTopicExtractor
 {
-  private static final String STOPWORD_PATH = "ressources/stopwords.txt";
-  private static final String VOCABULARY_PATH = "ressources/vocabulary.xml";
+  //private static final String STOPWORD_PATH = "ressources/stopwords.txt";
+  //private static final String VOCABULARY_PATH = "ressources/vocabulary.xml";
 
   public static void main(String[] args)
   {
-    if (args.length == 0)
-    {
-      TreeMap<Date, List<Document>> files = new TreeMap<>();
-      SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-      try
-      {
-        listFiles(new File("/mnt/dualuse/sharedData/Git-Projects/dke-topictracking/Reuters Corpus Volume 1 (RCV1) - Disk 1 of 2/unzipped/extractions/"), files, new SimpleDateFormat("yyyyMMdd"), df.parse("19970103"), 1, 1);
-        runMultipleNMF(files, 7, df, new File("days"), 30);
-      }
-      catch (ParseException e)
-      {
-      }
-    }
-    else if (args.length != 7)
+    if (args.length != 8)
     {
       printUsage();
       return;
@@ -67,15 +54,21 @@ public class NMFTopicExtractor
       }
       File inputDirectory = new File(args[4]);
       File outputDirectory = new File(args[5]);
+      File stopWordFile = new File(args[7]);
       if (!inputDirectory.isDirectory() || !outputDirectory.isDirectory())
       {
         System.out.println("given path is not a directory");
         printUsage();
         return;
       }
+      if(!stopWordFile.exists()||stopWordFile.isDirectory()){
+    	  System.out.println("you have to provide a stopword file");
+    	  printUsage();
+    	  return;
+      }
       TreeMap<Date, List<Document>> files = new TreeMap<>();
       listFiles(inputDirectory, files, format, startDate, interval, sequence);
-      runMultipleNMF(files, interval, format, outputDirectory, topicCount);
+      runMultipleNMF(files, interval, format, outputDirectory, topicCount, args[7]);
     }
 
   }
@@ -83,7 +76,7 @@ public class NMFTopicExtractor
   private static void printUsage()
   {
     System.out.println("NMFTopicExtractor:");
-    System.out.println("java -jar NMFTopicExtractor <interval> <sequence> <dateformat> <startdate> <input-directory> <output-directory> <topics>");
+    System.out.println("java -jar NMFTopicExtractor <interval> <sequence> <dateformat> <startdate> <input-directory> <output-directory> <topics> <stopword-file>");
     System.out.println("interval (int) - defines the day range of each interval");
     System.out.println("sequence (int) - defines number of intervals which will be extracted");
     System.out.println("dateformat (String) - defines the date format for documents directories, e.g. yyyyMMdd");
@@ -91,9 +84,10 @@ public class NMFTopicExtractor
     System.out.println("input-directory (Path) - takes a directory containing directories with the text files as input; the inner directories define the time steps (for example, days) to which the contained text files should be assigned.");
     System.out.println("output-directory (Path) - directory to store extracted xml files");
     System.out.println("topics (int) - defines the number of topics to be generated in each time step");
+    System.out.println("stopword-file (Path) - provide your stopword list");
   }
 
-  public static void runMultipleNMF(TreeMap<Date, List<Document>> documents, int interval, DateFormat format, File outputDirectory, int topicCount)
+  public static void runMultipleNMF(TreeMap<Date, List<Document>> documents, int interval, DateFormat format, File outputDirectory, int topicCount, String stopwordPath)
   {
     System.out.println("Run NMF iterations:");
     long completeStartTime = System.currentTimeMillis();
@@ -104,7 +98,7 @@ public class NMFTopicExtractor
               + (interval) + " days)");
       long nmfStartTime = System.currentTimeMillis();
 
-      runNMF(entry.getKey(), entry.getValue(), outputDirectory, format, interval, topicCount);
+      runNMF(entry.getKey(), entry.getValue(), outputDirectory, format, interval, topicCount, stopwordPath);
 
       long nmfElapsedTime = System.currentTimeMillis() - nmfStartTime;
       //In minutes
@@ -144,7 +138,7 @@ public class NMFTopicExtractor
         }
         long timeDiff = date.getTime() - startDate.getTime();
         int dayDiff = (int) TimeUnit.DAYS.convert(timeDiff, TimeUnit.MILLISECONDS);
-        if (dayDiff < interval * intervalCount)
+        if (intervalCount == 0 || dayDiff < interval * intervalCount)
         {
           Calendar c = Calendar.getInstance();
           c.setTime(startDate);
@@ -183,11 +177,11 @@ public class NMFTopicExtractor
   }
 
   public static void runNMF(Date timestamp, List<Document> documents, 
-          File outputDirectory, DateFormat format, int interval, int topicCount)
+          File outputDirectory, DateFormat format, int interval, int topicCount, String stopwordPath)
   {
     // read stopwords for normalizer
     System.out.print("Read stopwords ");
-    HashSet<String> stopwords = Normalizer.readStopwords(STOPWORD_PATH);
+    HashSet<String> stopwords = Normalizer.readStopwords(stopwordPath);
     System.out.println("- done");
 
     // create vocabulary
@@ -204,9 +198,9 @@ public class NMFTopicExtractor
     System.out.println("- done, Vocabulary Size: " + vocabulary.size());
 
     // save vocabulary in xml
-    System.out.print("Save vocabulary ");
-    vocabulary.saveVocabulary(VOCABULARY_PATH);
-    System.out.println("- done");
+    //System.out.print("Save vocabulary ");
+    //vocabulary.saveVocabulary(VOCABULARY_PATH);
+    //System.out.println("- done");
 
     // count words (tfidf)
     WordCounter wordCounter = new WordCounter(vocabulary);

@@ -42,7 +42,7 @@ public class VisualizationDataConverter
 			
 			//write mapping file
 			DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-			File topicMapping = new File(outputFile+"-mapping.txt");
+			File topicMapping = new File(outputFile+"-mapping.dat");
 			PrintWriter mappingWriter = new PrintWriter(topicMapping);
 			Calendar cal = Calendar.getInstance();
 	        cal.setTime(topicRiver.getStartDate());
