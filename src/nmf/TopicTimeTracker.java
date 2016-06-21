@@ -10,13 +10,7 @@ public class TopicTimeTracker
     boolean writeCSV = false;
     boolean writeJSON = false;
 
-    if (args.length == 0)
-    {
-      xmlInputPath = "/home/carsten/workspace/dke-topictracking/days";
-      writeCSV = true;
-      writeJSON = true;
-    }
-    else if (args.length != 3)
+    if (args.length != 3)
     {
       printUsage();
       return;
