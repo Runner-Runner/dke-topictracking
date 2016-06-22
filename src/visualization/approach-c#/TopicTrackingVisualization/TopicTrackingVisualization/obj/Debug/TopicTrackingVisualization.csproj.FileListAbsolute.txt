@@ -19,3 +19,6 @@ C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrac
 C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.TopicsOverviewForm.resources
 C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.MainForm.resources
 C:\Users\Azubi\Desktop\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.HelpForm.resources
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\bin\Debug\TopicTrackingVisualization.exe.config
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.exe
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Debug\TopicTrackingVisualization.pdb

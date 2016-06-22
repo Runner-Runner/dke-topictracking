@@ -1,0 +1,12 @@
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\bin\Release\TopicTrackingVisualization.exe.config
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\bin\Release\TopicTrackingVisualization.exe
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\bin\Release\TopicTrackingVisualization.pdb
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Release\TopicTrackingVisualization.csprojResolveAssemblyReference.cache
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Release\TopicTrackingVisualization.BasefolderSelectionForm.resources
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Release\TopicTrackingVisualization.HelpForm.resources
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Release\TopicTrackingVisualization.MainForm.resources
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Release\TopicTrackingVisualization.Properties.Resources.resources
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Release\TopicTrackingVisualization.TopicsOverviewForm.resources
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Release\TopicTrackingVisualization.csproj.GenerateResource.Cache
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Release\TopicTrackingVisualization.exe
+C:\Users\SND\Documents\GitHub\dke-topictracking\src\visualization\approach-c#\TopicTrackingVisualization\TopicTrackingVisualization\obj\Release\TopicTrackingVisualization.pdb
