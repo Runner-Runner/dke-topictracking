@@ -122,7 +122,19 @@ public class TopicWave {
 		}
 		return null;
 	}
-
+	
+	public Map<String, Double> getBestTerms(int count){
+		int termCount = 0;
+		Map<String, Double> bestTerms = new HashMap<>();
+		for (Entry<Double, String> terms : getTermsAverageTFIDF().descendingMap().entrySet()) {
+			bestTerms.put(terms.getValue(), terms.getKey());
+			termCount++;
+			if (termCount == 5) {
+				break;
+			}
+		}
+		return bestTerms;
+	}
 
 
 }

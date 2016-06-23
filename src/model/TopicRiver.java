@@ -10,7 +10,6 @@ import java.util.List;
 public class TopicRiver
 {
   private List<TopicWave> waves;
-  private TopicMatcher topicMatcher;
 
   private HashMap<Date, Double> tfidfTotalMap;
   private Date startDate;
@@ -19,7 +18,6 @@ public class TopicRiver
   public TopicRiver()
   {
     waves = new ArrayList<>();
-    topicMatcher = new TopicMatcher();
     tfidfTotalMap = new HashMap<>();
     startDate = new Date(Long.MAX_VALUE);
     endDate = new Date(Long.MIN_VALUE);
@@ -74,8 +72,8 @@ public class TopicRiver
       double currentScore;
       if (existingTopic != null && secondLastTopic != null)
       {
-        currentScore = topicMatcher.compareTopics(secondLastTopic, topic);
-        double previousScore = topicMatcher.compareTopics(secondLastTopic, existingTopic);
+        currentScore = TopicMatcher.compareTopics(secondLastTopic, topic);
+        double previousScore = TopicMatcher.compareTopics(secondLastTopic, existingTopic);
 
         if (currentScore <= previousScore)
         {
@@ -84,7 +82,7 @@ public class TopicRiver
       }
       else
       {
-        currentScore = topicMatcher.compareTopics(topic, wave.getLastTopic());
+        currentScore = TopicMatcher.compareTopics(topic, wave.getLastTopic());
       }
 
       if (currentScore > bestValue)
@@ -150,4 +148,40 @@ public class TopicRiver
   {
     return waves;
   }
+  
+  public void sortList(){
+	  TopicWave currentWave = null;
+	  double bestValue = Double.MIN_VALUE;
+	  for(TopicWave wave: waves){
+		  if(wave.getRelativeRelevance()>bestValue){
+			  currentWave = wave;
+			  bestValue = wave.getRelativeRelevance();
+		  }
+	  }
+	  List<TopicWave> nearestList = new ArrayList<>();
+	  nearestList.add(currentWave);
+	  bestValue = Double.MIN_VALUE;
+	  TopicWave bestMatch=null;
+	  waves.remove(currentWave);
+	  while(waves.size()>0){
+		  for(TopicWave wave: waves){
+			  double similarity = TopicMatcher.compareTopicWaves(currentWave, wave);
+			  if(similarity>bestValue){
+				  bestMatch = wave;
+				  bestValue = similarity;
+			  }
+		  }
+		  waves.remove(bestMatch);
+		  nearestList.add(bestMatch);
+		  currentWave = bestMatch;
+		  bestValue = Double.MIN_VALUE;
+	  }
+  }
 }
+
+
+
+
+
+
+

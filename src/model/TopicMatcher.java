@@ -1,21 +1,10 @@
 package model;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import net.didion.jwnl.JWNL;
-import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.data.IndexWord;
-import net.didion.jwnl.data.POS;
-import net.didion.jwnl.data.PointerType;
-import net.didion.jwnl.data.relationship.Relationship;
-import net.didion.jwnl.data.relationship.RelationshipFinder;
-import net.didion.jwnl.data.relationship.RelationshipList;
-import net.didion.jwnl.dictionary.Dictionary;
 
 public class TopicMatcher
 {
@@ -63,7 +52,7 @@ public class TopicMatcher
     return cosineDiff;
   }
   
-  public double compareTopics(Topic topic1, Topic topic2)
+  public static double compareTopics(Topic topic1, Topic topic2)
   {
     int termAmount = 20;
     HashMap<String, Double> bestTerms1 = topic1.getBestTerms(termAmount);
@@ -84,6 +73,25 @@ public class TopicMatcher
     return score;
   }
 
+  	public static double compareTopicWaves(TopicWave wave1, TopicWave wave2){
+  		 int termAmount = 20;
+  	    Map<String, Double> bestTerms1 = wave1.getBestTerms(termAmount);
+  	    Map<String, Double> bestTerms2 = wave2.getBestTerms(termAmount);
+
+  	    int matches = 0;
+  	    double score = 0;
+  	    for (String term : bestTerms1.keySet())
+  	    {
+  	      if (bestTerms2.keySet().contains(term))
+  	      {
+  	        double combinedValue = bestTerms1.get(term) + bestTerms2.get(term);
+  	        score += combinedValue;
+  	        matches++;
+  	      }
+  	    }
+  	    score *= matches;
+  	    return score;
+  	}
  
 
 
